@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Bitişik Kök İşareti — Örnek Sayfa</title>
+<style>
+  body{
+    font-family:"Comic Sans MS","FantasqueSansM Nerd Font","DejaVu Sans",sans-serif;
+    font-size:13.5pt; line-height:1.55; color:#111;
+    max-width:19cm; margin:0 auto; padding:10mm 8mm;
+  }
+  h1{font-size:15pt; margin:0 0 2mm;}
+  h2{font-size:12.5pt; background:#eaf3fb; border-left:4px solid #4a90c4;
+     padding:1.5mm 3mm; margin:6mm 0 3mm;}
+  .note{font-size:9.5pt; color:#555; margin:0 0 4mm;}
+  .row{margin:2.5mm 0;}
+  .lbl{display:inline-block; min-width:7mm; font-weight:bold;}
+
+  /* ============================================================
+     YENİ KÖK: .rt  — tek parça (çengel SVG + üst çizgi border değil,
+     gradient şerit). İçerik ne kadar yükselirse çengel de o kadar uzar.
+     Kullanım:  <span class="rt">radikand</span>
+                <span class="rt" data-n="3">radikand</span>  (küpkök vb.)
+     ============================================================ */
+  .rt{
+    display:inline-block;
+    position:relative;
+    white-space:nowrap;
+    padding:.30em .25em .05em .72em;
+    background:
+      /* üst çizgi: çengel kutusunun bittiği yerden sona kadar */
+      linear-gradient(currentColor,currentColor) no-repeat .60em 0 / calc(100% - .60em) .09em,
+      /* çengel: yüksekliğe göre esneyen SVG */
+      url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 62 L22 54 L46 96 L98 2" fill="none" stroke="%23111111" stroke-width="2.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>') no-repeat 0 0 / .66em 100%;
+  }
+  /* kök derecesi (2 dışındaki n) */
+  .rt[data-n]{ margin-left:.55em; }
+  .rt[data-n]::before{
+    content:attr(data-n);
+    position:absolute;
+    left:-.42em; top:-.10em;
+    font-size:.62em; line-height:1;
+  }
+
+  /* üs — satır kutusunu yükseltir, kök çizgisi de birlikte yükselir */
+  .sup{font-size:.62em; vertical-align:.62em; line-height:0; letter-spacing:0;}
+  .sub{font-size:.62em; vertical-align:-.25em; line-height:0;}
+
+  /* kesir */
+  .frac{display:inline-block; vertical-align:-.45em; text-align:center; line-height:1.1; padding:0 .15em;}
+  .frac .num{display:block; border-bottom:.09em solid currentColor; padding:0 .2em .02em;}
+  .frac .den{display:block; padding:.02em .2em 0;}
+
+  /* ------- ESKİ yöntemin taklidi (karşılaştırma için) ------- */
+  .old-rad{font-family:"DejaVu Sans";}
+  .ol{text-decoration:overline;}
+
+  /* font karşılaştırma şeridi */
+  .fontbox{display:inline-block; border:1px solid #ccc; border-radius:2mm;
+           padding:2mm 4mm; margin:1mm 2mm 1mm 0; vertical-align:top;}
+  .fontbox .fname{display:block; font-family:"DejaVu Sans"; font-size:8pt; color:#777; margin-bottom:1mm;}
+  .f1{font-family:"FantasqueSansM Nerd Font";}
+  .f2{font-family:"DejaVu Sans";}
+  .f3{font-family:"Fira Sans";}
+
+  .solve-space{height:14mm;}
+</style>
+</head>
+<body>
+
+<h1>Bitişik Kök İşareti — Deneme Sayfası</h1>
+<p class="note">Kök işareti artık font karakteri (√) değil: çengel, içeriğin yüksekliğine göre
+esneyen tek parça çizimdir ve üst çizgiyle bitişiktir. İçeride üs, kesir veya iç içe kök olsa
+bile çizgi kopmaz. Aşağıda belgedeki en zor ifadelerle test edilmiştir.</p>
+
+<h2>0. Eski / Yeni karşılaştırma</h2>
+<div class="row"><span class="lbl">Eski:</span>
+  <span class="old-rad">√</span><span class="ol">(−3)<span class="sup"><span class="ol">3</span></span></span> +
+  <span class="old-rad"><span class="sup">30</span>√</span><span class="ol">2<span class="sup"><span class="ol">17</span></span></span>
+  &nbsp;&nbsp;← çengel ayrı; çizgi, üs olunca bir daha kırılıyor
+</div>
+<div class="row"><span class="lbl">Yeni:</span>
+  <span class="rt" data-n="3">(−3)<span class="sup">3</span></span> +
+  <span class="rt" data-n="30">2<span class="sup">17</span></span>
+  &nbsp;&nbsp;← tek parça
+</div>
+
+<h2>1. Kök içinde üslü ifadeler</h2>
+<div class="row"><span class="lbl">a)</span>
+  <span class="rt">(−6)<span class="sup">2</span></span> +
+  <span class="rt" data-n="3">−27</span> +
+  <span class="rt" data-n="3">2<span class="sup">−3</span></span> = …
+</div>
+<div class="row"><span class="lbl">b)</span>
+  <span class="rt">121</span> +
+  <span class="rt" data-n="3">(−4)<span class="sup">3</span></span> = …
+</div>
+<div class="row"><span class="lbl">c)</span>
+  <span class="rt" data-n="4">x<span class="sup">8</span> · y<span class="sup">12</span></span> = …
+</div>
+
+<h2>2. Büyük dereceli kökler (Soru 16 tipi)</h2>
+<div class="row">
+  <span class="frac">
+    <span class="num"><span class="rt" data-n="3">2</span> · <span class="rt">2</span></span>
+    <span class="den"><span class="rt" data-n="5">4</span></span>
+  </span>
+  işleminin sonucu kaçtır?
+</div>
+<div class="row">
+  A) <span class="rt" data-n="30">2<span class="sup">17</span></span>&nbsp;&nbsp;
+  B) <span class="rt" data-n="11">2<span class="sup">13</span></span>&nbsp;&nbsp;
+  C) <span class="rt" data-n="15">2<span class="sup">7</span></span>&nbsp;&nbsp;
+  D) <span class="rt" data-n="30">2<span class="sup">11</span></span>&nbsp;&nbsp;
+  E) <span class="rt" data-n="30">2<span class="sup">13</span></span>
+</div>
+
+<h2>3. Kök içinde değişkenli ifade + tanım aralığı</h2>
+<div class="row">
+  A = <span class="rt">5−x</span> + <span class="rt">x−3</span> + 2x
+  &nbsp; olduğuna göre A kaçtır?
+</div>
+<div class="row">
+  <span class="rt">x<span class="sup">2</span> − 6x + 9</span> +
+  <span class="rt">x<span class="sup">2</span> + 10x + 25</span> = …
+</div>
+
+<h2>4. İç içe kökler</h2>
+<div class="row"><span class="lbl">a)</span>
+  <span class="rt">20 + <span class="rt">16 + <span class="rt">25</span></span></span> = …
+</div>
+<div class="row"><span class="lbl">b)</span>
+  <span class="rt" data-n="3"><span class="rt">64</span> · <span class="rt" data-n="4">16</span></span> = …
+</div>
+
+<h2>5. Kesirle birlikte</h2>
+<div class="row"><span class="lbl">a)</span>
+  <span class="rt"><span class="frac"><span class="num">49</span><span class="den">25</span></span></span> = …
+  &nbsp;&nbsp;&nbsp;
+  <span class="lbl">b)</span>
+  <span class="frac"><span class="num"><span class="rt">2</span></span><span class="den">2 − <span class="rt">3</span></span></span> = …
+  &nbsp;&nbsp;&nbsp;
+  <span class="lbl">c)</span>
+  <span class="frac"><span class="num">1</span><span class="den">3<span class="rt">2</span> − 4</span></span> = …
+</div>
+<div class="row"><span class="lbl">d)</span>
+  <span class="frac"><span class="num"><span class="rt">150</span></span><span class="den"><span class="rt">30</span> · <span class="rt">125</span></span></span>
+  işleminin sonucu kaçtır?
+</div>
+
+<h2>6. Ondalıklı ve düz metin içinde</h2>
+<div class="row">
+  <span class="rt">0,25</span> · <span class="rt">1,21</span> · <span class="rt">5</span> · <span class="rt">0,20</span> = …
+  &nbsp; — düz metnin arasında <span class="rt">320</span> + <span class="rt">45</span> − <span class="rt">605</span> gibi satır hizası bozulmadan akar.
+</div>
+
+<h2>7. Aynı ifade 3 farklı fontta — kök hep aynı</h2>
+<div class="row">
+  <span class="fontbox f1"><span class="fname">FantasqueSans (el yazısı benzeri)</span>
+    <span class="rt" data-n="3">(−3)<span class="sup">3</span></span> + <span class="rt">x−3</span> + <span class="rt" data-n="30">2<span class="sup">17</span></span></span>
+  <span class="fontbox f2"><span class="fname">DejaVu Sans</span>
+    <span class="rt" data-n="3">(−3)<span class="sup">3</span></span> + <span class="rt">x−3</span> + <span class="rt" data-n="30">2<span class="sup">17</span></span></span>
+  <span class="fontbox f3"><span class="fname">Fira Sans</span>
+    <span class="rt" data-n="3">(−3)<span class="sup">3</span></span> + <span class="rt">x−3</span> + <span class="rt" data-n="30">2<span class="sup">17</span></span></span>
+</div>
+<p class="note">Not: Bu makinede Comic Sans / Kristen ITC yüklü olmadığı için üç yaygın fontla
+gösterildi. Çengel ve çizgi fonttan gelmediği için Windows'ta Comic Sans MS veya adaylardan
+hangisi seçilirse seçilsin kök görünümü değişmeyecek — font kararından bağımsız.</p>
+
+<h2>8. Karşılaştırma: standart yöntem (MathML) aynı ifadeyle</h2>
+<div class="row">
+  <math><mroot><msup><mrow><mo>(</mo><mrow><mo>−</mo><mn>3</mn></mrow><mo>)</mo></mrow><mn>3</mn></msup><mn>3</mn></mroot></math>
+  &nbsp;+&nbsp;
+  <math><mroot><msup><mn>2</mn><mn>17</mn></msup><mn>30</mn></mroot></math>
+  &nbsp;+&nbsp;
+  <math><msqrt><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>6</mn><mi>x</mi><mo>+</mo><mn>9</mn></mrow></msqrt></math>
+</div>
+<p class="note">Bu satır tarayıcının yerleşik MathML desteğiyle basıldı: kök tek parça çıkar ama
+glifler matematik fontundan gelir — Comic Sans görünümüyle uyuşmaz. 7. bölümdeki CSS çözümü,
+MathML'in "esneyen tek parça kök" davranışını seçtiğimiz el yazısı fontuyla birleştirir.</p>
+
+</body>
+</html>

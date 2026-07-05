@@ -1,15 +1,20 @@
 # Proje: 9. Sınıf Matematik PDF Yeniden Düzenleme (1.tema.pdf)
 
-> **GÜNCEL DURUM (2026-07-04 akşam):** Proje tamamlandı + revizyonlar yapıldı. Bu dosya
-> ilk planlama dokümanı olarak korunuyor; güncel durum ve değişiklik günlüğü için
-> `COORDINATION.md`'ye bak. Kısa özet:
-> - Proje klasörü: `C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\`
-> - Güncel çıktı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; karekökler `.rad` sınıfı
->   ile Cambria Math'a sabitlendi; header'da yazı yok, ES logosu sol üst köşede)
-> - Header artık "EGEMEN SARIKCI" YAZISI İÇERMİYOR — sadece logo (`build\logo.jpg`,
->   print.mjs'e base64 gömülü). Aşağıdaki 2. maddedeki "logo/başlık" isteği bu şekilde revize edildi.
-> - Font değişikliği kararı bekleniyor: `font_ornekleri.pdf`'teki 5 aday (Kristen ITC,
->   Segoe Print, Tempus Sans ITC, Maiandra GD, Bradley Hand ITC — hepsi √'ü yerleşik destekler).
+> **GÜNCEL DURUM (2026-07-05, FAZ 3 — Linux):** Proje kullanıcının Linux (CachyOS)
+> makinesine taşındı; depo `/home/mesuto/Documents/PROJELER/test_hazirlik/` (GitHub:
+> Mesut-Outlook/test_hazirlik). Bu dosyanın aşağısı FAZ 1-2'nin (Windows) tarihi
+> planlama dokümanıdır — Windows yolları artık GEÇERSİZ. Güncel kural kitabı:
+> **`SISTEM.md`**, canlı görev panosu ve değişiklik günlüğü: **`COORDINATION.md`**
+> (önce bu ikisini oku). Kısa özet:
+> - FAZ 1-2 çıktısı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; logo sol üstte, header
+>   yazısız, karekökler `.rad` yamalı) — bu dosya ve `1.tema_orijinal.pdf` SALT OKUNUR.
+> - FAZ 3 (sürüyor): v2'den düzenlenebilir HTML yeniden kuruluyor (`build_linux/`),
+>   kökler bitişik kök tekniği `.rt` ile (referans: `kok_bitisik_ornek.html`). Hedef:
+>   `1.tema_egemen_sarikci_v3.pdf`. İlk taslakta extract.py kaynaklı yapısal QA
+>   bulguları çıktı; düzeltme (A4a) ve 2. tur QA süreci COORDINATION.md panosunda.
+> - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA'nın
+>   bir kısmı AGY (Antigravity, COORDINATION.md üzerinden koordine).
+> - Font değişikliği kararı hâlâ açık: `font_ornekleri.pdf`'teki 5 aday bekliyor.
 
 ## Amaç
 
