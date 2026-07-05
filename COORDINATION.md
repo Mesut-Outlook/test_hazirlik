@@ -105,6 +105,8 @@ YOK** ve kullanıcı beklemek istemedi. Eldeki tek kaynak, git deposundaki çık
 | Q4 | Nihai örneklem QA (Fable): v3'te anahtar ifade sayımı + çift-basım sayfalarının göz kontrolü | Fable (ana oturum) | ✅ tamam (kim: Fable, 2026-07-05) — SONUÇ: KABUL EDİLMEDİ. İyi: soru metni tam (120=120), "Kurgusu" 20=20, kur-tag azalması KURALA UYGUN dedup (başlık yalnız bölüm değişiminde, CLAUDE.md kuralı — v2'deki tekrarlar kaynak sayfa düzenindendi); tablolar görsele çevrilmiş (metin katmanından çıkmaları İÇERİK KAYBI DEĞİL, gözle doğrulandı). KÖTÜ: **çift basım sürüyor** — v3 sf.137'de "Ses Seviyesi" tablosu ÜST ÜSTE İKİ KEZ, sf.142'de "İdeal doğum kütlesi" VE "Fidan" tabloları İKİŞER KEZ; sf.137 sağ üstte öksüz "1.B 2.B" + boşta "4." kalıntısı. Düzeltme A4c'de |
 | A4c | Q4 bulgularının düzeltilmesi: (1) tablo-görsellerinin ÇİFT eklenmesi (aynı figür bölgesi iki kez mi tespit ediliyor, yoksa eski mükerrer metin bloğunun İKİ kopyası da mı görsele çevrildi? — extract.py'de kök neden bul, tek kopya kalsın), (2) öksüz cevap-anahtarı kalıntıları ("1.B 2.B" + boşta soru numarası), (3) dogrula.py'ye görsel-tekrar kontrolü (aynı asset dosyasının art arda iki <img> olarak eklenmesini yakala) + yeniden üretim + Q4 tekrarı | AGY (Antigravity) — kullanıcı kararıyla kalan işler AGY'de | ✅ tamam (kim: AGY, 2026-07-05) — (1) çakışan raster görüntüler ve vektör figür kırpmaları de-duplicate edilerek mükerrer tablo baskıları elendi, (2) split_mixed_blocks eklenerek cevap anahtarı kalıntıları ve soru numaraları ayrıştırıldı, (3) qa/dogrula.py'ye görsel-tekrar kontrolü eklendi. PDF başarıyla 177 sayfa olarak derlendi ve doğrulandı. |
 | A6 | SAYFA TASARIMI (kullanıcı isteği, 2026-07-05 — örnek: `~/Downloads/11.Köklü Sayılar.pdf`): sorular arasında düzenli ayraç çizgileri + sütunlar arası dikey çizgi + tutarlı çözüm alanı. ŞARTNAME (Fable): (1) `.page-flow`'a `column-rule: 0.6pt solid #999`; (2) her `.question`'ın altına (çözüm boşluğu DAHİL, çizgi boşluğun ALTINDA) tam sütun genişliğinde ince ayraç `border-bottom: 0.6pt solid #bbb` + dengeli dikey padding; (3) `.solve-space` min 26mm→30mm (örnekteki dev boşluklar 550 soruda sayfayı patlatır; kullanıcı önizlemede isterse artırılır); (4) teori kutusu/cevap anahtarı ayraçsız, kur-tag öncesi ekstra üst boşluk; (5) örnekteki ağır dış çerçeve YOK — sade modern grid. Çıktı: flow_linux.css + 3-4 sayfalık önizleme `build_linux/test/tasarim_onizleme.pdf` — NİHAİ PDF yeniden üretilMEZ (regen A4c'de/sonrasında tek sefer) | Claude-Sonnet #8 | ✅ tamam (kim: Claude-Sonnet #8, 2026-07-05) — `flow_linux.css`'e 5 değişiklik: (1) `.page-flow{column-rule:0.6pt solid #999}`; (2) `.question` artık `border-bottom:0.6pt solid #bbb`+`padding-bottom:3mm`+`margin:0 0 5mm` alıyor — `.solve-space` extract.py'de zaten `.question`'ın SON çocuğu olarak üretiliyor (satır ~1289-1294), bu yüzden extract.py'ye DOKUNMADAN çizgi otomatik olarak çözüm boşluğunun altında kalıyor; (3) `.solve-space` 26mm→30mm, `.solve-space-lg` 40mm→44mm (aynı +4mm farkla); (4) `.kur-tag` üst boşluğu 4mm→8mm (bölüm başlangıcı nefesleniyor), `.theory-box`/`.answer-key`/`.img-block` bilerek ayraçsız bırakıldı (kendi kenarlıkları var, `.question` çizgisiyle çakışma riski yok); (5) ağır dış çerçeve eklenmedi. Önizleme: `build_linux/test/tasarim_onizleme.html` (1tema.html satır 359-556 kesiti: kur-tag×2, section-sub, theory-box×3, 15 soru [biri solve-space-lg], answer-key×5) → `print_linux.mjs` ile `build_linux/test/tasarim_onizleme.pdf` (5 sayfa) basıldı, pdftoppm 130-250dpi PNG'ye çevrilip Read ile göz kontrolü yapıldı: sütun çizgisi tam boy düzgün, her sorunun altında TEK düz gri çizgi (çift çizgi/üst üste binme YOK — 250dpi crop'ta doğrulandı), cevap anahtarının kendi noktalı çizgisiyle karışmıyor, ikinci kur-tag'in önündeki boşluk belirgin şekilde ferah, solve-space görsel olarak öncekinden belirgin daha geniş. 1 iterasyonda kabul edildi (ek düzeltme gerekmedi). Örnek PDF (`~/Downloads/11.Köklü Sayılar.pdf`) referans alındı ama ağır dış çerçevesi taklit edilmedi — kullanıcının "daha iyisini yapabileceğine inanıyorum" beklentisine uygun sade/modern grid tercih edildi. |
+| Q4-tekrar | A4c+A6 sonrası örneklem QA (v3 177 sf) | Fable | ✅ tamam (kim: Fable, 2026-07-05 akşam) — ÇİFT BASIM ÇÖZÜLDÜ (sf.152 "Ses Seviyesi", sf.158 "İdeal doğum", sf.159 "Fidan" hepsi TEK; öksüz cevap-anahtarı kalıntısı yok), TASARIM tam belgede uygulanmış (sütun çizgisi + soru ayraçları + çözüm alanı, temiz), sayımlar 120=120 ve Kurgusu 20=20 ✓. AMA 2 yeni SADAKAT bulgusu (v2 sf.12 ↔ v3 sf.15 karşılaştırmasıyla gözle teyitli) → A4d şartıyla kabul |
+| A4d | SON sadakat düzeltmeleri: (1) **CEVAP ANAHTARI ÜSLERİ DÜZLEŞMİŞ** — v2 sf.12 anahtarında "2⁸, 10¹², 3⁴, 5⁻⁵, 2¹⁰, (−3)¹¹" üstsimge iken v3 sf.15'te "28, 1012, 34, 5-5, 210, (-3)11" düz basılıyor (sayı YANLIŞ okunur!); answer-key satırlarında üs tespiti + `.sup` dönüşümü uygula, üslü bölümün TÜM anahtarlarını tara; (2) **UYARI teori kutusu düz metne dönüşmüş** — v2 sf.12'deki kırmızı rozetli mavi "UYARI" kutusu (ve içindeki Örneğin akışı) v3 sf.15'te soru 3'ün gövdesine karışmış; UYARI/Örneğin bloklarını `.theory-box` olarak sınıflandır, diğer UYARI kutularını da kontrol et; (3) minör: bir adet "2 3 · 2 3" düz kalmış gövde örneği (pdftotext'te tek eşleşme) + v3 sf.159 ayna görselinin alt kenarında soluk altyazı kalıntısı. Sonra regen + dogrula.py + pano/changelog/log güncelle | AGY (Antigravity) — kalan işler AGY'de | ⬜ AGY'yi bekliyor (AGY talimatları 8. madde) |
 | A5 | Kullanıcı onayından SONRA: SISTEM.md §1 yerleşimine taşıma (yukarıdaki KARAR maddesi) + ID DONDURMA: taşımayla birlikte 01-tema için extract.py yeniden ÇALIŞTIRILMAZ (id'leri yeniden üretir, §2 kalıcı-id kuralını bozar); sonraki düzeltmeler sorular.html/manifest.json üzerinde | Fable planlar, Sonnet uygular | ⬜ kullanıcı onayını bekliyor |
 
 Görev alan ajan bu tabloyu güncellesin (🔄 devam ediyor / ✅ tamam + kısa not: kaç sayfa,
@@ -218,6 +220,22 @@ serbest ve teşvik edilir — sayfa aralıklarına göre paralel dağıt):
    30mm) bir Sonnet ajanında flow_linux.css'i güncelliyor. Regen'i GÜNCEL flow_linux.css
    ile yap; CSS'teki `.question` ayraç/column-rule kurallarına dokunma. A6 senin
    regen'inden sonra biterse son bir regen'i Fable yaptırır — dert değil.
+8. **A4d — Q4-tekrar bulguları (Fable, 2026-07-05 akşam): A4c'n BÜYÜK ölçüde başarılı**
+   (çift basım çözüldü, tasarım güzel uygulanmış — teşekkürler), kalan 2+2 sadakat işi:
+   - **Cevap anahtarı üsleri**: v2 sf.12 anahtarı "1. a) 2⁸ b) 10¹² c) 3⁴ d) 5⁻⁵ e) 2¹⁰
+     f) (−3)¹¹" gibi üstsimgeli; v3 sf.15'te bunlar "28, 1012, 34, 5-5, 210, (-3)11"
+     DÜZ basılıyor — bir öğretmen/öğrenci için 2⁸ ile 28 farkı kritiktir. answer-key
+     satırlarının span'larında üs (küçük punto + yükseltilmiş y) tespiti soru
+     gövdesindekiyle aynı mantıkla çalışmalı; üslü bölümün (v2 sf.1-29) tüm
+     anahtarlarını, köklü bölümde de birkaçını örneklem kontrol et.
+   - **UYARI kutuları**: v2 sf.12'deki kırmızı "UYARI" rozetli mavi kutu v3'te düz metin
+     olarak soru gövdesine karışmış (v3 sf.15 sağ sütun). "UYARI" başlıklı blokları
+     `.theory-box` (+ rozet) olarak sınıflandır; belgedeki TÜM "UYARI" geçişlerini tara.
+   - Minör: (a) pdftotext'te tek geçen "2 3 · 2 3" düz gövde örneği (muhtemelen 2³·2³·2³,
+     "üslü ifade biçiminde yazınız" alt maddesi); (b) v3 sf.159 ayna görselinin alt
+     kenarındaki soluk altyazı şeridi (figür bbox'ı altyazının bir kısmını içeriyor).
+   - Bitince: regen (`1.tema_egemen_sarikci_v3.pdf` üzerine), dogrula.py, pano ✅ +
+     changelog + log, commit(+push yapabiliyorsan). Fable sonra son Q4'ü koşacak.
 
 ## AGY için Görev Ataması (dış ajan — bu dosya üzerinden koordine ediliyor)
 
@@ -1073,3 +1091,13 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     dedup olarak KABUL edildi; tabloların metin katmanından çıkması görselleştirme
     nedeniyle — gözle doğrulandı, içerik kaybı yok.
   - Karar: A4c açıldı (AGY talimatları 7. madde), v3 henüz kullanıcı onayına SUNULMADI.
+- **Q4-tekrar (Fable, 2026-07-05 akşam): A4c+A6 sonrası v3 (177 sf) örneklem kontrolü — A4d ŞARTIYLA KABUL.**
+  - ÇÖZÜLDÜ: çift tablo basımı (sf.152/158/159 gözle teyit — hepsi tek), öksüz cevap
+    anahtarı kalıntıları, tasarım (sütun çizgisi + soru ayraçları + çözüm alanı) tam
+    belgede temiz uygulanmış. Sayımlar: "işleminin sonucu kaçtır" 120=120, "Kurgusu" 20=20.
+  - [v3 sf.15 ↔ v2 sf.12] CEVAP ANAHTARI ÜSLERİ DÜZ: "2⁸→28, 10¹²→1012, 3⁴→34, 5⁻⁵→5-5,
+    2¹⁰→210, (−3)¹¹→(-3)11" — matematik sadakati ihlali, üslü bölümün tüm anahtarları riskli.
+  - [v3 sf.15 ↔ v2 sf.12] "UYARI" teori kutusu (kırmızı rozet + mavi kutu) v3'te düz metin
+    olarak soru 3 gövdesine karışmış.
+  - [minör] tek "2 3 · 2 3" düz gövde örneği; sf.159 ayna görseli altında soluk altyazı şeridi.
+  - Karar: A4d açıldı (AGY talimatları 8. madde). v3 kullanıcı onayına A4d SONRASI sunulacak.
