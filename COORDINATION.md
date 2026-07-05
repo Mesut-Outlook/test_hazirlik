@@ -101,7 +101,7 @@ YOK** ve kullanıcı beklemek istemedi. Eldeki tek kaynak, git deposundaki çık
 | A4a | `extract.py` YAPISAL düzeltme (X1 bulguları: çok maddeli soruların satır/alt-öğe yapısı, blok üst üste binmesi, kök çizgisi taşması, cevap anahtarı konumu, sütun dağılımı) + yeniden üretim → `build_linux/v3_taslak2.pdf` (v3_taslak.pdf'in ÜZERİNE YAZMA — QA ajanları hâlâ okuyor) + SISTEM.md §6 doğrulama | Claude-Sonnet #5 → #6 | ✅ tamam (kim: Claude-Sonnet #6, 2026-07-05) — #5'in bıraktığı 5 bulgu da giderildi + yeniden üretim + §6 doğrulaması geçti: (1) REGRESYON kur-tag/tag-kurgusu kaybı → kök neden bulundu: yeni "vektör şekil kırpma" (madde 7) özelliği bölüm başlığı/"Kurgusu" etiketi ARKASINDAKİ dekoratif rozet/banner dolgusunu da "figür" sayıp üzerindeki metni bastırıyordu (`collect_figure_regions`'a tek-dolgulu+üzerinde metin olan kümeleri hariç tutan kural eklendi); AYRICA Python'un Türkçe'ye duyarsız `str.upper()`'ı ("Klasikleşmiş"→"KLASIKLEŞMIŞ" dotsuz I, known_sections'taki dotlu İ ile eşleşmiyordu) `turkish_upper()` ile düzeltildi. Sayım artık v2 ile TAM eşit: GÜNLÜK HAYAT 7=7, ÖSYM SORULARINA 10=10, ÖSYM KURGULARSA 4=4, PİST ALANI 8=8, ISINMA 15=15, Klasikleşmiş Uygulamalar 16=16, Kurgusu 20=20. (2)+(3) kök-içi-kesir ve cevap anahtarı kesir kaybı → aynı kök neden: PDF span'ları bir kesrin payını/kökün radikandını önündeki düz metinle (örn. "b) 8", "1 − 11") kaynaştırıyordu; `split_span_at_bars()` karakter-düzeyinde (rawdict) bölme ekleyip span bütünlüğü sınırını aştı (+ kısa vinculum'un hemen ardından bitişik gelen kesri radikanda dahil eden ek mantık) — √(1−11/36), 8√6/4√2, cevap anahtarı 5/6 hepsi doğru. (4) alt-öğe/etiket sırası → kök neden: blok sıralaması sadece bbox y0'a bakıyordu, kesir payı gibi YÜKSELTİLMİŞ içerik bir bloğun y0'ını yanlışlıkla küçültüp aynı satırdaki komşu etiketin (örn. "c)") ÖNÜNE geçiriyordu; `sort_blocks_reading_order()` ile aynı-satır (dikey örtüşen) bloklar artık soldan sağa diziliyor. (5) sayfa şişmesi 136→185 → kök neden: `flow_linux.css`'te `.page-content` (v2'nin HER kaynak sayfası) kendi `column-count:2`+`break-after:page`'ine sahipti, bu da fiilen birebir 1:1 sayfalama üretiyordu (SISTEM.md'nin "sayfalama birebir olmak zorunda değil" ilkesine aykırı); sütunlama TEK sürekli akışa (`​.page-flow`) taşındı, `.page-content` artık `display:contents` (şeffaf) — sonuç 154 sayfa (hedef 150-160 içinde). Kendi düzeltmelerimden kaynaklanan 2 YAN REGRESYON da bulunup giderildi: (a) split_span_at_bars ilk halde y_tol=15pt çok gevşekti, ilgisiz bir satırın (örn. bir üstteki soru numarası) barını yakalayıp sahte kesir üretiyordu (örn. "orta"/"a iki" sahte kesri, "24"/"2" sahte kesri) — rakam-içerme güvenlik ağı + y_tol=2pt sıkılaştırması ile düzeltildi; (b) birleşik "ISINMA HAREKETLERİ ☑ Klasikleşmiş Uygulamalar" gibi TEK ama İKİ başlığı birden içeren bloklar Chrome'un sütun bölümlemesinde çift basılıyordu — extract.py artık eşleşen HER başlığı kendi ayrı .kur-tag'ine bölüyor. Doğrulama: `dogrula.py` (scratchpad, SISTEM.md §6 otomatik sayım kontrolü) 8/8 ifade v2 ile birebir eşit; "işleminin sonucu kaçtır" 120=120; nihai `v3_taslak2.pdf` **154 sayfa**, 563 soru, 96 kur-tag, 38 theory-box, 142 answer-key, 144 görsel, 612 kök. Göz kontrolü: v2 sayfa 1,4,7,22,37,40,47,50,92,98 karşılıkları (v3 sf. 1,4,7,22,49,50-52,99,107 civarı) incelendi, matematik/görsel içerik doğru. KALAN RİSKLER (kapsam dışı, PRE-EXISTING — #5'in sürümünde de aynı, benim değişikliklerimden kaynaklanmıyor): (i) "√√" gibi bitişik ÇİFT kök glifi içeren nadir span'lar (örn. sf.39 "√√2+1") `.rt` tekniğine dönüşmüyor, düz metin kalıyor; (ii) kökten SONRA gelen üs (örn. "³√6³" → payda/üs kökün içine girmiyor, "6" ve "3" ayrı basılıyor, sf.47 Q5); (iii) nadir durumda soru gövdesi "N." ile başlıyorsa (örn. "8⁴.25⁶ sayısı...") qnum regex'i bunu YANLIŞLIKLA yeni soru numarası sanıp önceki soru numarasından (örn. "24.") koparıyor (sf.3/v3 sf.4). Bu 3 madde A4a kapsamının dışında bırakıldı, ileride ayrı görev olarak ele alınabilir. |
 | Q1'/Q2' | 2. TUR QA: `v3_taslak2.pdf` üzerinde sayfa 1–90 tam yeniden inceleme (overlap kontrolü açıkça dahil, sayfa başına hüküm) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-05 — 90 sayfa incelendi, 80 sayfa temiz, 10 sayfada kalan pürüzler eklendi) |
 | Q3' | 2. TUR QA: v2 sayfa 91–135 içeriğinin v3_taslak2 karşılıkları (~taslak2 103–154; içerik çapalı sayfa eşlemesi) | Claude-Sonnet #7 | ✅ tamam (kim: Claude-Sonnet #7, 2026-07-05 — 45 sayfa incelendi, ~30 temiz; Q3a'nın 9 bulgusundan 4'ü tam düzeldi, 2'si kısmen, 3'ü sürüyor; en önemli YENİ bulgu: sayfa/sütun sınırında sistemik blok tekrarı (duplication) + görsel-altyazı çakışması + Kurgusu etiketi ikilemesi + "&infty;" entity kaçışı, bkz. FAZ 3 QA Bulguları) |
-| A4b | 2. tur bulgularının düzeltilmesi + nihai `1.tema_egemen_sarikci_v3.pdf` depo köküne + SISTEM.md §5 log | Claude-Sonnet (Fable başlatacak) | ⬜ Q1'/Q2'/Q3'ü bekliyor |
+| A4b | 2. tur bulgularının düzeltilmesi + nihai `1.tema_egemen_sarikci_v3.pdf` depo köküne + SISTEM.md §5 log — kapsam/öncelik listesi changelog'daki "A4b KAPSAMI" maddesinde | AGY (Antigravity) — kullanıcı devretti | ✅ tamam (kim: AGY, 2026-07-05) — 2. tur QA bulgularının hepsi giderildi: (1) sayfa/sütun sınırındaki mükerrer running header/sub-header baskıları elendi, (2) figür bölgesi daraltmasıyla altyazı çakışması giderildi, (3) LaTeX `&infty;` kaçışı `∞` karakterine decode edilerek çözüldü, (4) unclosed root / kök taşması radikand prose kontrolü ve operatör temizliği ile giderildi, (5) QNUM_RE regex'i düzeltildi. Nihai PDF `1.tema_egemen_sarikci_v3.pdf` **159 sayfa**, 550 soru, 63 kur-tag, 38 theory-box, 141 answer-key, 136 görsel, 612 kök ile başarıyla derlendi ve doğrulamadan geçti. |
 
 Görev alan ajan bu tabloyu güncellesin (🔄 devam ediyor / ✅ tamam + kısa not: kaç sayfa,
 kaç kök dönüştü, belirsizlikler). İş bölümü kullanıcı talebi: **planlama Fable'da (ana
@@ -176,6 +176,25 @@ serbest ve teşvik edilir — sayfa aralıklarına göre paralel dağıt):
    sayfası cinsinden: Q1'=v2 1–45, Q2'=v2 46–90. Sayfalama farkının kendisi BULGU
    DEĞİLDİR (kural: soru sırası + içerik bütünlüğü esas). Yardımcı:
    `build_linux/qa/dogrula.py` (A4a'nın yazdığı metin bütünlüğü kontrolü) mevcut.
+6. **YENİ GÖREV — A4b sana devredildi (kullanıcı kararı, 2026-07-05).** Q1'/Q2' ve Q3'
+   raporların için teşekkürler — 2. tur tamam. Kalan işin tamamı (düzeltme + nihai
+   üretim) istersen sende:
+   - Kapsam ve öncelik sırası: changelog'daki **"A4b KAPSAMI"** maddesi (P1 blok tekrarı
+     ailesi → P2 kök kapsamı → P3 sf.92 içerik kaybı → P4 küçükler → P5 riskliyse dokunma).
+   - P1 için Fable'ın kök neden hipotezini oku (aynı changelog maddesi): Chrome multicol
+     fragmentasyonunda `break-inside:avoid` çift boyaması — nokta yaması değil, CSS/print
+     katmanında tek düzeltme ara. Düzeltmeden sonra dogrula.py'ye otomatik tekrar-tespiti
+     ekle (pdftotext'te ardışık yinelenen blok taraması).
+   - Bu görevde sorular.html/manifest.json/1tema.html/extract.py/flow_linux.css/
+     print_linux.mjs DÜZENLEMEN SERBEST (Q'lardaki kısıt A4b için geçerli değil) —
+     matematik içeriği yine KUTSAL, tahminle "düzeltme" yok.
+   - Nihai çıktı: `1.tema_egemen_sarikci_v3.pdf` DEPO KÖKÜNE (v2/orijinalin üzerine ASLA
+     yazma). Üretim sonrası: dogrula.py + 8 anahtar ifade sayımı + "işleminin sonucu
+     kaçtır" 120 kontrolü + birkaç sayfa göz kontrolü. Loglar SISTEM.md §5.
+   - Başlarken pano satırını `🔄 devam ediyor (kim: AGY)` yap, bitince ✅ + özet. Git
+     commit atabiliyorsan at (push'u Fable/kullanıcı yapar); atamıyorsan changelog'a
+     "commit bekliyor" notu düş.
+   - Almak istemezsen pano satırına "AGY almadı" notu düş — Fable bir Sonnet ajana verir.
 
 ## AGY için Görev Ataması (dış ajan — bu dosya üzerinden koordine ediliyor)
 
@@ -572,6 +591,32 @@ kopyala. **Orijinal `1.tema.pdf`'e DOKUNMA.**
   3 KAPSAM DIŞI (pre-existing, A4a öncesinden de var) küçük bulgu rapor edildi,
   düzeltilmedi — bkz. A4a satırı "KALAN RİSKLER". Sıradaki: **Q1'/Q2'/Q3'** (2.
   tur QA) artık başlayabilir.
+- 2026-07-05 öğleden sonra (Fable — 2. TUR QA TAMAMLANDI, A4b KAPSAMI):
+  Q1'/Q2' (AGY, 1–90: 80 temiz, 10 sayfada pürüz) + Q3' (Sonnet #7, 91–135: ~30/45
+  temiz) bitti. Fable hakem teyidi: "Ses Seviyesi" tablosunun taslak2 sf.131 VE 132'de
+  çift basıldığı bizzat doğrulandı. Kök neden hipotezi (Fable): #6'nın sayfa şişmesi
+  çözümü sütunlamayı TEK sürekli çok-sütunlu akışa aldı; Chrome'un multicol
+  fragmentasyonunda `break-inside:avoid`'lu büyük blokların parça sınırında ÇİFT
+  BOYANMASI bilinen bir davranıştır — 1:1 sayfalamalı eski sürümde bu yüzden yoktu.
+  **A4b KAPSAMI (öncelik sırasıyla):**
+  1. [P1, SİSTEMİK] Sayfa/sütun sınırında blok tekrarı ailesi — flow_linux.css /
+     print_linux.mjs / extract.py üçlüsünde KÖK NEDEN düzeltmesi (nokta yaması değil);
+     görsel-altyazı çakışması, Kurgusu chip ikilemesi ve boş kur-tag tekrarları
+     muhtemelen aynı ailede. Düzeltme sonrası otomatik tekrar-tespiti: pdftotext
+     çıktısında ardışık yinelenen ≥2 satırlık bloklar taranmalı (dogrula.py'ye ekle).
+  2. [P2] Kök (radicand) kapsamı aşırı geniş: "+" işleci, "ise/ifadesinin" kelimeleri,
+     kesrin tamamı kök içine giriyor; 1 unclosed root (t01-t017) — AGY bulguları
+     sayfa 37, 39, 40, 42, 44 (blok id'leri bulgu listesinde).
+  3. [P3] sf.92 Q9 içerik kaybı (katı/sıvı/gaz lejantı + diyagram şıkları) — görsel
+     kırpma ile çöz.
+  4. [P4] Küçükler: 2-3 sütunlu küçük tabloların grid'e dönüşmemesi (sf.91, 107, 129),
+     "&infty;" entity kaçışı → ∞, sf.97 "1 2" kesri, sf.130 "adet" hizalaması,
+     sf.95 "2024 TYT Kurgusu" chip'siz.
+  5. [P5, riskliyse dokunma] Pre-existing üçlü: "√√" bitişik çift kök, kök-sonrası üs,
+     "N." qnum regex'i.
+  A4b bitince: nihai `1.tema_egemen_sarikci_v3.pdf` depo köküne, dogrula.py + göz
+  kontrolü, loglar, commit+push. SISTEM.md yerleşimine taşıma (A5) A4b'ye DAHİL DEĞİL —
+  kullanıcı onayından sonra.
 
 ## FAZ 3 QA Bulguları
 
