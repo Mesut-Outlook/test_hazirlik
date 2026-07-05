@@ -32,8 +32,15 @@ def main():
 
     blocks = {}
     pattern = re.compile(r'<(section|div)\s+class="([^"]+)"\s+id="([^"]+)"\s+data-kaynak-sayfa="([^"]+)"[^>]*>(.*?)</\1>', re.DOTALL)
+    duplicates = []
     for tag, cls, b_id, page, inner in pattern.findall(sorular_content):
+        if b_id in blocks:
+            duplicates.append(b_id)
         blocks[b_id] = f'<{tag} class="{cls}" id="{b_id}" data-kaynak-sayfa="{page}">{inner}</{tag}>'
+    if duplicates:
+        # SISTEM.md 2: id kalici ve TEKIL olmali; cakisma sessizce blok kaybettirir.
+        print(f"HATA: sorular.html icinde mukerrer id: {sorted(set(duplicates))}")
+        sys.exit(2)
 
     title = f"{manifest.get('baslik', 'Test')} — Sürüm {manifest.get('surum', 1)}"
     html = f"""<!DOCTYPE html>

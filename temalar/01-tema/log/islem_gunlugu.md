@@ -151,3 +151,4 @@
   - Root `.gitignore` dosyası yeni dizin yapısına (`sistem/`, `temalar/`, `qa/`) göre güncellendi.
   - `qa/` doğrulama klasörü depo köküne taşındı ve `qa/dogrula.py` içindeki yol referansları güncellendi.
 - Doğrulama: `qa/dogrula.py` testi yeni dizinler üzerinden çalıştırıldı ve başarıyla geçti.
+- 2026-07-05 gece (Fable): AGY A4d id çakışması (t01-t026/t027 → t01-e001/e002) ve 3 teori kutusu düz üssü düzeltildi; assemble.py mükerrer-id koruması eklendi; v3 yeniden derlendi (177 sf) — KULLANICI ONAYINA HAZIR.
