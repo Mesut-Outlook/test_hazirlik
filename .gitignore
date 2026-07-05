@@ -3,14 +3,14 @@
 __pycache__/
 node_modules/
 
-# QA karşılaştırma görüntüleri (146M+; compare.py ile yeniden üretilebilir)
-build_linux/qa/cmp_*.png
-build_linux/qa/r2/
-build_linux/qa/*.ppm
+# QA karşılaştırma görüntüleri (compare.py ile yeniden üretilebilir)
+qa/cmp_*.png
+qa/r2/
+qa/r3/
+qa/*.ppm
+qa/text_diff.txt
 
-# Test/deneme çıktıları (script'lerle yeniden üretilebilir)
-build_linux/test/
+# Üretilen HTML dosyaları (assemble.py ile yeniden üretilebilir)
+temalar/*/*.html
+!temalar/*/sorular.html
 
-# Terk edilmiş paralel deneme (extract_claude1 hattı)
-build_linux/*_claude1*
-build_linux/assets_claude1/

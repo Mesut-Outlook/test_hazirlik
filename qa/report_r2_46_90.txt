@@ -1,0 +1,45 @@
+[sayfa 046] temiz
+[sayfa 047] temiz
+[sayfa 048] temiz
+[sayfa 049] temiz
+[sayfa 050] temiz
+[sayfa 051] temiz
+[sayfa 052] temiz
+[sayfa 053] temiz
+[sayfa 054] temiz
+[sayfa 055] temiz
+[sayfa 056] temiz
+[sayfa 057] temiz
+[sayfa 058] temiz
+[sayfa 059] temiz
+[sayfa 060] temiz
+[sayfa 061] temiz
+[sayfa 062] temiz
+[sayfa 063] temiz
+[sayfa 064] sorun — rt kök çizgisi metin ve şıklar üzerine taşmış (t01-s300) — parser'daki kök kapatma mantığı (unclosed root span) düzeltilmelidir.
+[sayfa 065] temiz
+[sayfa 066] temiz
+[sayfa 067] temiz
+[sayfa 068] sorun — rt kök çizgisi metin ve şıklar üzerine taşmış (t01-s313, t01-s316) — parser'daki kök kapatma sınırları düzeltilmelidir.
+[sayfa 069] sorun — rt kök çizgisi metin üzerine taşmış (t01-s318) — parser'daki kök kapatma sınırları düzeltilmelidir.
+[sayfa 070] temiz
+[sayfa 071] temiz
+[sayfa 072] temiz
+[sayfa 073] temiz
+[sayfa 074] temiz
+[sayfa 075] temiz
+[sayfa 076] temiz
+[sayfa 077] temiz
+[sayfa 078] temiz
+[sayfa 079] temiz
+[sayfa 080] temiz
+[sayfa 081] temiz
+[sayfa 082] temiz
+[sayfa 083] temiz
+[sayfa 084] temiz
+[sayfa 085] temiz
+[sayfa 086] temiz
+[sayfa 087] temiz
+[sayfa 088] temiz
+[sayfa 089] temiz
+[sayfa 090] temiz

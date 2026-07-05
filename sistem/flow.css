@@ -1,0 +1,351 @@
+/* ============================================================
+   flow_linux.css — 1.tema v3 (Linux) akan HTML için tek CSS dosyası
+   FAZ 3 / Görev A2 — Claude-Sonnet #2
+
+   Kapsam: CSS Sınıf Sözleşmesi (COORDINATION.md "FAZ 3" bölümü):
+     .page-flow, .question, .qnum, .rt/.rt[data-n]/.sup/.sub/.frac,
+     .theory-box, .kur-tag, .tag-kurgusu, .answer-key, .solve-space,
+     .img-block
+
+   Görsel referans: v2 PDF sayfa 51-53 (soru/cevap anahtarı düzeni),
+   sayfa 7 ve 22 (theory-box + kur-tag/section-sub stili) — pdftoppm
+   ile 120dpi PNG'ye çevrilip Read ile piksel renkleri örneklendi:
+     - theory-box arka plan: #eef7fb, kenarlık: #a9d3ea
+     - theory-box iç başlığı (varsa, örn. "Üslü İfade"): kırmızımsı
+       #c0392b, kalın
+     - kur-tag "hap" (pill) rozeti: arka plan #eeeeee, kenarlık #dcdcdc,
+       yazı #555555, büyük harf, harf aralığı
+     - cevap anahtarı: ince noktalı üst çizgi + küçük gri metin
+
+   ÖNEMLİ (proje tuzağı — CLAUDE.md'de de yazıyor): @page { margin:0 }
+   KULLANMA. print_linux.mjs kendi marginlerini (üst 1.15in, alt 0.5in,
+   sol/sağ ~0.4in) CDP üzerinden veriyor; @page margin:0 bunu ezer.
+   ============================================================ */
+
+/* ---------- Gömülü font (v2'den PyMuPDF ile çıkarılan Comic Sans MS) --------- */
+@font-face {
+  font-family: "Comic Sans MS Embedded";
+  src: url("fonts/ComicSansMS-Regular.woff2") format("woff2"),
+       url("fonts/ComicSansMS-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Comic Sans MS Embedded";
+  src: url("fonts/ComicSansMS-Bold.woff2") format("woff2"),
+       url("fonts/ComicSansMS-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Comic Sans MS Embedded";
+  src: url("fonts/ComicSansMS-Italic.woff2") format("woff2"),
+       url("fonts/ComicSansMS-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+/* CambriaMath: yalnızca .rt tekniğinin KAPSAMADIĞI olası düz "√" karakteri
+   veya diğer matematik sembolleri (∓, ∧, ∨, ∪, ≅, ⊆, ⊕ vb.) için yedek.
+   Bitişik kök tekniği (.rt) font glifi kullanmadığı için normalde buna
+   gerek kalmaz; güvenlik ağı olarak tutuluyor. */
+@font-face {
+  font-family: "Cambria Math Embedded";
+  src: url("fonts/CambriaMath.woff2") format("woff2"),
+       url("fonts/CambriaMath.ttf") format("truetype");
+  font-display: swap;
+}
+
+/* ---------- Genel sayfa / gövde ---------- */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-family: "Comic Sans MS Embedded", "Comic Sans MS", sans-serif;
+  font-size: 12.5pt;
+  line-height: 1.5;
+  color: #111;
+}
+
+/* Not: @page { margin:0 } BİLEREK YOK — bkz. dosya başlığındaki uyarı. */
+@page {
+  size: A4;
+}
+
+/* ---------- Ana akış kapsayıcı ---------- */
+/* A4a/#6 düzeltmesi: column-count + break-after:page eskiden HER
+   `.page-content` (= v2'nin HER kaynak sayfası) için ayrı ayrı tanımlıydı —
+   bu, her kaynak sayfasını kendi PDF sayfasına ZORLUYOR, gerçek "akan HTML"
+   yerine fiilen birebir 1:1 sayfalama üretiyordu (SISTEM.md §"Sayfalama
+   birebir aynı olmak zorunda DEĞİL" ilkesine aykırı) ve ciddi sayfa
+   şişmesine yol açıyordu (136→185→210 sayfa, bkz. COORDINATION.md A4a
+   notu). Düzeltme: TEK sürekli 2 sütunlu akış — sütunlama artık belge
+   genelinde `.page-flow` üzerinde, `.page-content` sadece kaynak-sayfa
+   takibi için şeffaf bir sarmalayıcı (akışı bölmüyor). */
+.page-flow {
+  column-count: 2;
+  column-gap: 8mm;
+  /* A6 (Claude-Sonnet #8): sütunlar arası ince dikey ayraç — örnek PDF'teki
+     kalın dış çerçeve/ızgara yerine sade, baskıda (siyah-beyaz fotokopi)
+     iyi çıkan gri ton. */
+  column-rule: 0.6pt solid #999;
+}
+.page-content {
+  display: contents;
+}
+
+/* ---------- Soru bloğu ---------- */
+/* A6 (Claude-Sonnet #8): her sorunun altına (çözüm boşluğu DAHİL — extract.py
+   `.solve-space` div'ini HER ZAMAN `.question`'ın SON çocuğu olarak üretiyor,
+   bkz. extract.py satır ~1289-1294, bu yüzden CSS'te ekstra bir yapı
+   değişikliğine gerek kalmadan border burada duruyorsa çizgi otomatik olarak
+   boşluğun ALTINDA kalıyor) tam sütun genişliğinde ince ayraç çizgisi.
+   padding-bottom border'ı içerikten ayırır, margin-bottom bir sonraki
+   soru/kur-tag/theory-box'tan ayırır — böylece ardışık sorularda çizgiler
+   üst üste binmez, her biri kendi sorusunun net ayracı olur. */
+.question {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  margin: 0 0 5mm;
+  padding-bottom: 3mm;
+  border-bottom: 0.6pt solid #bbb;
+}
+.qnum {
+  font-weight: bold;
+}
+
+/* ---------- Bitişik kök tekniği — kok_bitisik_ornek.html'den AYNEN ---------- */
+.rt {
+  display: inline-block;
+  position: relative;
+  white-space: nowrap;
+  padding: .30em .25em .05em .72em;
+  background:
+    linear-gradient(currentColor, currentColor) no-repeat .60em 0 / calc(100% - .60em) .09em,
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M4 62 L22 54 L46 96 L98 2" fill="none" stroke="%23111111" stroke-width="2.6" vector-effect="non-scaling-stroke" stroke-linejoin="round" stroke-linecap="round"/></svg>') no-repeat 0 0 / .66em 100%;
+}
+.rt[data-n] {
+  margin-left: .55em;
+}
+.rt[data-n]::before {
+  content: attr(data-n);
+  position: absolute;
+  left: -.42em;
+  top: -.10em;
+  font-size: .62em;
+  line-height: 1;
+}
+
+.sup {
+  font-size: .62em;
+  vertical-align: .62em;
+  line-height: 0;
+  letter-spacing: 0;
+}
+.sub {
+  font-size: .62em;
+  vertical-align: -.25em;
+  line-height: 0;
+}
+
+.frac {
+  display: inline-block;
+  vertical-align: -.45em;
+  text-align: center;
+  line-height: 1.1;
+  padding: 0 .15em;
+}
+.frac .num {
+  display: block;
+  border-bottom: .09em solid currentColor;
+  padding: 0 .2em .02em;
+}
+.frac .den {
+  display: block;
+  padding: .02em .2em 0;
+}
+
+/* Olası düz "√" karakteri güvenlik ağı (bkz. yukarıdaki not) */
+.rad {
+  font-family: "Cambria Math Embedded", "Cambria Math", "Segoe UI Symbol", serif;
+}
+
+/* ---------- Teori kutusu (açık mavi, yuvarlak köşe) ---------- */
+/* v2 sayfa 7/22 referansından: arka plan #eef7fb, kenarlık #a9d3ea */
+/* A6: ayraçsız — kutunun kendi kenarlığı zaten görsel sınır, ek border-bottom
+   YOK (bir önceki .question çizgisiyle çakışmaz). */
+.theory-box {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #eef7fb;
+  border: 1.5px solid #a9d3ea;
+  border-radius: 3mm;
+  padding: 3mm 4mm 4mm;
+  margin: 3mm 0 5mm;
+  break-inside: avoid;
+}
+/* kutu İÇİNDE ilk satır olarak kullanılan başlık (örn. "Üslü İfade") —
+   v2'de kırmızımsı/bordo kalın yazı */
+.theory-box-title {
+  color: #c0392b;
+  font-weight: bold;
+  font-size: 1.05em;
+  margin: 0 0 2mm;
+  display: block;
+}
+/* kutunun DIŞINDA, üstünde duran düz siyah başlık (örn. "Kökte Tam Kare ve
+   İki Kare Farkı") kullanılan sayfalar için — v2 sayfa 53 referansı */
+.theory-title-outer {
+  font-weight: bold;
+  color: #111;
+  margin: 4mm 0 1.5mm;
+  display: block;
+}
+
+/* ---------- Bölüm rozetleri ---------- */
+/* KUR rozetleri (1.KUR, 2.KUR... rakamları) ZATEN kaldırılmış durumda
+   (v2 aşamasında temizlendi) — .kur-tag SADECE altındaki gerçek bölüm
+   adını taşır (örn. "ISINMA HAREKETLERİ", "GÜNLÜK HAYAT UYGULAMALARI").
+   v2 referansı: gri hap (pill) rozet, büyük harf. */
+.kur-tag {
+  display: inline-block;
+  background: #eeeeee;
+  border: 1px solid #dcdcdc;
+  color: #555555;
+  border-radius: 999px;
+  padding: 1mm 4mm;
+  font-size: .78em;
+  font-weight: bold;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  /* A6 (Claude-Sonnet #8): eskiden 4mm — bölüm başlangıcının önceki sorunun
+     ayraç çizgisinden net ayrılıp "nefes alması" için üst boşluk artırıldı.
+     Kendi border/arka planı olduğu için ayrıca çizgi (border) ALMIYOR —
+     bir önceki .question'ın alt çizgisiyle üst üste binme riski yok. */
+  margin: 8mm 0 1mm;
+  /* A4a/#6 düzeltmesi: break-inside:avoid YOKTU — bir .kur-tag sütun/sayfa
+     kırılım noktasına denk geldiğinde Chrome'un çok-sütunlu bölümlemesi
+     içeriği İKİ KEZ basıyordu (bir kısmı bir sütunda, TÜMÜ tekrar bir
+     sonrakinde) — bu da "Klasikleşmiş Uygulamalar" gibi metinlerin sayım
+     bazlı doğrulamada v2 ile UYUŞMAMASINA yol açtı (bkz. COORDINATION.md
+     A4a notu, dogrula.py). */
+  break-inside: avoid;
+}
+/* rozetin altındaki alt başlık (örn. "Gerçek Sayıların Üslü Gösterimi") */
+.section-sub {
+  display: block;
+  font-style: italic;
+  color: #2c3e50;
+  font-size: 1.05em;
+  margin: 0 0 3mm;
+  break-inside: avoid;
+}
+
+/* "ÖSYM KURGULARSA" bölümündeki sınav yılı etiketleri (örn. "2020 MSÜ
+   Kurgusu") — KUR rakamı DEĞİL, içerik olarak korunur */
+.tag-kurgusu {
+  display: inline-block;
+  background: #fdf3e3;
+  border: 1px solid #e8c987;
+  color: #8a6416;
+  border-radius: 2mm;
+  padding: .3mm 2mm;
+  font-size: .82em;
+  font-weight: bold;
+  margin: 0 0 1mm;
+  break-inside: avoid;
+}
+
+/* ---------- Cevap anahtarı ---------- */
+/* A6: ayraçsız kalır — kendi noktalı üst çizgisi zaten bir soru/bölümün
+   BİTİŞİNİ işaretliyor, .question'ın alt çizgisiyle üst üste binmemesi için
+   .answer-key hiçbir zaman border-bottom ALMAZ. */
+.answer-key {
+  margin-top: 2mm;
+  padding-top: 1.5mm;
+  border-top: 1px dotted #999;
+  font-size: .82em;
+  color: #444;
+}
+
+/* ---------- Çözüm boşluğu ---------- */
+/* A6 (Claude-Sonnet #8): kullanıcı isteğiyle 26mm→30mm (örnek PDF'teki dev
+   boşluklar 550+ soruda sayfa sayısını patlatacağı için ölçülü artış
+   seçildi; solve-space-lg de aynı +4mm farkla artırıldı). */
+.solve-space {
+  min-height: 30mm;
+}
+/* çok parçalı (a,b,c,...) sorularda daha fazla boşluk gerektiğinde
+   bu ek sınıf kullanılabilir (extract.py/A1 tarafından eklenir) */
+.solve-space.solve-space-lg {
+  min-height: 44mm;
+}
+
+/* ---------- Görsel / tablo / şekil blokları ---------- */
+/* A6: ayraçsız — görsel/tablo bloğu kendi başına bir birim, soru ayracıyla
+   karıştırılmasın diye border-bottom eklenmiyor. */
+.img-block {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 2mm auto;
+  break-inside: avoid;
+}
+.img-block img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.img-block .caption {
+  font-size: .75em;
+  color: #666;
+  text-align: center;
+  margin-top: 1mm;
+}
+
+/* ---------- Ayraç (soru arası noktalı çizgi, v2'de görülüyor) ---------- */
+.qsep {
+  border: none;
+  border-top: 1px dotted #bbb;
+  margin: 3mm 0;
+}
+
+/* ---------- Bölüm ayırıcı sayfa (örn. "GERÇEK SAYI KÜMELERİ" divider) ---------- */
+.chapter-divider {
+  break-before: column;
+  text-align: center;
+  font-size: 1.6em;
+  font-weight: bold;
+  margin: 10mm 0;
+}
+
+/* ---------- A4a (Claude-Sonnet #5) eklemeleri ---------- */
+/* Çoktan seçmeli şıklar konteyneri — .question içindeki .opts, satır
+   içi akar; asıl boşluk artık extract.py'nin span-arası boşluk
+   tespitinden geliyor, bu kural sadece görsel nefes payı ekliyor. */
+.opts {
+  margin-top: 1.5mm;
+  word-spacing: .15em;
+}
+
+/* Sınıflandırılamayan (kur-tag/theory-box/question/answer-key
+   olmayan) ama sayfada gerçekten var olan içerik (serbest paragraf,
+   basit çok satırlı tablo vb.) için — .theory-box'ın aksine kutu/
+   arka plan YOK, sadece satır yapısını (.br ile) koruyan düz blok.
+   Amaç: eskiden her satırın ayrı bir .theory-box'a bölünmesini
+   önlemek (bkz. COORDINATION.md FAZ 3 QA bulguları). */
+.para {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 3mm;
+  break-inside: avoid;
+}

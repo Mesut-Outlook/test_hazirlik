@@ -1,0 +1,45 @@
+[sayfa 001] temiz
+[sayfa 002] temiz
+[sayfa 003] sorun — Soru 24 numarası gövdesinden ayrı satıra bölünmüş — öneri: extract.py içindeki qnum regex'i "N." ile başlayan soru gövdelerinde yeni soru numarası algılamayacak şekilde güncellenmelidir.
+[sayfa 004] sorun — Soru 27 numarası gövdesinden ayrı satıra bölünmüş — öneri: extract.py içindeki qnum regex'i "N." ile başlayan soru gövdelerinde yeni soru numarası algılamayacak şekilde güncellenmelidir.
+[sayfa 005] temiz
+[sayfa 006] temiz
+[sayfa 007] temiz
+[sayfa 008] temiz
+[sayfa 009] temiz
+[sayfa 010] temiz
+[sayfa 011] temiz
+[sayfa 012] temiz
+[sayfa 013] temiz
+[sayfa 014] temiz
+[sayfa 015] temiz
+[sayfa 016] temiz
+[sayfa 017] temiz
+[sayfa 018] temiz
+[sayfa 019] temiz
+[sayfa 020] temiz
+[sayfa 021] temiz
+[sayfa 022] temiz
+[sayfa 023] temiz
+[sayfa 024] temiz
+[sayfa 025] temiz
+[sayfa 026] temiz
+[sayfa 027] temiz
+[sayfa 028] temiz
+[sayfa 029] temiz
+[sayfa 030] temiz
+[sayfa 031] temiz
+[sayfa 032] temiz
+[sayfa 033] temiz
+[sayfa 034] temiz
+[sayfa 035] temiz
+[sayfa 036] temiz
+[sayfa 037] sorun — Soru 16 formülünde kök çizgisi küçüktür (<) işaretinin üzerine taşmış (t01-s179) — öneri: extract.py'nin span bölme ve kök algılama toleransı iyileştirilerek formül dışındaki işaretler root kapsamı dışına çıkarılmalıdır.
+[sayfa 038] temiz
+[sayfa 039] sorun — Soru 26'da (t01-s190) "x = A ise" ve "x ifadesinin" metinleri root kapsamına girmiş; Soru 29'da (t01-s194) pay ve payda formüllerinde artı (+) işareti kök içine sızmış — öneri: extract.py'nin span bölme mantığı, "ise", "ifadesinin" ve artı (+) gibi işleçleri kök kapsayıcısından (rt) ayıracak şekilde güncellenmelidir.
+[sayfa 040] sorun — Soru 32 formülünde artı (+) işaretleri kök kapsamı içinde kalmış (t01-s197) — öneri: extract.py'nin span bölme ve kök algılama toleransı iyileştirilerek artı (+) işaretleri kök dışına çıkarılmalıdır.
+[sayfa 041] temiz
+[sayfa 042] sorun — Soru 40 formülünde kök işareti tüm kesrin üzerine taşmış (t01-s205) — öneri: extract.py'de formül ayrıştırma mantığı güncellenerek kök kapsamının sadece kök altındaki ifadeyle (a) sınırlı kalması ve sonrasındaki kesri kapsamaması sağlanmalıdır.
+[sayfa 043] temiz
+[sayfa 044] sorun — rt kök çizgisi taşmış (unclosed root: 'a ifadesi, tüm a değerleri...' id: t01-t017) — öneri: extract.py'nin kök çizgisi kapatma sınırları gözden geçirilmeli ve "ifadesi, tüm..." gibi açıklamalar kök dışına taşınmalıdır.
+[sayfa 045] temiz
