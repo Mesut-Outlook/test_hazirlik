@@ -99,8 +99,8 @@ YOK** ve kullanıcı beklemek istemedi. Eldeki tek kaynak, git deposundaki çık
 | Q3b | Taslak QA: sayfa 114–135 (cmp görüntülerini compare.py ile ÜRET + incele, belge sonu dahil) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-05 07:45 — sayfa 114-136 incelendi, bulgular eklendi) |
 | X1 | Çapraz kontrol: 1–90 aralığından kök/kesir-yoğun ~10 sayfalık örneklem (öncelik 37–55) bağımsız gözle yeniden incele — Q1/Q2 "sıfır hata" teyidi | Claude-Sonnet #4 | ✅ tamam (kim: Claude-Sonnet #4 — "sıfır hata" TEYİT EDİLEMEDİ, 10/12 sayfada ciddi overlap bulundu, bkz. FAZ 3 QA Bulguları) |
 | A4a | `extract.py` YAPISAL düzeltme (X1 bulguları: çok maddeli soruların satır/alt-öğe yapısı, blok üst üste binmesi, kök çizgisi taşması, cevap anahtarı konumu, sütun dağılımı) + yeniden üretim → `build_linux/v3_taslak2.pdf` (v3_taslak.pdf'in ÜZERİNE YAZMA — QA ajanları hâlâ okuyor) + SISTEM.md §6 doğrulama | Claude-Sonnet #5 → #6 | ✅ tamam (kim: Claude-Sonnet #6, 2026-07-05) — #5'in bıraktığı 5 bulgu da giderildi + yeniden üretim + §6 doğrulaması geçti: (1) REGRESYON kur-tag/tag-kurgusu kaybı → kök neden bulundu: yeni "vektör şekil kırpma" (madde 7) özelliği bölüm başlığı/"Kurgusu" etiketi ARKASINDAKİ dekoratif rozet/banner dolgusunu da "figür" sayıp üzerindeki metni bastırıyordu (`collect_figure_regions`'a tek-dolgulu+üzerinde metin olan kümeleri hariç tutan kural eklendi); AYRICA Python'un Türkçe'ye duyarsız `str.upper()`'ı ("Klasikleşmiş"→"KLASIKLEŞMIŞ" dotsuz I, known_sections'taki dotlu İ ile eşleşmiyordu) `turkish_upper()` ile düzeltildi. Sayım artık v2 ile TAM eşit: GÜNLÜK HAYAT 7=7, ÖSYM SORULARINA 10=10, ÖSYM KURGULARSA 4=4, PİST ALANI 8=8, ISINMA 15=15, Klasikleşmiş Uygulamalar 16=16, Kurgusu 20=20. (2)+(3) kök-içi-kesir ve cevap anahtarı kesir kaybı → aynı kök neden: PDF span'ları bir kesrin payını/kökün radikandını önündeki düz metinle (örn. "b) 8", "1 − 11") kaynaştırıyordu; `split_span_at_bars()` karakter-düzeyinde (rawdict) bölme ekleyip span bütünlüğü sınırını aştı (+ kısa vinculum'un hemen ardından bitişik gelen kesri radikanda dahil eden ek mantık) — √(1−11/36), 8√6/4√2, cevap anahtarı 5/6 hepsi doğru. (4) alt-öğe/etiket sırası → kök neden: blok sıralaması sadece bbox y0'a bakıyordu, kesir payı gibi YÜKSELTİLMİŞ içerik bir bloğun y0'ını yanlışlıkla küçültüp aynı satırdaki komşu etiketin (örn. "c)") ÖNÜNE geçiriyordu; `sort_blocks_reading_order()` ile aynı-satır (dikey örtüşen) bloklar artık soldan sağa diziliyor. (5) sayfa şişmesi 136→185 → kök neden: `flow_linux.css`'te `.page-content` (v2'nin HER kaynak sayfası) kendi `column-count:2`+`break-after:page`'ine sahipti, bu da fiilen birebir 1:1 sayfalama üretiyordu (SISTEM.md'nin "sayfalama birebir olmak zorunda değil" ilkesine aykırı); sütunlama TEK sürekli akışa (`​.page-flow`) taşındı, `.page-content` artık `display:contents` (şeffaf) — sonuç 154 sayfa (hedef 150-160 içinde). Kendi düzeltmelerimden kaynaklanan 2 YAN REGRESYON da bulunup giderildi: (a) split_span_at_bars ilk halde y_tol=15pt çok gevşekti, ilgisiz bir satırın (örn. bir üstteki soru numarası) barını yakalayıp sahte kesir üretiyordu (örn. "orta"/"a iki" sahte kesri, "24"/"2" sahte kesri) — rakam-içerme güvenlik ağı + y_tol=2pt sıkılaştırması ile düzeltildi; (b) birleşik "ISINMA HAREKETLERİ ☑ Klasikleşmiş Uygulamalar" gibi TEK ama İKİ başlığı birden içeren bloklar Chrome'un sütun bölümlemesinde çift basılıyordu — extract.py artık eşleşen HER başlığı kendi ayrı .kur-tag'ine bölüyor. Doğrulama: `dogrula.py` (scratchpad, SISTEM.md §6 otomatik sayım kontrolü) 8/8 ifade v2 ile birebir eşit; "işleminin sonucu kaçtır" 120=120; nihai `v3_taslak2.pdf` **154 sayfa**, 563 soru, 96 kur-tag, 38 theory-box, 142 answer-key, 144 görsel, 612 kök. Göz kontrolü: v2 sayfa 1,4,7,22,37,40,47,50,92,98 karşılıkları (v3 sf. 1,4,7,22,49,50-52,99,107 civarı) incelendi, matematik/görsel içerik doğru. KALAN RİSKLER (kapsam dışı, PRE-EXISTING — #5'in sürümünde de aynı, benim değişikliklerimden kaynaklanmıyor): (i) "√√" gibi bitişik ÇİFT kök glifi içeren nadir span'lar (örn. sf.39 "√√2+1") `.rt` tekniğine dönüşmüyor, düz metin kalıyor; (ii) kökten SONRA gelen üs (örn. "³√6³" → payda/üs kökün içine girmiyor, "6" ve "3" ayrı basılıyor, sf.47 Q5); (iii) nadir durumda soru gövdesi "N." ile başlıyorsa (örn. "8⁴.25⁶ sayısı...") qnum regex'i bunu YANLIŞLIKLA yeni soru numarası sanıp önceki soru numarasından (örn. "24.") koparıyor (sf.3/v3 sf.4). Bu 3 madde A4a kapsamının dışında bırakıldı, ileride ayrı görev olarak ele alınabilir. |
-| Q1'/Q2' | 2. TUR QA: `v3_taslak2.pdf` üzerinde sayfa 1–90 tam yeniden inceleme (overlap kontrolü açıkça dahil, sayfa başına hüküm) | AGY (Antigravity) | ⬜ A4a'yı bekliyor — AGY talimatları 5. maddeye bak |
-| Q3' | 2. TUR QA: v2 sayfa 91–135 içeriğinin v3_taslak2 karşılıkları (~taslak2 103–154; içerik çapalı sayfa eşlemesi) | Claude-Sonnet #7 | 🔄 devam ediyor (kim: Claude-Sonnet #7, 2026-07-05, Fable atadı) |
+| Q1'/Q2' | 2. TUR QA: `v3_taslak2.pdf` üzerinde sayfa 1–90 tam yeniden inceleme (overlap kontrolü açıkça dahil, sayfa başına hüküm) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-05 — 90 sayfa incelendi, 80 sayfa temiz, 10 sayfada kalan pürüzler eklendi) |
+| Q3' | 2. TUR QA: v2 sayfa 91–135 içeriğinin v3_taslak2 karşılıkları (~taslak2 103–154; içerik çapalı sayfa eşlemesi) | Claude-Sonnet #7 | ✅ tamam (kim: Claude-Sonnet #7, 2026-07-05 — 45 sayfa incelendi, ~30 temiz; Q3a'nın 9 bulgusundan 4'ü tam düzeldi, 2'si kısmen, 3'ü sürüyor; en önemli YENİ bulgu: sayfa/sütun sınırında sistemik blok tekrarı (duplication) + görsel-altyazı çakışması + Kurgusu etiketi ikilemesi + "&infty;" entity kaçışı, bkz. FAZ 3 QA Bulguları) |
 | A4b | 2. tur bulgularının düzeltilmesi + nihai `1.tema_egemen_sarikci_v3.pdf` depo köküne + SISTEM.md §5 log | Claude-Sonnet (Fable başlatacak) | ⬜ Q1'/Q2'/Q3'ü bekliyor |
 
 Görev alan ajan bu tabloyu güncellesin (🔄 devam ediyor / ✅ tamam + kısa not: kaç sayfa,
@@ -766,6 +766,212 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
   - [sayfa 043] Seçenekler bitişik/sıkışık (örn: `0B)`); Q42, Q46, Q47, Q49 şıklarında kök işaretleri kapatılmamış (Root Clashing); Q45'te üslü terimler ve açıklama metni ("b tane") kesir yapısı içine girerek bozulmuş; Q49 E seçeneğinde sayfa numarası "43" üs olarak sızmış — öneri — Kök kapatma, üs algılama ve sayfa numarası süzme mantığının düzeltilmesi.
   - [sayfa 044] Seçenekler bitişik/sıkışık (örn: `2B)`); "Köklü İfade Kavramı ve Tanım Aralığı" bilgi kutusunda metin ve formüller kesir olarak bozulmuş; Q50 ve Q51'de kökler kapatılmamış; "Kök Mutlak Değer İlişkisi" bilgi kutusu Q51 şıklarının içine sızmış/birleşmiş — öneri — Bilgi kutusu ve soru sınırlarının, kök kapatma mantığının düzeltilmesi.
   - [sayfa 045] Q1 alıştırma soruları ve üsleri tamamen karışmış ve bozuk kesirlere dönüşmüş; Q2 alıştırma şıklarında kökler birbirinin üzerine taşmış (Root Clashing); Q3 alıştırma sorusu bilgi kutularına bölünmüş ve kök çizgileri şıkların üzerine uzamış; Q4 ve Q5 sorularında kökler kapatılmamış; cevap anahtarı soru bloğuyla birleşmiş ve sayfa numarası "45" üs olarak sızmış — öneri — Alıştırma ayrıştırma, kök kapatma ve sayfa numarası temizliğinin düzeltilmesi.
+
+## FAZ 3 2. Tur QA Bulguları (v3_taslak2.pdf)
+
+2. Tur QA incelemelerinde, sayfa 1–90 aralığı görsel ve metinsel olarak (v2 referans ile yan yana) `v3_taslak2.pdf` üzerinde yeniden taranmıştır. Bu sürümde dikey sütun taşmaları, üst üste binen bloklar ve seçenek sıkışmaları neredeyse tamamen giderilmiştir. Tespit edilen kalan pürüzler aşağıda sayfa sayfa listelenmiştir:
+
+- **Q1' (AGY, 2026-07-05): sayfa 1–45 incelemesi tamamlandı.**
+  - [sayfa 001] temiz
+  - [sayfa 002] temiz
+  - [sayfa 003] sorun — Soru 24 numarası gövdesinden ayrı satıra bölünmüş — öneri: extract.py içindeki qnum regex'i "N." ile başlayan soru gövdelerinde yeni soru numarası algılamayacak şekilde güncellenmelidir.
+  - [sayfa 004] sorun — Soru 27 numarası gövdesinden ayrı satıra bölünmüş — öneri: extract.py içindeki qnum regex'i "N." ile başlayan soru gövdelerinde yeni soru numarası algılamayacak şekilde güncellenmelidir.
+  - [sayfa 005] temiz
+  - [sayfa 006] temiz
+  - [sayfa 007] temiz
+  - [sayfa 008] temiz
+  - [sayfa 009] temiz
+  - [sayfa 010] temiz
+  - [sayfa 011] temiz
+  - [sayfa 012] temiz
+  - [sayfa 013] temiz
+  - [sayfa 014] temiz
+  - [sayfa 015] temiz
+  - [sayfa 016] temiz
+  - [sayfa 017] temiz
+  - [sayfa 018] temiz
+  - [sayfa 019] temiz
+  - [sayfa 020] temiz
+  - [sayfa 021] temiz
+  - [sayfa 022] temiz
+  - [sayfa 023] temiz
+  - [sayfa 024] temiz
+  - [sayfa 025] temiz
+  - [sayfa 026] temiz
+  - [sayfa 027] temiz
+  - [sayfa 028] temiz
+  - [sayfa 029] temiz
+  - [sayfa 030] temiz
+  - [sayfa 031] temiz
+  - [sayfa 032] temiz
+  - [sayfa 033] temiz
+  - [sayfa 034] temiz
+  - [sayfa 035] temiz
+  - [sayfa 036] temiz
+  - [sayfa 037] sorun — Soru 16 formülünde kök çizgisi küçüktür (<) işaretinin üzerine taşmış (t01-s179) — öneri: extract.py'nin span bölme ve kök algılama toleransı iyileştirilerek formül dışındaki işaretler root kapsamı dışına çıkarılmalıdır.
+  - [sayfa 038] temiz
+  - [sayfa 039] sorun — Soru 26'da (t01-s190) "x = A ise" ve "x ifadesinin" metinleri root kapsamına girmiş; Soru 29'da (t01-s194) pay ve payda formüllerinde artı (+) işareti kök içine sızmış — öneri: extract.py'nin span bölme mantığı, "ise", "ifadesinin" ve artı (+) gibi işleçleri kök kapsayıcısından (rt) ayıracak şekilde güncellenmelidir.
+  - [sayfa 040] sorun — Soru 32 formülünde artı (+) işaretleri kök kapsamı içinde kalmış (t01-s197) — öneri: extract.py'nin span bölme ve kök algılama toleransı iyileştirilerek artı (+) işaretleri kök dışına çıkarılmalıdır.
+  - [sayfa 041] temiz
+  - [sayfa 042] sorun — Soru 40 formülünde kök işareti tüm kesrin üzerine taşmış (t01-s205) — öneri: extract.py'de formül ayrıştırma mantığı güncellenerek kök kapsamının sadece kök altındaki ifadeyle (a) sınırlı kalması ve sonrasındaki kesri kapsamaması sağlanmalıdır.
+  - [sayfa 043] temiz
+  - [sayfa 044] sorun — rt kök çizgisi taşmış (unclosed root: 'a ifadesi, tüm a değerleri...' id: t01-t017) — öneri: extract.py'nin kök çizgisi kapatma sınırları gözden geçirilmeli ve "ifadesi, tüm..." gibi açıklamalar kök dışına taşınmalıdır.
+  - [sayfa 045] temiz
+
+- **Q2' (AGY, 2026-07-05): sayfa 46–90 incelemesi tamamlandı.**
+  - [sayfa 046] temiz
+  - [sayfa 047] temiz
+  - [sayfa 048] temiz
+  - [sayfa 049] temiz
+  - [sayfa 050] temiz
+  - [sayfa 051] temiz
+  - [sayfa 052] temiz
+  - [sayfa 053] temiz
+  - [sayfa 054] temiz
+  - [sayfa 055] temiz
+  - [sayfa 056] temiz
+  - [sayfa 057] temiz
+  - [sayfa 058] temiz
+  - [sayfa 059] temiz
+  - [sayfa 060] temiz
+  - [sayfa 061] temiz
+  - [sayfa 062] temiz
+  - [sayfa 063] temiz
+  - [sayfa 064] sorun — rt kök çizgisi metin ve şıklar üzerine taşmış (t01-s300) — öneri — parser'daki kök kapatma mantığı (unclosed root span) düzeltilmelidir.
+  - [sayfa 065] temiz
+  - [sayfa 066] temiz
+  - [sayfa 067] temiz
+  - [sayfa 068] sorun — rt kök çizgisi metin ve şıklar üzerine taşmış (t01-s313, t01-s316) — öneri — parser'daki kök kapatma sınırları düzeltilmelidir.
+  - [sayfa 069] sorun — rt kök çizgisi metin üzerine taşmış (t01-s318) — öneri — parser'daki kök kapatma sınırları düzeltilmelidir.
+  - [sayfa 070] temiz
+  - [sayfa 071] temiz
+  - [sayfa 072] temiz
+  - [sayfa 073] temiz
+  - [sayfa 074] temiz
+  - [sayfa 075] temiz
+  - [sayfa 076] temiz
+  - [sayfa 077] temiz
+  - [sayfa 078] temiz
+  - [sayfa 079] temiz
+  - [sayfa 080] temiz
+  - [sayfa 081] temiz
+  - [sayfa 082] temiz
+  - [sayfa 083] temiz
+  - [sayfa 084] temiz
+  - [sayfa 085] temiz
+  - [sayfa 086] temiz
+  - [sayfa 087] temiz
+  - [sayfa 088] temiz
+  - [sayfa 089] temiz
+  - [sayfa 090] temiz
+
+- **Q3' (Claude-Sonnet #7, 2. tur): v2 sayfa 91–135 → v3_taslak2.pdf karşılıkları incelendi.**
+  Yöntem: sayfalama 1:1 değil (taslak2 154 sf, v2 135 sf), bu yüzden önce içerik-çapalı eşleme
+  kuruldu (`pdftotext`/PyMuPDF ile her v2 sayfasından ayırt edici satır alınıp taslak2'de
+  arandı). Eşleme: v2 91→t98, 92→99, 93→100, 94→101, 95→102, 96→104, 97→105, 98→107, 99→108,
+  100→109, 101→110, 102→111, 103→112, 104→113, 105→115, 106→116, 107→117, 108→118, 109→119,
+  110→121, 111→123, 112→124, 113→125, 114→125, 115→126, 116→129, 117→130, 118→131, 119→133,
+  120→134, 121→136, 122→137, 123→138, 124→139, 125→141, 126→142, 127→143, 128→146, 129→148,
+  130→149, 131→150, 132→151, 133→152, 134→153, 135→153 (bazı düşük-güven eşlemelerde ±1 sayfa
+  komşusu da render edilip kontrol edildi). Karşılaştırma script'i `qa/r2/compare_r2.py`
+  (compare.py'nin çift-sayfa/açık-eşlemeli varyantı), çıktılar SADECE `qa/r2/cmp_v2pNNN.png`
+  (45 dosya) — 1. tur `qa/cmp_*.png` ve `qa/text_diff.txt`'ye dokunulmadı.
+
+  **1. tur (Q3a) bulgularının düzelme durumu** (Q3a'nın "sayfa NNN" numaraları eski
+  v3_taslak.pdf'e ait, v2 ile ~0-1 sayfa yakın olduğundan doğrudan eşleşiyor):
+  - sf.91 Q8 (köfte/pizza/mantı tablosu, satır satır kutuya bölünme): **İYİLEŞTİ** — artık
+    ayrı kutulara bölünmüyor, düz akan metin olarak doğru sırada basılıyor; grid/tablo
+    görünümü yok (küçük biçim farkı, içerik doğru).
+  - sf.92 Q9 (katı/sıvı/gaz renk lejantı + A-E şık diyagramları): **DÜZELMEDİ** — "Katı/Sıvı/
+    Gaz" lejantındaki renkli çizgi örnekleri kayıp (düz siyah metin), A)-E) şıklarının renkli
+    sayı-doğrusu diyagramları tamamen boş (içerik kaybı aynen duruyor).
+  - sf.95 Q5 / sf.98 Q5 ("Aralık Sayı Doğrusu Gösterimi" ve "Akın parkur" tabloları — v2
+    sf.94 ve sf.97'ye karşılık gelir): **KISMEN İYİLEŞTİ** — satır/şık karışıklığı (scrambled
+    sıra) düzelmiş, harfler doğru sırada; ama her iki soruda da sayı-doğrusu/ok DİYAGRAMLARI
+    hâlâ kayıp, sadece çıplak sayı çiftleri kalmış (örn. "A) 2500 3500" — ok/çizgi yok).
+  - sf.103 teori kutusu madde 8 (1/a > 1/b kesri bozuk): **DÜZELDİ** — v2 92-93. sayfalarda
+    (taslak2 sf.110-112) kesir doğru bar ile basılıyor.
+  - sf.107 "Kapalılık Özelliği" tablosu (v2 sf.106, taslak2 sf.116): **DÜZELMEDİ** — hâlâ grid
+    değil, satır satır düz metne dönüşmüş ("Sayı Kümesi İşlem+ Kapalılık Özelliği... a) N −
+    b) R × ..."); okunabilir ama tablo görünümü yok. Cevap anahtarı ayrıca doğru.
+  - sf.108-109 Bağlaç/Niceleyici Gerektirme sembol tablosu (v2 sf.108, taslak2 sf.117):
+    **DÜZELDİ** — gerçek HTML tablo olarak (sarı başlık, kenarlıklar, ∧∨⊻∃∀⇒⇔ sembolleri)
+    doğru basılıyor.
+  - sf.111 "şema" tablosu (Değişme/Birleşme/Ters/Yutan/Birim Eleman, v2 sf.109-110, taslak2
+    sf.119-121): **DÜZELDİ** — renkli, kenarlıklı gerçek tablo.
+  - sf.112-113 □ işlemi 5×5 tablosu (v2 sf.112, taslak2 sf.124): **DÜZELDİ** — tam 5×5 grid
+    tablo, satır/sütun başlıkları doğru.
+  - Genel: v2'nin kendi sayfa numarasının bir sonraki sayfaya sızması (Q3a'nın "her sayfa,
+    yaygın MİNÖR" bulgusu) bu aralıkta bir daha rastlanmadı — düzelmiş görünüyor.
+
+  **YENİ bulgular (v3_taslak2'de ilk kez görülen / 1. turda bu aralıkta raporlanmamış):**
+  - **[SİSTEMİK, ÖNCELİKLİ] İçerik/blok tekrarı (duplication) sayfa/sütun sınırlarında.**
+    En az 5 ayrı örnekte TAM bir blok (tablo veya soru gövdesi veya görsel) sayfa geçişinde
+    İKİ KEZ basılıyor: (1) v2 sf.118 Q3 "Ses Seviyesi/Ses Göstergesi" tablosu taslak2 sf.131
+    VE sf.132'de tam olarak iki kez (soru metni + tablo + şıklar); (2) v2 sf.121 Q10 (gömlek/
+    pantolon fiyat aralığı) metni taslak2 sf.136'da tam basılı, AYNI soru gövdesi (görselsiz)
+    tekrar sf.136'nın altında beliriyor; (3) v2 sf.122 Q15 "İdeal doğum kütlesi" tablosu VE
+    Q16 "Fidan" tablosu taslak2 sf.137→138 geçişinde İKİŞER KEZ basılı; (4) v2 sf.124 Q4
+    "kutu/kantar" görseli taslak2 sf.139'da bir kez, sf.140 başında AYNI görsel tekrar. Bu,
+    tek sayfada/sorguda rastlantısal değil, tekrar eden bir desen — muhtemelen flow_linux.css/
+    print_linux.mjs'in sütun/sayfa taşması (overflow) durumunda bir bloğu hem taşan sütunun
+    sonuna hem yeni sayfanın başına bastığı bir print/pagination hatası (ya da extract.py'de
+    bir "sığmazsa yeniden dene" mantığının çıktıyı silmeden ikinci kez eklemesi). A4b öncesi
+    extract.py/print_linux.mjs/flow_linux.css üçlüsünde kök neden aranmalı — çok sayfayı
+    etkileyebilir, sadece görülen 4-5 örnekle sınırlı olmayabilir.
+  - **[TEKRARLANAN] Görsel altyazısı/açıklama metni resimle çakışarak tekrarlanıyor.**
+    Bir figürün ALTINDA yer alması gereken açıklama cümlesi, figürün İÇİNE/ALTINA taşan
+    kırpılmış/soluk bir kopya olarak bir kez, sonra doğru konumda tam olarak bir kez daha
+    basılıyor (okunabilir ama görsel gürültü + potansiyel kafa karıştırıcı). Örnekler: v2
+    sf.96 Q4 (çember/pist görseli altında "Pistlerden birinin yarıçapı..." satırı), v2 sf.99
+    Q15 (su ısıtıcı renkli gösterge görseli altında "...renkli gösterge verilmiştir." satırı),
+    v2 sf.123 Q14 (ayna/çember görseli altında "Şekildeki kahverengi boyalı bölge..." satırı),
+    v2 sf.129 (10-20-50 TL kağıt para görseli altında "...para adedini göstermektedir."
+    satırı — ayrıca bu kopya "göstermektedir"i "gostermektedir" olarak Türkçe karaktersiz
+    basıyor), v2 sf.131 Q6 (Şekil1/2/3 3D küp görseli altında "Buna göre, görselde temsil
+    edilen işlem" satırı). En az 5 örnek — muhtemelen aynı kök nedenin (yukarıdaki blok
+    tekrarı) daha küçük ölçekli bir varyantı.
+  - **[TEKRARLANAN] "Kurgusu" etiketi çifti belirsiz metinle tekrarlanıyor.** İki ardışık
+    "...Kurgusu" etiketi (örn. "2019 AYT Kurgusu" + "2023 TYT Kurgusu") turuncu chip olarak
+    doğru basılıyor, AMA aralarında AYNI iki etiketin düz/stilsiz metin kopyası da beliriyor
+    ("2019 AYT Kurgusu 2023 TYT Kurgusu" tek satır düz yazı). Görülen yerler: v2 sf.94-95
+    (taslak2 sf.102), v2 sf.128 (taslak2 sf.146). Ayrıca v2 sf.95'teki "2024 TYT Kurgusu"
+    etiketi taslak2'de HİÇ chip olarak basılmıyor, düz metin kalıyor (tutarsız biçimlendirme).
+  - **[TEKRARLANAN] Bölüm başlığı (kur-tag) kümesi boş içerikle art arda tekrarlanıyor.**
+    "ISINMA HAREKETLERİ" / "☑ Klasikleşmiş Uygulamalar" / "ISINMA HAREKETLERİ" / "KLASİKLEŞMİŞ
+    UYGULAMALAR" dört etiketi hiçbir soru içeriği olmadan art arda beliriyor. Görülen yerler:
+    taslak2 sf.118 sonu (v2 sf.108-109 sınırı) ve taslak2 sf.121 sonu (v2 sf.110-111 sınırı).
+  - **HTML varlık (entity) kaçışı bozuk: "&infty;" literal metin olarak basılıyor**, ∞ sembolü
+    yerine. Görülen: v2 sf.93-94 (taslak2 sf.101), Soru 8 şıkları — "B) [-2, &infty;)",
+    "D) (-&infty;, 8)", "E) (-5, &infty;)". Muhtemelen extract.py'de ∞ karakteri bir ara adımda
+    HTML-escape edilip tekrar unescape edilmiyor.
+  - v2 sf.97 Q6: "A = [1/2, 5)" ifadesindeki 1/2 kesri bar'sız "1 2" olarak basılmış (izole
+    örnek — komşu sayfalardaki diğer kesirler doğru).
+  - v2 sf.130 Q2 (10/20/50 TL'lik kağıt para grupları): önceki turda "a+2a10-2aadetadetadet"
+    şeklinde tamamen scramble olan etiketler artık okunaklı ("a + 2  a  10 – 2a" / "adet adet
+    adet") ama hâlâ HER görselin altına doğru "X adet" olarak hizalanmıyor, üç ifade ve üç
+    "adet" kelimesi ayrı satırlarda genel liste halinde — kısmi düzelme.
+  - v2 sf.129 Q4: v2'deki "I | II / III | IV" 2×2 grid tablosu taslak2'de düz "I II III IV"
+    metin listesine dönüşmüş (içerik kaybı yok, görsel grid kaybı var) — küçük.
+  - v2 sf.133 Q12 şıklarındaki "7ᵐ neg[atiftir]" kelime kesilmesi KONTROL EDİLDİ — bu v2'nin
+    KENDİ orijinalinde de aynı şekilde kesik (kaynak PDF'in kendi sütun/tablo taşması),
+    taslak2 kaynaklı bir regresyon DEĞİL — bulgu olarak SAYILMADI.
+  - Belge sonu (v2 sf.135 → taslak2 sf.153-154): TAM — son soru (18, "Üç çocuklu bir ailede...")
+    eksiksiz basılı, taslak2 154/154 ile bitiyor, kesik/eksik blok yok.
+
+  **Genel değerlendirme:** Q3a'nın flag'lediği 9 spesifik bulgudan 4'ü tam düzeldi (sf.103,
+  108-109, 111, 112-113), 2'si kısmen düzeldi (sf.95/98 sıra karışıklığı gitti ama diyagram
+  kaybı kaldı, sf.91 kutu-bölünmesi gitti), 3'ü düzelmedi (sf.92 içerik kaybı, sf.107 tablo
+  düzleşmesi, ve genel olarak küçük 2-3 sütunlu tabloların TAMAMI hâlâ grid'e dönüşmüyor —
+  buna karşın büyük/karmaşık tablolar [sembol, şema, 5×5 □ işlemi] mükemmel çalışıyor, bu
+  tutarsızlık ilginç). Q3b'nin flag'lediği tekil satır-bazlı hatalar (root kapanmaması,
+  teori-kutusu bölünmesi, kayıp tablo görseli, sıkışık şıklar, kesir birleşmesi) neredeyse
+  TAMAMEN düzelmiş — ama bunların yerini YENİ bir hata ailesi almış: sayfa/sütun sınırlarında
+  blok tekrarı (duplication) + görsel-altyazı çakışması + Kurgusu etiketi ikilemesi. Bu üçü
+  muhtemelen ORTAK bir kök nedene (print/pagination taşma davranışı) sahip ve A4b'de öncelikle
+  buraya bakılmalı — aksi halde nokta-atışı düzeltmeler yeni sayfalarda aynı deseni
+  tekrarlayabilir. 45 sayfanın kabaca 30'u tam temiz, geri kalan ~15'i yukarıdaki hata
+  ailelerinden birine dahil (çoğu OKUNABİLİR durumda, içerik kaybı sadece sf.92 Q9'da ciddi).
 
 
 
