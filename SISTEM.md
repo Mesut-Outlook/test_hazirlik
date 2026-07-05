@@ -111,6 +111,19 @@ Her çalıştırma iki yere yazar:
    modelli ajanlarca kaynakla karşılaştırılır; bulgular COORDINATION.md'ye yazılır.
 4. Çıktı adı `…_vN.pdf` — bir öncekinin üzerine ASLA yazılmaz; onaydan sonra eski
    sürüm silinebilir (kullanıcı kararı).
+5. **Sayfa eşlemesi** (FAZ 3 dersi): akan HTML yeniden sayfalandığı için çıktı sayfa
+   sayısı kaynaktan farklı olabilir — görsel QA, aynı numaralı sayfaları değil, içerik
+   çapasıyla (pdftotext'te ayırt edici dize arayarak) eşlenen sayfaları karşılaştırır.
+   Sayfalama farkının kendisi bulgu DEĞİLDİR; soru sırası + içerik bütünlüğü esastır.
+6. **Anahtar ifade sayımı** (FAZ 3 dersi): bölüm başlıkları ("ISINMA HAREKETLERİ",
+   "PİST ALANI"…), "Kurgusu" etiketleri ve "işleminin sonucu kaçtır" gibi kritik
+   ifadelerin kaynak↔çıktı adet EŞİTLİĞİ otomatik kontrol edilir (örnek uygulama:
+   `build_linux/qa/dogrula.py`; CSS text-transform büyük harfe çevirebilir,
+   karşılaştırmayı buna dayanıklı yap).
+7. **Blok tekrarı taraması** (FAZ 3 dersi — bilinen tuzak): Chrome, tek sürekli
+   çok-sütunlu (multicol) akışta `break-inside:avoid`'lu büyük blokları (tablo, görselli
+   soru) sayfa/sütun sınırında ÇİFT BASABİLİR. Her üretimde pdftotext çıktısında ardışık
+   yinelenen ≥2 satırlık bloklar taranmalı; görsel QA sayfa geçişlerine ayrıca bakmalı.
 
 ## 7. Sürümleme
 

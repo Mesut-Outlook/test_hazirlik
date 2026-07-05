@@ -8,13 +8,18 @@
 > (önce bu ikisini oku). Kısa özet:
 > - FAZ 1-2 çıktısı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; logo sol üstte, header
 >   yazısız, karekökler `.rad` yamalı) — bu dosya ve `1.tema_orijinal.pdf` SALT OKUNUR.
-> - FAZ 3 (sürüyor): v2'den düzenlenebilir HTML yeniden kuruluyor (`build_linux/`),
->   kökler bitişik kök tekniği `.rt` ile (referans: `kok_bitisik_ornek.html`). Hedef:
->   `1.tema_egemen_sarikci_v3.pdf`. İlk taslakta extract.py kaynaklı yapısal QA
->   bulguları çıktı; düzeltme (A4a) ve 2. tur QA süreci COORDINATION.md panosunda.
-> - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA'nın
->   bir kısmı AGY (Antigravity, COORDINATION.md üzerinden koordine).
-> - Font değişikliği kararı hâlâ açık: `font_ornekleri.pdf`'teki 5 aday bekliyor.
+> - FAZ 3 (sürüyor): v2'den düzenlenebilir HTML yeniden kuruldu (`build_linux/`),
+>   kökler bitişik kök tekniği `.rt` ile (referans: `kok_bitisik_ornek.html`).
+>   A4a tamam (`v3_taslak2.pdf`, 154 sf; metin bütünlüğü v2 ile doğrulandı), 2. tur
+>   QA tamam (~110/135 sayfa temiz). Şu an A4b (AGY'de): kalan bulguların düzeltilmesi
+>   — en önemlisi Chrome multicol kaynaklı sayfa sınırında blok tekrarı — ve nihai
+>   `1.tema_egemen_sarikci_v3.pdf` üretimi. Sonrası: Q4 örneklem QA → kullanıcı onayı
+>   → SISTEM.md §1 yerleşimine taşıma (A5).
+> - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA + A4b
+>   AGY (Antigravity, COORDINATION.md üzerinden koordine).
+> - Font değişikliği kararı (FAZ 2'den kalan) muhtemelen ARTIK GEREKSİZ: `.rt` kök
+>   çizimi font glifi kullanmıyor, v3 gömülü Comic Sans subset'iyle basılıyor —
+>   kullanıcı estetik değişiklik istemezse kapatılabilir.
 
 ## Amaç
 
