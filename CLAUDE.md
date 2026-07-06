@@ -24,13 +24,13 @@
 > - Yeniden basım: `python3 sistem/assemble.py temalar/01-tema/manifest.json
 >   temalar/01-tema/sorular.html ../../sistem/flow.css temalar/01-tema/1tema.html`
 >   sonra `node sistem/print.mjs temalar/01-tema/1tema.html cikti/<ad>.pdf`.
-> - **FAZ 4 — ARAYÜZ (sürüyor):** Yerel web arayüzü MVP hazır —
+> - **FAZ 4 — ARAYÜZ (TAMAMLANDI, 2026-07-06):** Yerel web arayüzü ve entegrasyonu tamamlandı.
 >   `bash arayuz/calistir.sh` → http://127.0.0.1:8756 (FastAPI backend +
 >   framework'süz Türkçe SPA; dosya/klasör seçimi, dönüştürme job'ları + canlı
 >   ilerleme, PDF önizleme, blok düzenleme, serbest talep kuyruğu; logo sol üstte).
->   API sözleşmesi COORDINATION.md "FAZ 4" bölümünde SABİT. Kalan: F3 (extract
->   genelleştirme), F4 (uçtan uca test), F5 (paketleme) — üçü de AGY'de
->   (kullanıcı devri, 2026-07-06); Fable her teslimi örneklemle denetler.
+>   F3 (extract genelleştirme), F4 (uçtan uca test & QA entegrasyonu) ve F5 (paketleme
+>   & README/tanıtım güncellemeleri) tamamlanarak depoya gönderildi. Matematiksel ifadelerin
+>   (integral, limit, Yunan/Latin harfleri vb.) sistem genelinde çözümlenmesi sağlandı.
 > - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA +
 >   büyük düzeltmeler AGY (Antigravity, COORDINATION.md üzerinden). DERS: ajan
 >   "tamam/sıfır hata" raporları mutlaka örneklemle çapraz doğrulanır (SISTEM.md §6).

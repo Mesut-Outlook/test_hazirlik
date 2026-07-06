@@ -1353,3 +1353,14 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     olarak soru 3 gövdesine karışmış.
   - [minör] tek "2 3 · 2 3" düz gövde örneği; sf.159 ayna görseli altında soluk altyazı şeridi.
   - Karar: A4d açıldı (AGY talimatları 8. madde). v3 kullanıcı onayına A4d SONRASI sunulacak.
+
+- **Faz 4 (AGY, 2026-07-06): Arayüz ve Entegrasyonun Tamamlanması (F3, F4, F5)**
+  - **F3**: `sistem/extract.py` CLI parametreleri (`--tema`, `--profil`) ve dinamik `tNN-` ön ek desteğiyle genelleştirildi. `sistem/profiller/metin_yayinlari.json` yayınevi profili oluşturuldu. Sınıflandırılamayan durumlar için loglama ve try-except eklendi.
+  - **F4**: FastAPI backend entegrasyonu tamamlandı. `arayuz/backend/pipeline.py` ve `temalar_api.py` güncellenerek parametreler bağlandı. `shutil.SameFileError` hatası önlendi. `qa/dogrula.py` dinamik ve tema-bağımsız hale getirildi. 02-deneme-temasi ile uçtan uca testler başarıyla çalıştırıldı ve `OK` doğrulama raporu alındı.
+  - **F5**: Yerel web arayüzünün (Arayüz) özelliklerini ve başlatılmasını anlatan detaylı `README.md` güncellemesi yapıldı.
+  - **Hata Giderme & Tanıtım (Landing) Sayfası**:
+    * Soru düzenleme ekranındaki ilk blok bölüm bilgisi barındırmadığında oluşan `ul is null / appendChild` hatası giderildi.
+    * Arayüze sistemin neler yapabileceğini modern ve şık bir CSS mock illüstrasyonu eşliğinde anlatan, doğrudan sihirbaza yönlendiren **"Nedir?" (Landing) tanıtım ekranı** eklendi.
+    * Logoyu ve başlığı tıklayarak doğrudan tanıtım/landing sayfasına dönme işlevi (`gotoView("landing")`) entegre edildi.
+    * Logunun boyutu **80x80px**'e büyütülerek görsel kalitesi ve görünürlüğü artırıldı.
+  - **Gelişmiş Matematik & Karakter Desteği**: `sistem/flow.css` altındaki `body` font-family fallback tanımlarına `Cambria Math Embedded` ve `Segoe UI Symbol` fontları eklenerek; integral (∫), limit, matris, toplam (∑) ve tüm Yunan/Latin karakterlerinin yüksek sadakatle çözümlenmesi ve basılması garanti altına alındı.
