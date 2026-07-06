@@ -158,6 +158,14 @@
         })
       );
     },
+    async fsMkdir(path, ad) {
+      return govdeAyristir(
+        await fetch("/api/fs/mkdir", { method: "POST", headers: JSON_BASLIK, body: JSON.stringify({ path, ad }) })
+      );
+    },
+    async temaSil(temaId) {
+      return govdeAyristir(await fetch(`/api/temalar/${encodeURIComponent(temaId)}`, { method: "DELETE" }));
+    },
     pdfUrl(yol) {
       return "/api/pdf?path=" + encodeURIComponent(yol || "");
     },
@@ -355,6 +363,29 @@
     }
   });
 
+  // "+ Yeni Klasör": gezginin şu an içinde bulunduğu dizin altında bir alt
+  // klasör oluşturur (POST /api/fs/mkdir, F7 eki), sonra listeyi tazeler.
+  el("#gezgin-btn-yeni-klasor").addEventListener("click", async () => {
+    if (!state.gezgin || !state.gezgin.mevcutYol) {
+      bildirimGoster("Önce bir klasör içine girin.", "hata");
+      return;
+    }
+    const girdi = prompt("Yeni klasörün adı:");
+    if (girdi == null) return; // kullanıcı iptal etti
+    const ad = girdi.trim();
+    if (!ad) {
+      bildirimGoster("Klasör adı boş olamaz.", "hata");
+      return;
+    }
+    try {
+      await api.fsMkdir(state.gezgin.mevcutYol, ad);
+      bildirimGoster(`"${ad}" klasörü oluşturuldu.`, "basari");
+      await gezginYukle(state.gezgin.mevcutYol);
+    } catch (err) {
+      bildirimGoster("Klasör oluşturulamadı: " + err.message, "hata");
+    }
+  });
+
   function gezginSatirOlustur({ ad, ikon, dizinMi, secilebilir }) {
     const btn = document.createElement("button");
     btn.className = "gezgin-satiri" + (!dizinMi ? " dosya" : "") + (secilebilir ? " secilebilir" : "");
@@ -490,12 +521,31 @@
         <button class="btn" data-aksiyon="onizle" ${hazirDegil ? "disabled" : ""}>Önizle</button>
         <button class="btn btn-birincil" data-aksiyon="duzenle" ${hazirDegil ? "disabled" : ""}>Düzenle</button>
         <button class="btn" data-aksiyon="uret" ${hazirDegil ? "disabled" : ""}>Yeniden Üret</button>
+        <button class="btn btn-tehlike" data-aksiyon="sil" title="Temayı çöpe taşı">Sil</button>
       </div>
     `;
     kart.querySelector('[data-aksiyon="onizle"]').addEventListener("click", () => pdfOnizlemeAc(tema));
     kart.querySelector('[data-aksiyon="duzenle"]').addEventListener("click", () => duzenleAc(tema.tema_id));
     kart.querySelector('[data-aksiyon="uret"]').addEventListener("click", () => temaYenidenUret(tema));
+    kart.querySelector('[data-aksiyon="sil"]').addEventListener("click", () => temaSilOnayla(tema));
     return kart;
+  }
+
+  // DELETE /api/temalar/{id}: KALICI SİLME DEĞİL — backend temayı temalar/.cop/
+  // altına taşır, geri alınabilir (F7 eki). Onay metni bunu açıkça belirtir.
+  async function temaSilOnayla(tema) {
+    const onay = confirm(
+      `"${tema.ad}" temasını silmek istediğinize emin misiniz?\n\n` +
+        "Not: Tema kalıcı olarak silinmez, çöp klasörüne taşınır ve gerekirse geri alınabilir."
+    );
+    if (!onay) return;
+    try {
+      await api.temaSil(tema.tema_id);
+      bildirimGoster(`"${tema.ad}" çöpe taşındı.`, "basari");
+      anaSayfaYukle();
+    } catch (err) {
+      bildirimGoster("Tema silinemedi: " + err.message, "hata");
+    }
   }
 
   async function anaSayfaYukle() {
@@ -541,12 +591,28 @@
     el("#pdf-onizleme-modal").classList.add("acik");
   }
 
-  el("#pdf-onizleme-modal-kapat").addEventListener("click", () => {
+  function pdfOnizlemeKapat() {
     el("#pdf-onizleme-modal").classList.remove("acik");
     el("#pdf-onizleme-embed").removeAttribute("src");
-  });
+  }
+
+  el("#pdf-onizleme-modal-kapat").addEventListener("click", pdfOnizlemeKapat);
   el("#pdf-onizleme-modal").addEventListener("click", (e) => {
-    if (e.target.id === "pdf-onizleme-modal") el("#pdf-onizleme-modal-kapat").click();
+    if (e.target.id === "pdf-onizleme-modal") pdfOnizlemeKapat();
+  });
+
+  // Esc: açık olan tam ekran PDF önizlemesini (ya da açık kalmışsa gezgin
+  // modalını) kapatır — tam ekran modallarda klavye ile çıkış beklenen bir
+  // davranıştır (F7 eki).
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (el("#pdf-onizleme-modal").classList.contains("acik")) {
+      pdfOnizlemeKapat();
+      return;
+    }
+    if (el("#gezgin-modal").classList.contains("acik")) {
+      gezginKapat();
+    }
   });
 
   async function temaYenidenUret(tema) {

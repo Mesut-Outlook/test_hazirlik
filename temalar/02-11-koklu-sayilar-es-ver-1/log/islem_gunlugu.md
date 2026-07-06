@@ -9,3 +9,6 @@
 ## 2026-07-06T09:45:35+03:00 (Arayüz - üretim)
 - 11_Koklu_Sayilar_ES_Ver_1_v2.pdf üretildi (sürüm 2, 14 sayfa).
 - Doğrulama: ok
+
+## 2026-07-06T21:12:35+03:00 (Arayüz - manifest güncelleme)
+- Akış (sıralama/silme) güncellendi, yedek: manifest.json.bak

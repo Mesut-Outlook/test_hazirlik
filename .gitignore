@@ -19,3 +19,6 @@ temalar/*/*.html
 
 # Arayüz çalışma-zamanı meta dosyaları (makineye özgü yollar)
 temalar/*/tema_meta.json
+
+# Silinen (arşivlenmiş) temalar — DELETE /api/temalar/{id} kalıcı silmez, buraya taşır (F7)
+temalar/.cop/

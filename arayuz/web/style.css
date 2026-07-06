@@ -769,26 +769,41 @@ button {
   white-space: nowrap;
 }
 
-/* ---------- Bildirim / toast ---------- */
+/* ---------- Bildirim / toast ----------
+   Sabit sağ-üst köşe; en üst z-index (modalların da üstünde, bkz. .modal-perde
+   z-index:100) — açık bir modal üzerindeyken de tam görünür olmalı. Konteynerin
+   kendisi genişlik/yükseklik almaz (align-items:flex-end + width içerikten),
+   her bildirim kendi max-width'i içinde satır kırar (overflow-wrap) — uzun
+   metin/yol asla yatayda taşıp kesilmez. Üst üste bildirimler dikey yığılır
+   (flex-direction:column + gap), en yeni en altta. */
 
 .bildirim-alani {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  top: 20px;
+  right: 20px;
+  left: 20px;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 10px;
-  z-index: 200;
-  max-width: 360px;
+  z-index: 10000;
+  pointer-events: none;
 }
 
 .bildirim {
+  pointer-events: auto;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(420px, 100%);
   background: var(--renk-metin);
   color: #fff;
-  padding: 13px 18px;
+  padding: 14px 20px;
   border-radius: var(--radius-kucuk);
   box-shadow: var(--golge-belirgin);
   font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: break-word;
   animation: bildirim-gir 0.2s ease;
 }
 
@@ -796,10 +811,70 @@ button {
 .bildirim.basari { background: var(--renk-basari); }
 
 @keyframes bildirim-gir {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@media (max-width: 480px) {
+  .bildirim-alani { top: 12px; right: 12px; left: 12px; align-items: stretch; }
+  .bildirim { max-width: 100%; width: auto; }
+}
+
+/* ---------- PDF önizleme modalı: GERÇEK tam ekran ----------
+   .modal-perde temel sınıfı (perde/backdrop, ortalama) klasör gezgini gibi
+   normal boyutlu diyaloglarda kalır; .tam-ekran değiştiricisi eklendiğinde
+   modal-kutu viewport'un TAMAMINI kaplar (inset:0 etkisi — dış boşluk yok),
+   başlık çubuğu sabit kalır, embed geri kalan TÜM alanı flex ile doldurur. */
+
+.modal-perde.tam-ekran {
+  padding: 0;
+}
+
+.modal-perde.tam-ekran .modal-kutu {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+}
+
+.modal-perde.tam-ekran .modal-govde {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+}
+
+.modal-perde.tam-ekran .pdf-onizleme-kutu {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.modal-perde.tam-ekran .pdf-onizleme-kutu embed {
+  height: 100%;
+}
+
+.modal-kapat--belirgin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14.5px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--renk-hata-zemin);
+  color: var(--renk-hata);
+}
+
+.modal-kapat--belirgin:hover { background: var(--renk-hata); color: #fff; }
+
+.pdf-onizleme-arac-cubugu {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
 }
 
 /* ---------- Landing Page (Nedir?) ---------- */

@@ -95,7 +95,7 @@ talepleri TAMAMEN ön yüzden yürür.
 | F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — Uçtan uca backend API'si üzerinden yeni tema (02-deneme-temasi) oluşturma ve PDF derleme/üretme işleri başarıyla koşturulup doğrulanmıştır. `qa/dogrula.py` dinamik ve yayınevi/tema-bağımsız çalışacak şekilde güncellendi. |
 | F5 | **Paketleme + README güncelleme** (arayüz kullanım bölümü, ekran akışı) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — `README.md` dosyası yerel web arayüzünün başlatılması, özellikleri ve kullanımını detaylandıracak şekilde güncellenerek paketleme tamamlandı. |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
-| F7 | Arayüz iyileştirmeleri (kullanıcı istekleri, 2026-07-06): (1) klasör gezgininde YENİ KLASÖR oluşturma (`POST /api/fs/mkdir`); (2) tema kartlarında SİLME (onaylı; `DELETE /api/temalar/{id}` → `temalar/.cop/`a taşınır, kalıcı silme yok); (3) bildirim (toast) kutuları ekranda TAM görünmüyor — konum/z-index/taşma düzeltilecek; (4) PDF önizleme modalı TAM EKRAN olacak (viewport'u doldursun, kapatma düğmesi erişilebilir) | Claude-Sonnet #11 | 🔄 devam ediyor (kim: Claude-Sonnet #11, Fable atadı) |
+| F7 | Arayüz iyileştirmeleri (kullanıcı istekleri, 2026-07-06): (1) klasör gezgininde YENİ KLASÖR oluşturma (`POST /api/fs/mkdir`); (2) tema kartlarında SİLME (onaylı; `DELETE /api/temalar/{id}` → `temalar/.cop/`a taşınır, kalıcı silme yok); (3) bildirim (toast) kutuları ekranda TAM görünmüyor — konum/z-index/taşma düzeltilecek; (4) PDF önizleme modalı TAM EKRAN olacak (viewport'u doldursun, kapatma düğmesi erişilebilir) | Claude-Sonnet #11 → #12 | ✅ tamam (kim: Claude-Sonnet #12, 2026-07-06) — #11'in yarım bıraktığı `app.js`/`mock.js` tamamlandı: gezgin modalına "+ Yeni Klasör" akışı (`api.fsMkdir`, prompt→POST /api/fs/mkdir→liste tazelenir), tema kartına `btn-tehlike` "Sil" butonu + onay metni ("çöpe taşınır, geri alınabilir") + `api.temaSil` (DELETE), Esc tuşu ile PDF önizleme/gezgin modalı kapatma. mock.js'e aynı iki uç nokta sahte olarak eklendi. Backend (#11'in fs_api.py/temalar_api.py/jobs.py eklemeleri) + index.html/style.css (tam ekran modal, toast konumu) zaten sağlamdı, aynen korundu. **Bulunan ve düzeltilen gerçek hata**: `GET /api/temalar` (temalar_api.py) ve `utils.tema_klasorleri()` gizli `temalar/.cop/` klasörünü de bir tema sanıp listeye "İşleniyor…" kartı olarak ekliyordu — her silme sonrası arayüzde sahte bir ".cop" kartı beliriyordu; artık nokta (`.`) ile başlayan klasörler atlanıyor. Doğrulama: `node --check` (app.js, mock.js) temiz; curl ile mkdir (400/409/200) ve DELETE (404/200 + `.cop` taşıma) uçları test edildi; headless Chrome ile gerçek arayüzde 4 özellik de gözle doğrulandı (yeni klasör oluşturuldu ve listede göründü, sahte tema silindi ve `.cop` kartı ARTIK belirmedi, tam ekran PDF önizleme + Esc ile kapama çalıştı), konsolda hata yok. Test için oluşturulan sahte tema (`99-agent-ui-test`) ve klasör (`cikti/agent-test-klasoru`) doğrulama sonrası temizlendi; kullanıcının gerçek temaları/çıktıları (01-tema, 02-11-…, 03-ekonomi-6, 04-10-sinif-tema-1, 05-0-sinif-tema1-ver-2, `cikti/*.pdf`) dokunulmadan kaldı. |
 
 ### F1+F2 sonrası Fable denetimi (2026-07-06)
 
@@ -1380,3 +1380,29 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     * Logoyu ve başlığı tıklayarak doğrudan tanıtım/landing sayfasına dönme işlevi (`gotoView("landing")`) entegre edildi.
     * Logunun boyutu **80x80px**'e büyütülerek görsel kalitesi ve görünürlüğü artırıldı.
   - **Gelişmiş Matematik & Karakter Desteği**: `sistem/flow.css` altındaki `body` font-family fallback tanımlarına `Cambria Math Embedded` ve `Segoe UI Symbol` fontları eklenerek; integral (∫), limit, matris, toplam (∑) ve tüm Yunan/Latin karakterlerinin yüksek sadakatle çözümlenmesi ve basılması garanti altına alındı.
+
+- **F7 (Claude-Sonnet #11 → #12, 2026-07-06): Arayüz iyileştirmeleri — TAMAMLANDI.**
+  - #11 backend'i (`fs_api.py` mkdir, `temalar_api.py` DELETE→`.cop`, `jobs.py`
+    `tema_mesgul_mu`) ve `index.html`/`style.css`'in yarısını (tam ekran modal iskeleti,
+    toast konumu, "+ Yeni Klasör" butonu) bırakıp düştü; `app.js`/`mock.js` HİÇ
+    güncellenmemişti (o oturumun app.js işi kaybolmuştu).
+  - #12 tamamladı: `app.js`'e `api.fsMkdir`/`api.temaSil`, gezgin modalına "+ Yeni
+    Klasör" akışı (prompt→POST /api/fs/mkdir→liste tazelenir), tema kartına
+    `btn-tehlike` "Sil" butonu + "çöpe taşınır, geri alınabilir" onay metni +
+    `DELETE /api/temalar/{id}`, Esc tuşu ile PDF önizleme/gezgin modalını kapatma.
+    `mock.js`'e aynı iki uç nokta sahte veriyle eklendi (?mock=1 modu için).
+  - **Gerçek hata bulundu ve düzeltildi**: `GET /api/temalar` ve
+    `utils.tema_klasorleri()` gizli `temalar/.cop/` klasörünü de bir tema sanıp
+    listeye ekliyordu — her tema silindiğinde arayüzde sahte, bozuk bir ".cop"
+    kartı ("İşleniyor…", tıklanamaz butonlar) beliriyordu. Düzeltme: nokta (`.`)
+    ile başlayan klasör adları listelemeden atlanıyor (iki dosyada da).
+  - Doğrulama: `node --check app.js mock.js` temiz; curl ile `/api/fs/mkdir`
+    (200/400 geçersiz ad/409 mükerrer) ve `DELETE /api/temalar/{id}` (200 + `.cop`'a
+    taşıma/404 bulunamadı) test edildi; headless Chrome ile gerçek arayüzde tüm 4
+    özellik gözle doğrulandı (yeni klasör oluşturulup listede görüldü; sahte
+    `99-agent-ui-test` teması silinip `.cop` kartı ARTIK belirmedi; tam ekran PDF
+    önizleme + Esc ile kapatma çalıştı), konsolda hata yok. Test için oluşturulan
+    sahte tema ve `cikti/agent-test-klasoru` doğrulama sonrası temizlendi;
+    kullanıcının 5 gerçek teması ve `cikti/`'deki PDF'ler dokunulmadan kaldı.
+  - Sunucu `bash arayuz/calistir.sh` ile http://127.0.0.1:8756 üzerinde çalışır
+    bırakıldı.

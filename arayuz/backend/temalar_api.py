@@ -19,6 +19,7 @@ import tema_meta
 from config import CIKTI_DIR, FLOW_CSS, TEMALAR_DIR
 from jobs import Job, job_manager
 from utils import (
+    TR_TZ,
     ApiHata,
     guvenli_ev_yolu,
     islem_gunlugu_yaz,
@@ -28,6 +29,7 @@ from utils import (
     sonraki_tema_no,
     tema_dir_by_id,
 )
+from datetime import datetime
 
 router = APIRouter()
 
@@ -49,6 +51,8 @@ def get_temalar():
     if not os.path.isdir(TEMALAR_DIR):
         return sonuc
     for tema_id in sorted(os.listdir(TEMALAR_DIR)):
+        if tema_id.startswith("."):
+            continue  # temalar/.cop/ (silinen temaların arşivi, F7) bir tema DEĞİL
         tema_dir = os.path.join(TEMALAR_DIR, tema_id)
         if not os.path.isdir(tema_dir):
             continue
@@ -365,3 +369,37 @@ def post_istek(tema_id: str, body: TalepIstek):
                 f.write(yeni_icerik)
 
     return {"tema_id": tema_id, "kaydedildi": True}
+
+
+# ------------------------------------------------------- DELETE /api/temalar/{id}
+COP_DIR = os.path.join(TEMALAR_DIR, ".cop")
+
+
+@router.delete("/api/temalar/{tema_id}")
+def delete_tema(tema_id: str):
+    """KALICI SİLME YOK: tema klasörünü temalar/.cop/<id>-<zaman>/ altına taşır
+    (F7 eki, 2026-07-06). Çalışan/bekleyen bir işi olan tema silinemez (409)."""
+    tema_dir = tema_dir_by_id(tema_id)
+
+    if job_manager.tema_mesgul_mu(tema_id):
+        raise ApiHata(
+            409,
+            "tema meşgul",
+            "Bu temada devam eden (bekleyen veya çalışan) bir iş var, bitmeden silinemez.",
+        )
+
+    os.makedirs(COP_DIR, exist_ok=True)
+    damga = datetime.now(TR_TZ).strftime("%Y%m%d-%H%M%S")
+    hedef = os.path.join(COP_DIR, f"{tema_id}-{damga}")
+    sayac = 1
+    while os.path.exists(hedef):
+        sayac += 1
+        hedef = os.path.join(COP_DIR, f"{tema_id}-{damga}-{sayac}")
+
+    shutil.move(tema_dir, hedef)
+    islem_gunlugu_yaz(
+        hedef,
+        "Arayüz - tema silme",
+        [f"Tema çöpe taşındı: {tema_dir} -> {hedef}"],
+    )
+    return {"tema_id": tema_id, "tasindi": hedef}

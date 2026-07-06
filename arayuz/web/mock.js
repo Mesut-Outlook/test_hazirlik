@@ -271,6 +271,25 @@
       return jsonYanit(fsListele(yolParam, sadece));
     }
 
+    // POST /api/fs/mkdir {path, ad} -> {path, ad} (F7 eki) — fs_api.py ile aynı
+    // kurallar: ad boş olamaz, '/','\\','.','..' içeremez, aynı ad zaten varsa 409.
+    if (yol === "/api/fs/mkdir" && yontem === "POST") {
+      const govde = await govdeOku(secenekler);
+      const ustYol = govde.path || EV_DIZINI;
+      const ad = (govde.ad || "").trim();
+      if (!ad || ad === "." || ad === ".." || ad.includes("/") || ad.includes("\\")) {
+        return hataYanit("geçersiz klasör adı", `'${govde.ad}' geçerli bir klasör adı değil`, 400);
+      }
+      if (!FAKE_FS[ustYol]) FAKE_FS[ustYol] = [];
+      if (FAKE_FS[ustYol].some((g) => g.ad === ad)) {
+        return hataYanit("klasör zaten var", ustYol + "/" + ad, 409);
+      }
+      FAKE_FS[ustYol].push({ ad, tur: "dir" });
+      const yeniYol = ustYol.replace(/\/$/, "") + "/" + ad;
+      FAKE_FS[yeniYol] = [];
+      return jsonYanit({ path: yeniYol, ad });
+    }
+
     // GET /api/temalar -> DÜZ DİZİ (sarmalayıcı yok), PDF yolu yok.
     if (yol === "/api/temalar" && yontem === "GET") {
       return jsonYanit(DB.temalar);
@@ -410,6 +429,22 @@
     eslesme = yol.match(/^\/api\/temalar\/([^/]+)\/istek$/);
     if (eslesme && yontem === "POST") {
       return jsonYanit({ tema_id: eslesme[1], kaydedildi: true });
+    }
+
+    // DELETE /api/temalar/{id} -> KALICI SİLME DEĞİL, gerçek backend gibi
+    // (temalar/.cop/ yerine) burada sadece listeden kaldırılıp DB.cop'a
+    // taşınmış gibi işaretlenir (F7 eki) -> {tema_id, tasindi}.
+    eslesme = yol.match(/^\/api\/temalar\/([^/]+)$/);
+    if (eslesme && yontem === "DELETE") {
+      const temaId = eslesme[1];
+      const idx = DB.temalar.findIndex((t) => t.tema_id === temaId);
+      if (idx === -1) return hataYanit("tema bulunamadı", temaId, 404);
+      const [tasinanTema] = DB.temalar.splice(idx, 1);
+      delete DB.bloklarByTema[temaId];
+      const hedef = "(mock)/.cop/" + temaId + "-" + Date.now();
+      DB.cop = DB.cop || [];
+      DB.cop.push({ ...tasinanTema, tasindi: hedef });
+      return jsonYanit({ tema_id: temaId, tasindi: hedef });
     }
 
     // GET /api/pdf

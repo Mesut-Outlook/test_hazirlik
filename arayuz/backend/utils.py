@@ -106,7 +106,9 @@ def tema_klasorleri() -> list[str]:
     if not os.path.isdir(TEMALAR_DIR):
         return []
     return sorted(
-        d for d in os.listdir(TEMALAR_DIR) if os.path.isdir(os.path.join(TEMALAR_DIR, d))
+        d
+        for d in os.listdir(TEMALAR_DIR)
+        if not d.startswith(".") and os.path.isdir(os.path.join(TEMALAR_DIR, d))
     )
 
 

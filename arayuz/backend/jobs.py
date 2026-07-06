@@ -83,6 +83,12 @@ class JobManager:
         with self._lock:
             return self._jobs.get(job_id)
 
+    def tema_mesgul_mu(self, tema_id: str) -> bool:
+        """tema_id için bekleyen veya çalışan bir iş var mı? (silme koruması, F7)."""
+        with self._lock:
+            jobs = list(self._jobs.values())
+        return any(j.tema_id == tema_id and j.durum in ("bekliyor", "çalışıyor") for j in jobs)
+
     def _calis(self) -> None:
         while True:
             job, calistir = self._kuyruk.get()

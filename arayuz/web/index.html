@@ -338,20 +338,22 @@
     </div>
     <div class="modal-alt">
       <span class="modal-alt__yol-secili" id="gezgin-secili-yol"></span>
+      <button class="btn" id="gezgin-btn-yeni-klasor">+ Yeni Klasör</button>
       <button class="btn" id="gezgin-btn-iptal">İptal</button>
       <button class="btn btn-birincil" id="gezgin-btn-sec" hidden>Bu Klasörü Seç</button>
     </div>
   </div>
 </div>
 
-<!-- ================= PDF ÖNİZLEME MODALI (ana sayfa kartlarından) ================= -->
-<div class="modal-perde" id="pdf-onizleme-modal">
-  <div class="modal-kutu" style="max-width:820px;">
+<!-- ================= PDF ÖNİZLEME MODALI (ana sayfa kartlarından + sihirbaz Adım 3) =================
+     .tam-ekran: viewport'un tamamını kaplar (bkz. style.css), Esc ile de kapanır (app.js). -->
+<div class="modal-perde tam-ekran" id="pdf-onizleme-modal">
+  <div class="modal-kutu">
     <div class="modal-baslik">
       <h3 id="pdf-onizleme-modal-baslik">PDF Önizleme</h3>
-      <button class="modal-kapat" id="pdf-onizleme-modal-kapat" aria-label="Kapat">×</button>
+      <button class="modal-kapat modal-kapat--belirgin" id="pdf-onizleme-modal-kapat" aria-label="Kapat">Kapat ✕</button>
     </div>
-    <div class="modal-govde" style="padding:16px;">
+    <div class="modal-govde">
       <div class="pdf-onizleme-kutu">
         <embed id="pdf-onizleme-embed" type="application/pdf">
       </div>
