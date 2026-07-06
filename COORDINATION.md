@@ -94,6 +94,19 @@ talepleri TAMAMEN ön yüzden yürür.
 | F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | Claude-Sonnet | ⬜ F4'ü bekliyor |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
 
+### F1+F2 sonrası Fable denetimi (2026-07-06)
+
+- Gerçek backend + gerçek ön yüz birlikte ayağa kaldırılıp ana ekran headless
+  ekran görüntüsüyle doğrulandı: logo sol üstte, 01-tema kartı gerçek sayımlarla
+  (v4, 567 soru, 131 görsel) geliyor, Önizle/Düzenle/Yeniden Üret butonları yerinde.
+- F2'nin işaretlediği açık KAPATILDI (Fable, küçük yama): `GET /api/temalar` artık
+  kalıcı `son_pdf` alanı döner (uret job'ı tema_meta.json'a yazar; 01-tema için
+  mevcut v3 tohumlandı), ön yüz Önizle'de önce bunu kullanır, localStorage yedek.
+  tema_meta.json makineye özgü olduğundan .gitignore'a alındı.
+- Başlatma: `bash arayuz/calistir.sh` → http://127.0.0.1:8756
+- SIRADA: F3 (AGY — extract genelleştirme, talimat 9. madde) ve F4 (uçtan uca
+  test; F3 bitince Fable bir Sonnet ajanla AGY'ye paylaştıracak).
+
 ### FAZ 4 Talep Kuyruğu
 
 (Arayüzden gelen serbest metin düzenleme talepleri buraya eklenecek — işleyen

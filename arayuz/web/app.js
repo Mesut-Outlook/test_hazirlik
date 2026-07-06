@@ -524,7 +524,8 @@
   // ---- PDF önizleme modalı (kartlardan / sonuç ekranından ortak) ----
 
   function pdfOnizlemeAc(tema) {
-    const bilinenYol = sonPdfYollariOku()[tema.tema_id];
+    // Öncelik: backend'in kalıcı son_pdf alanı; yoksa bu oturumun localStorage kaydı
+    const bilinenYol = (tema && tema.son_pdf) || sonPdfYollariOku()[tema.tema_id];
     if (!tema || !bilinenYol) {
       bildirimGoster(
         'Bu tema için bu oturumda üretilmiş bir PDF yok. "Yeniden Üret" ile bir PDF oluşturduktan sonra önizleyebilirsiniz.',

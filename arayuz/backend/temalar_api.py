@@ -81,6 +81,9 @@ def get_temalar():
                 }
             )
             continue
+        son_pdf = meta.get("son_pdf")
+        if son_pdf and not os.path.exists(son_pdf):
+            son_pdf = None
         sonuc.append(
             {
                 "tema_id": tema_id,
@@ -90,6 +93,7 @@ def get_temalar():
                 "soru_sayisi": sayimlar["soru"],
                 "kok_sayisi": sayimlar["kok"],
                 "gorsel_sayisi": sayimlar["gorsel"],
+                "son_pdf": son_pdf,
             }
         )
     return sonuc
@@ -308,6 +312,8 @@ def post_uret(tema_id: str, body: UretIstek):
                 f"Doğrulama: {dogrulama_str}",
             ],
         )
+        # Önizleme oturumlar arası da çalışsın diye son çıktı yolu kalıcı tutulur
+        tema_meta.yaz(tema_dir, {"son_pdf": cikti_pdf})
         job.bitir(
             {
                 "cikti_pdf": cikti_pdf,

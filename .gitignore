@@ -16,3 +16,6 @@ qa/text_diff.txt
 temalar/*/*.html
 !temalar/*/sorular.html
 
+
+# Arayüz çalışma-zamanı meta dosyaları (makineye özgü yollar)
+temalar/*/tema_meta.json
