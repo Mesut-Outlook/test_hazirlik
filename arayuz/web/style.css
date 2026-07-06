@@ -74,6 +74,7 @@ button {
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid var(--renk-kenar);
+  cursor: pointer;
 }
 
 .ust-baslik__baslik {
@@ -81,6 +82,7 @@ button {
   font-weight: 700;
   color: var(--renk-ana-koyu);
   margin-right: auto;
+  cursor: pointer;
 }
 
 .ust-baslik__alt {

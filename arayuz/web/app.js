@@ -521,6 +521,8 @@
 
   el("#btn-yeni-tema-anasayfa").addEventListener("click", () => gotoView("sihirbaz"));
   el("#btn-landing-basla").addEventListener("click", () => gotoView("sihirbaz"));
+  el(".ust-baslik__logo").addEventListener("click", () => gotoView("landing"));
+  el(".ust-baslik__baslik").addEventListener("click", () => gotoView("landing"));
 
   // ---- PDF önizleme modalı (kartlardan / sonuç ekranından ortak) ----
 
