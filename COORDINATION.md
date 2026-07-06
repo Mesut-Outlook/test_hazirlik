@@ -88,7 +88,7 @@ talepleri TAMAMEN ön yüzden yürür.
 |---|---|---|---|
 | F0 | Mimari + API sözleşmesi + görev dağılımı (bu bölüm) | Fable | ✅ tamam (2026-07-06) |
 | F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | ✅ tamam (2026-07-06, Claude-Sonnet #9) — bkz. Değişiklik Günlüğü |
-| F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | 🔄 devam ediyor (kim: Claude-Sonnet #10, Fable atadı) |
+| F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | ✅ tamam (kim: Claude-Sonnet #10, 2026-07-06) — 4 ekran (ana sayfa/sihirbaz/düzenleme/ayarlar) + `mock.js`; F1'in gerçek kodu okunarak API hizalandı (9 madde, bkz. değişiklik günlüğü) — özellikle POST /temalar PDF üretmediği için sihirbaz create+uret zincirliyor, GET /temalar PDF yolu vermediği için "Önizle" localStorage yedeğiyle çalışıyor. mock.js ile 17 ekran görüntüsü + puppeteer-core ile uçtan uca gezildi, 1 gerçek hata (hidden/CSS çakışması) bulunup düzeltildi. Logo `arayuz/web/logo_es.jpg`'ye kopyalandı, header sol üstte sabit. |
 | F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ⬜ AGY'yi bekliyor (AGY talimatları 9. madde) |
 | F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY + 1 Sonnet | ⬜ F1+F2+F3'ü bekliyor |
 | F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | Claude-Sonnet | ⬜ F4'ü bekliyor |
@@ -813,6 +813,89 @@ kopyala. **Orijinal `1.tema.pdf`'e DOKUNMA.**
     görsel taraması `temalar/01-tema/sorular.html`'i hardcode ediyor); `uret`
     job'ı yine de kaynak/çıktı PDF'i vererek çalıştırıyor, başka temalarda
     "FARK" çıkması beklenen/bilgi amaçlı bir durum, hata değil.
+- 2026-07-06 (Claude-Sonnet #10 — F2 tamamlandı, arayüz ön yüzü): `arayuz/web/`
+  altında framework'süz tek sayfa uygulama yazıldı — `index.html` + `app.js`
+  (~1000 satır) + `style.css` + `mock.js`. Ekranlar: (1) ana sayfa tema kartları
+  (Önizle/Düzenle/Yeniden Üret), (2) 3 adımlı sihirbaz (dosya+klasör seç →
+  ilerleme+canlı log → PDF önizleme+doğrulama paneli), (3) düzenleme ekranı
+  (bölüm başlıklarıyla gruplu blok listesi, HTML5 sürükle-bırak sıralama, silme
+  onaylı, yeni blok formu, serbest talep kutusu — talepler `localStorage`'da
+  tema başına saklanıyor), (4) ayarlar. Klasör/dosya seçimi `GET /api/fs/list`
+  ile modal bir gezgin üzerinden (dosya modu: yalnızca pdf/docx tıklanabilir;
+  dizin modu: "Bu Klasörü Seç" butonu). Logo `sistem/logo_es.jpg`'den
+  `arayuz/web/logo_es.jpg`'ye KOPYALANDI (Fable talebiyle — backend statik
+  servisi `arayuz/web/`den yaptığı için `sistem/` yoluna bağımlı olunmadı);
+  header'ın sol ucunda sabit, ~40px, hafif yuvarlatılmış köşe, her ekranda görünür
+  (header `<body>` düzeyinde, görünüm değişse de kaybolmuyor).
+  - **ÖNEMLİ — API hizalaması F1'in GERÇEK koduyla yapıldı** (COORDINATION.md'deki
+    sözleşme yalnızca uç nokta adlarını sabitliyor, yanıt gövdesi şekillerini
+    değil; F1 paralelde `arayuz/backend/` kodunu zaten yazmıştı, bu kod okunarak
+    varsayımlar yerine gerçek şekiller kullanıldı — `app.js` üstündeki büyük yorum
+    bloğunda tam liste var). Öne çıkan farklar/kararlar:
+    1. `GET /api/temalar` SARMALAYICISIZ düz dizi döner, alan adı `tema_id`
+       (`id` değil), **PDF yolu HİÇ döndürmüyor**. Çözüm: "Önizle" butonu, bir
+       `/uret` işi TAMAMLANDIĞINDA `job.sonuc.cikti_pdf`/`kopya`'dan yakaladığı
+       yolu `localStorage`'a (tema_id → yol) yazıyor; hiç üretim yapılmamış bir
+       temada "Önizle" bilgilendirici bir mesaj gösteriyor (fetch hatası yerine).
+       **F1/Fable'a öneri**: `tema_meta.json`'a son üretilen PDF yolu yazılıp
+       `GET /api/temalar` yanıtına bir `son_pdf` alanı eklenirse bu geçici çözüm
+       kaldırılabilir.
+    2. `POST /api/temalar` işi **SADECE extract.py'yi çalıştırır, PDF ÜRETMEZ**
+       (koddan doğrulandı — `run_assemble`/`run_print` o işte hiç çağrılmıyor).
+       Sihirbazın tek "Dönüştür" tıklamasıyla 3. adımda gerçek bir PDF
+       önizlemesi göstermesi için `app.js`'te oluşturma işi bitince OTOMATİK
+       olarak `POST /uret` zincirleniyor (`sihirbazJobIzle` fonksiyonu, `asama`
+       parametresiyle "olustur"→"uret" geçişi yapıyor).
+    3. `GET /api/fs/list` alan adları `path`/`ust_dizin`/`tur:'dir'|'dosya'`
+       (F2'nin ilk taslağında `yol`/`ust`/`'dizin'` varsayılmıştı, düzeltildi).
+    4. `GET /api/temalar/{id}/bloklar` → `{tema_id, bloklar}` (`akis` değil).
+    5. `PATCH .../manifest` gövdesi **SAYFA/GRUP yapılı** bekleniyor:
+       `{akis:[{sayfa, bloklar:[id,...]}]}` — ama `GET .../bloklar` bunu
+       düzleştirip veriyor (grup sınırları/sayfa bilgisi ön yüze hiç ulaşmıyor).
+       F2 bu yüzden TÜM sırayı TEK bir grupta (`{sayfa:1, bloklar:[...]}`)
+       gönderiyor; `blocks.manifest_patch` yalnızca id varlığı/tekrarsızlığını
+       doğruladığı için bu çalışıyor ama özgün grup/sayfa bilgisini kaybediyor.
+       **F1/Fable'a not**: GET/PATCH arasındaki bu asimetri (biri düzleştirir,
+       diğeri grup ister) ileride çok sayfalı manifestlerde sorun çıkarabilir —
+       ya GET de grup yapısını dönmeli, ya da PATCH tek grubu kabul etmeye devam
+       etmeli (şu an ikincisi fiilen doğru ama şartname'de yazılı değil).
+    6. `POST .../bloklar` gövdesinde `konum` alanı `{sonra_id}|null` (bir dize
+       değil) ve `sinif` değeri backend'in `BILINEN_SINIFLAR` kümesiyle BİREBİR
+       eşleşmeli (`question, theory-box, kur-tag, answer-key, img-block, para,
+       section-sub`) — ön yüzdeki "Yeni Blok Ekle" formu bu tam değerlerle
+       güncellendi (ilk taslakta "soru"/"teori" gibi Türkçe kısaltmalar vardı,
+       backend bunları reddederdi).
+    7. İş (job) gövdesinde **ilerleme yüzdesi ve mesaj alanı YOK**; SSE İSİMLİ
+       olaylar kullanıyor (`log`: tek satır, `durum`: tam anlık — yalnızca
+       tamam/hata'da bir kez). `jobIzle()` buna göre yeniden yazıldı; ilerleme
+       çubuğu artık sayısal yüzde yoksa "belirsiz" (kayan animasyon) modda,
+       durum metni son log satırından türetiliyor.
+    8. `job.sonuc.dogrulama` bir kontrol listesi DEĞİL, `{calisti, cikti, not}`
+       şeklinde `qa/dogrula.py`'nin ham metin çıktısı — doğrulama paneli buna
+       göre (özet rozet + ham çıktı kutusu, "FARK" geçip geçmediğine bakarak)
+       yeniden tasarlandı.
+    9. `POST .../istek` → `{tema_id, kaydedildi:true}` döner (id/durum yok) —
+       sunucu tarafında talep durumu sorgulanacak bir uç nokta yok; gönderilen
+       talepler ön yüzde `localStorage`'da tutulup "kuyrukta" gösteriliyor.
+  - **Test**: `python3 -m http.server` + `google-chrome-stable --headless` +
+    `puppeteer-core` (repo'daki `node_modules`) ile tüm ekranlar `?mock=1`
+    modunda uçtan uca gezildi (dosya/klasör seçimi, sihirbaz 3 adım, blok
+    sürükle-bırak/silme/ekleme, sıralama kaydetme, yeniden üretim, ayarlar, PDF
+    önizleme modalı) — konsol hatası kalmadı (yalnızca zararsız favicon 404'ü).
+    1 gerçek arayüz hatası bulunup düzeltildi: `.form-eylemleri{display:flex}`
+    ile tarayıcının `[hidden]{display:none}` kuralı eşit özgüllükte çakışıyordu,
+    "Adım 1'e Dön" butonu ilerleme sırasında da görünüyordu — global
+    `[hidden]{display:none !important}` kuralıyla kalıcı çözüldü. `<embed
+    src="/api/pdf?...">`'in tarayıcı düzeyinde DOĞRUDAN ağ isteği attığı (mock'un
+    sarmaladığı `fetch`'i atladığı) fark edildi — çözüm: PDF her zaman `fetch()`
+    ile çekilip `blob:` URL'e çevriliyor (`pdfEmbedYukle`), hem mock hem gerçek
+    backend'de aynı kod yolu çalışıyor. `mock.js` da F1'in gerçek yanıt
+    şekilleriyle (yukarıdaki 9 madde) birebir eşleşecek şekilde güncellendi.
+  - **Kapsam dışı bırakılan/bilinen basitleştirmeler**: "hazırlanıyor"/"hata"
+    durumundaki temalar kartta pasifleştiriliyor ama ilerlemesi ana sayfadan
+    izlenemiyor (yalnızca oluşturma anındaki sihirbaz akışında görülür);
+    manifest PATCH'in tek-grup basitleştirmesi (madde 5); talep durumu canlı
+    güncellenmiyor (localStorage sabit "kuyrukta").
 
 ## FAZ 3 QA Bulguları
 

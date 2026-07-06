@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Hazırlık — Arayüz</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="ust-baslik">
+  <img class="ust-baslik__logo" src="logo_es.jpg" alt="Egemen Sarıkcı logosu">
+  <div class="ust-baslik__baslik">
+    Test Hazırlık
+    <span class="ust-baslik__alt">Ders notlarını tek tuşla düzenli teste çevir</span>
+  </div>
+  <span id="mock-rozeti" class="mock-rozeti" hidden>SAHTE VERİ MODU</span>
+  <nav class="sekme-nav">
+    <button class="sekme-btn" data-gorunum="anasayfa">Temalar</button>
+    <button class="sekme-btn" data-gorunum="sihirbaz">Yeni Tema</button>
+    <button class="sekme-btn" data-gorunum="ayarlar">Ayarlar</button>
+  </nav>
+</header>
+
+<main class="ana-icerik">
+
+  <!-- ================= ANA SAYFA: TEMA LİSTESİ ================= -->
+  <section class="gorunum" id="view-anasayfa">
+    <h1 class="gorunum-baslik">Temalarım</h1>
+    <p class="gorunum-aciklama">Daha önce oluşturduğunuz testler burada listelenir. Yeni bir ders notunu teste çevirmek için sağdaki "Yeni Tema" butonunu kullanın.</p>
+
+    <div class="eylem-satiri">
+      <div></div>
+      <button class="btn btn-birincil btn-buyuk" id="btn-yeni-tema-anasayfa">+ Yeni Tema Oluştur</button>
+    </div>
+
+    <div id="tema-izgara-alani">
+      <p class="yukleniyor-metni">Temalar yükleniyor…</p>
+    </div>
+  </section>
+
+  <!-- ================= SİHİRBAZ ================= -->
+  <section class="gorunum" id="view-sihirbaz">
+    <h1 class="gorunum-baslik">Yeni Tema Oluştur</h1>
+    <p class="gorunum-aciklama">Üç adımda ders notunuzu düzenli bir teste dönüştürün.</p>
+
+    <div class="adim-gostergesi">
+      <div class="adim-gostergesi__ogeler">
+        <div class="adim aktif" data-adim="1"><span class="adim__numara">1</span> Dosya Seç</div>
+        <div class="adim-cizgi" data-cizgi="1"></div>
+        <div class="adim" data-adim="2"><span class="adim__numara">2</span> Dönüştür</div>
+        <div class="adim-cizgi" data-cizgi="2"></div>
+        <div class="adim" data-adim="3"><span class="adim__numara">3</span> Sonuç</div>
+      </div>
+    </div>
+
+    <!-- ADIM 1 -->
+    <div class="panel adim-panel" id="panel-adim-1">
+      <div class="form-grup">
+        <label for="girdi-kaynak-dosya">Kaynak Ders Notu (PDF veya Word)</label>
+        <div class="dosya-secici">
+          <input type="text" id="girdi-kaynak-dosya" placeholder="Henüz dosya seçilmedi" readonly>
+          <button class="btn" id="btn-kaynak-sec">Dosya Seç…</button>
+        </div>
+        <span class="ipucu">Bilgisayarınızdaki bir .pdf veya .docx dosyasını seçin.</span>
+      </div>
+
+      <div class="form-grup">
+        <label for="girdi-cikti-klasoru">Çıktı Klasörü</label>
+        <div class="dosya-secici">
+          <input type="text" id="girdi-cikti-klasoru" placeholder="Henüz klasör seçilmedi" readonly>
+          <button class="btn" id="btn-cikti-sec">Klasör Seç…</button>
+        </div>
+        <span class="ipucu">Hazırlanan PDF bu klasöre kaydedilecek.</span>
+      </div>
+
+      <div class="form-grup">
+        <label for="girdi-tema-adi">Tema Adı</label>
+        <input type="text" id="girdi-tema-adi" placeholder="Örn. 2. Tema — Fonksiyonlar">
+        <span class="ipucu">Testi daha sonra listede tanıyabilmeniz için kısa bir ad.</span>
+      </div>
+
+      <div class="form-eylemleri">
+        <button class="btn" id="btn-adim1-iptal">Vazgeç</button>
+        <button class="btn btn-birincil btn-buyuk" id="btn-adim1-donustur">Dönüştür →</button>
+      </div>
+    </div>
+
+    <!-- ADIM 2 -->
+    <div class="panel adim-panel" id="panel-adim-2" hidden>
+      <p class="durum-metni" id="adim2-durum-metni">Başlatılıyor…</p>
+      <div class="ilerleme-cubuk-dis">
+        <div class="ilerleme-cubuk-ic" id="adim2-ilerleme-cubuk"></div>
+      </div>
+      <div class="ilerleme-yuzde" id="adim2-yuzde">%0</div>
+      <div class="log-paneli" id="adim2-log-paneli"></div>
+      <div class="form-eylemleri" id="adim2-hata-eylemler" hidden>
+        <button class="btn" id="btn-adim2-geri">← Adım 1'e Dön</button>
+      </div>
+    </div>
+
+    <!-- ADIM 3 -->
+    <div class="panel adim-panel" id="panel-adim-3" hidden>
+      <div class="sonuc-izgara">
+        <div class="pdf-onizleme-kutu">
+          <embed id="adim3-pdf-onizleme" type="application/pdf">
+        </div>
+        <div class="dogrulama-paneli">
+          <h3>Doğrulama Sonucu</h3>
+          <div class="rozet-listesi" id="adim3-dogrulama-listesi"></div>
+          <div class="cikti-klasoru-notu" id="adim3-cikti-notu"></div>
+          <div class="form-eylemleri" style="justify-content:flex-start; margin-top:22px;">
+            <button class="btn btn-birincil" id="btn-adim3-duzenle">Soruları Düzenle</button>
+            <button class="btn" id="btn-adim3-anasayfa">Ana Sayfaya Dön</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DÜZENLEME EKRANI ================= -->
+  <section class="gorunum" id="view-duzenle">
+    <div class="duzenle-ust">
+      <div>
+        <h1 class="gorunum-baslik" id="duzenle-tema-baslik">Tema Düzenle</h1>
+        <p class="gorunum-aciklama" id="duzenle-tema-alt" style="margin-bottom:0;">Blokları sürükleyerek sıralayabilir, çöp kutusu ile kaldırabilir, aşağıdan yeni blok ekleyebilirsiniz.</p>
+      </div>
+      <div class="form-eylemleri" style="margin-top:0;">
+        <button class="btn" id="btn-duzenle-anasayfa">← Temalara Dön</button>
+        <button class="btn btn-birincil" id="btn-duzenle-kaydet">Sıralamayı Kaydet</button>
+        <button class="btn btn-birincil" id="btn-duzenle-uret">Yeniden Üret</button>
+      </div>
+    </div>
+
+    <div id="blok-listesi-alani">
+      <p class="yukleniyor-metni">Bloklar yükleniyor…</p>
+    </div>
+
+    <div class="panel" id="duzenle-uretim-paneli" hidden style="margin-top:24px;">
+      <h3 style="margin-top:0;">Yeniden Üretim İlerlemesi</h3>
+      <p class="durum-metni" id="duzenle-uretim-durum">Başlatılıyor…</p>
+      <div class="ilerleme-cubuk-dis">
+        <div class="ilerleme-cubuk-ic" id="duzenle-uretim-cubuk"></div>
+      </div>
+      <div class="ilerleme-yuzde" id="duzenle-uretim-yuzde">%0</div>
+      <div class="log-paneli" id="duzenle-uretim-log"></div>
+      <div id="duzenle-uretim-sonuc" hidden style="margin-top:18px;">
+        <div id="duzenle-uretim-dogrulama" style="margin-bottom:16px;"></div>
+        <h4 style="margin-bottom:8px;">Yeni PDF Önizleme</h4>
+        <div class="pdf-onizleme-kutu">
+          <embed id="duzenle-uretim-embed" type="application/pdf">
+        </div>
+      </div>
+    </div>
+
+    <div class="duzenle-alt-panel">
+      <div class="panel" id="panel-yeni-blok">
+        <h3 style="margin-top:0;">Yeni Blok Ekle</h3>
+        <div class="form-grup">
+          <label for="yeni-blok-tur">Blok Türü</label>
+          <select id="yeni-blok-tur">
+            <option value="question">Soru</option>
+            <option value="theory-box">Teori Kutusu</option>
+            <option value="img-block">Görsel</option>
+            <option value="answer-key">Cevap Anahtarı</option>
+            <option value="section-sub">Alt Başlık</option>
+            <option value="kur-tag">Bölüm Başlığı</option>
+            <option value="para">Paragraf / Not</option>
+          </select>
+          <span class="ipucu">Değerler backend'in kabul ettiği sınıf adlarıyla (sistem/flow.css sözleşmesi) eşleşir.</span>
+        </div>
+        <div class="form-grup">
+          <label for="yeni-blok-metin">İçerik (HTML/metin)</label>
+          <textarea id="yeni-blok-metin" placeholder="Soru metnini veya blok içeriğini buraya yazın…"></textarea>
+        </div>
+        <div class="form-eylemleri">
+          <button class="btn btn-birincil" id="btn-yeni-blok-ekle">Bloğu Ekle</button>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-serbest-talep">
+        <h3 style="margin-top:0;">Serbest Talep Gönder</h3>
+        <p class="gorunum-aciklama" style="font-size:14px; margin-bottom:14px;">
+          Kod bilmenize gerek yok — ne değişmesini istediğinizi kendi cümlelerinizle yazın,
+          talebiniz ajanlara iletilsin. Örn. "12. sayfadaki 3. soruyu sil" veya
+          "üslü sayılar bölümüne 2 yeni soru ekle".
+        </p>
+        <div class="form-grup">
+          <textarea id="serbest-talep-metin" placeholder="Talebinizi buraya yazın…"></textarea>
+        </div>
+        <div class="form-eylemleri">
+          <button class="btn btn-birincil" id="btn-talep-gonder">Ajanlara İlet</button>
+        </div>
+        <ul class="talep-listesi" id="talep-listesi"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= AYARLAR ================= -->
+  <section class="gorunum" id="view-ayarlar">
+    <h1 class="gorunum-baslik">Ayarlar</h1>
+    <p class="gorunum-aciklama">Sihirbazda önerilecek varsayılan giriş ve çıkış klasörlerini burada belirleyin.</p>
+
+    <div class="panel ayarlar-panel">
+      <div class="form-grup">
+        <label for="ayar-giris-klasoru">Varsayılan Giriş Klasörü</label>
+        <div class="dosya-secici">
+          <input type="text" id="ayar-giris-klasoru" readonly>
+          <button class="btn" id="btn-ayar-giris-sec">Klasör Seç…</button>
+        </div>
+      </div>
+      <div class="form-grup">
+        <label for="ayar-cikti-klasoru">Varsayılan Çıktı Klasörü</label>
+        <div class="dosya-secici">
+          <input type="text" id="ayar-cikti-klasoru" readonly>
+          <button class="btn" id="btn-ayar-cikti-sec">Klasör Seç…</button>
+        </div>
+      </div>
+      <div class="form-eylemleri">
+        <button class="btn btn-birincil" id="btn-ayarlar-kaydet">Ayarları Kaydet</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= KLASÖR/DOSYA GEZGİNİ MODALI ================= -->
+<div class="modal-perde" id="gezgin-modal">
+  <div class="modal-kutu">
+    <div class="modal-baslik">
+      <h3 id="gezgin-modal-baslik">Dosya Seç</h3>
+      <button class="modal-kapat" id="gezgin-modal-kapat" aria-label="Kapat">×</button>
+    </div>
+    <div class="modal-yol-cubugu" id="gezgin-yol-cubugu">/</div>
+    <div class="modal-govde" id="gezgin-govde">
+      <p class="yukleniyor-metni">Yükleniyor…</p>
+    </div>
+    <div class="modal-alt">
+      <span class="modal-alt__yol-secili" id="gezgin-secili-yol"></span>
+      <button class="btn" id="gezgin-btn-iptal">İptal</button>
+      <button class="btn btn-birincil" id="gezgin-btn-sec" hidden>Bu Klasörü Seç</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PDF ÖNİZLEME MODALI (ana sayfa kartlarından) ================= -->
+<div class="modal-perde" id="pdf-onizleme-modal">
+  <div class="modal-kutu" style="max-width:820px;">
+    <div class="modal-baslik">
+      <h3 id="pdf-onizleme-modal-baslik">PDF Önizleme</h3>
+      <button class="modal-kapat" id="pdf-onizleme-modal-kapat" aria-label="Kapat">×</button>
+    </div>
+    <div class="modal-govde" style="padding:16px;">
+      <div class="pdf-onizleme-kutu">
+        <embed id="pdf-onizleme-embed" type="application/pdf">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bildirim-alani" id="bildirim-alani"></div>
+
+<!-- mock.js SADECE ?mock=1 parametresiyle devreye girer; gerçek backend
+     bağlandığında bu satırı kaldırmaya gerek yok, backend bağlıyken
+     mock=1 verilmezse hiçbir şeye dokunmaz. -->
+<script src="mock.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
