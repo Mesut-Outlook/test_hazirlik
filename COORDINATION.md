@@ -80,6 +80,8 @@ talepleri TAMAMEN ön yüzden yürür.
   → çıktı `cikti/` + kullanıcının seçtiği çıktı klasörüne kopya
 - `GET  /api/pdf?path=` — PDF stream (önizleme; sadece proje/çıktı klasörleri)
 - `POST /api/temalar/{id}/istek` `{metin}` — serbest talebi kuyruğa yaz
+- `POST /api/fs/mkdir` `{path, ad}` — seçili dizin altında yeni klasör (ev dizini sınırı geçerli) *(F7 eki, 2026-07-06)*
+- `DELETE /api/temalar/{id}` — temayı SİLMEZ, `temalar/.cop/<id>-<zaman>/` altına taşır (geri alınabilir) *(F7 eki, 2026-07-06)*
 - Hata gövdesi standardı: `{hata: "...", detay: "..."}`; tüm yollar UTF-8/Türkçe.
 
 ### Görev Panosu — FAZ 4
@@ -93,6 +95,7 @@ talepleri TAMAMEN ön yüzden yürür.
 | F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — Uçtan uca backend API'si üzerinden yeni tema (02-deneme-temasi) oluşturma ve PDF derleme/üretme işleri başarıyla koşturulup doğrulanmıştır. `qa/dogrula.py` dinamik ve yayınevi/tema-bağımsız çalışacak şekilde güncellendi. |
 | F5 | **Paketleme + README güncelleme** (arayüz kullanım bölümü, ekran akışı) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — `README.md` dosyası yerel web arayüzünün başlatılması, özellikleri ve kullanımını detaylandıracak şekilde güncellenerek paketleme tamamlandı. |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
+| F7 | Arayüz iyileştirmeleri (kullanıcı istekleri, 2026-07-06): (1) klasör gezgininde YENİ KLASÖR oluşturma (`POST /api/fs/mkdir`); (2) tema kartlarında SİLME (onaylı; `DELETE /api/temalar/{id}` → `temalar/.cop/`a taşınır, kalıcı silme yok); (3) bildirim (toast) kutuları ekranda TAM görünmüyor — konum/z-index/taşma düzeltilecek; (4) PDF önizleme modalı TAM EKRAN olacak (viewport'u doldursun, kapatma düğmesi erişilebilir) | Claude-Sonnet #11 | 🔄 devam ediyor (kim: Claude-Sonnet #11, Fable atadı) |
 
 ### F1+F2 sonrası Fable denetimi (2026-07-06)
 
