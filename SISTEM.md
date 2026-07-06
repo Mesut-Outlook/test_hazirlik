@@ -45,6 +45,14 @@ test_hazirlik/
 - Kimlik şeması: `tNN-sNNN` (tema no + soru sırası, üretimde bir kez verilir, sonra
   ASLA değişmez — yeni soru eklerken aradaki sayıya sıkıştırma yok, sona ekle:
   elle eklenen sorular `tNN-eNNN` ("e"=ek) serisinden gider).
+  **UYARI (FAZ 3 dersi, 2026-07-05):** elle blok eklerken MEVCUT bir id'yi kullanmak
+  assemble aşamasında sessiz içerik kaybı yaratır (aynı id'li son blok kazanır, öbür
+  konumlara da o basılır). `sistem/assemble.py` bu yüzden mükerrer id görürse HATA
+  verip durur (exit 2) — id vermeden önce `grep 'id="tNN-' sorular.html` ile son
+  kullanılan numaraya bak. 01-tema'da son ek id: `t01-e002`.
+- **ID DONDURMA:** bir temanın üretimi kullanıcı onayına ulaştıktan sonra o tema için
+  `extract.py` bir daha ÇALIŞTIRILMAZ (id'leri baştan üretir, kalıcılığı bozar);
+  her düzeltme sorular.html + manifest.json üzerinden yapılır.
 - Soru dışı bloklar da aynı düzende: `class="theory-box"`, `class="kur-tag"`,
   `class="answer-key"`, `class="img-block"` — hepsi id'li.
 - `manifest.json` belgenin İSKELETİDİR: hangi blokların hangi sırayla basılacağı.

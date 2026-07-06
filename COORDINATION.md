@@ -8,22 +8,26 @@ tuzaklar). Bu dosya sadece **görev atama ve ilerleme takibi** içindir.
 `🔄 devam ediyor (kim: ...)` olarak güncellesin, bitirince `✅ tamam` yapsın. Çakışmayı
 önlemek için bir görevi almadan önce mutlaka bu dosyayı TEKRAR OKU (başkası almış olabilir).
 
-## Genel Durum (son güncelleme: Claude, 2026-07-04 akşam)
+## Genel Durum (son güncelleme: Fable, 2026-07-06)
 
-- 18/18 fragment tamam: frag_01, 02, 03, 04, 05, 06, 07, 08, 09, 10, 11, 12, 13, 14, 15, 16, 17, 18
-- 0/18 fragment eksik: (Tümü tamamlandı!)
-- Proje Durumu: ✅ TAMAMLANDI + revizyonlar yapıldı (karekök düzeltmesi, logo header).
-- Proje klasörü artık: `C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\` (md dosyaları,
-  orijinal PDF kopyası, final PDF'ler ve logo burada). DİKKAT: iCloudDrive'a kopyalandı
-  notu YANLIŞTI — iCloud'da hâlâ sadece orijinal 1.tema.pdf var, düzenlenmiş sürüm
-  kopyalanmadı (kullanıcı isterse kopyalanacak).
-- Güncel teslim dosyası: `Test Hazırlık\1.tema_egemen_sarikci_v2.pdf` (135 sayfa,
-  logo sol üstte, "EGEMEN SARIKCI" yazısı YOK, karekökler düzeltilmiş).
-  `1.tema_egemen_sarikci.pdf` (v1) bir önceki sürüm — kullanıcıda açık olduğu için
-  üzerine yazılamadı; kullanıcı kapatınca v2 onun üzerine kopyalanıp v2 silinebilir.
-- BEKLEYEN KARAR: Kullanıcı gövde yazı tipini değiştirmek istiyor olabilir —
-  `font_ornekleri.pdf` ile 5 aday font sunuldu, seçim bekleniyor (aşağıda changelog'a bak).
-- **YENİ FAZ (2026-07-04 gece): Linux makinede v3 — aşağıdaki "FAZ 3" bölümüne bak.**
+- **FAZ 3 TAMAMLANDI (2026-07-05).** Nihai teslim adayı:
+  **`cikti/1.tema_egemen_sarikci_v3.pdf`** (177 sayfa; depo kökünde kopyası var) —
+  **KULLANICI ONAYI BEKLENİYOR**. İçerik doğrulaması geçti (Q4-final satırına bak):
+  soru metinleri 120=120, Kurgusu 20=20, UYARI/teori kutuları tam, cevap anahtarı
+  üsleri doğru, çift basım yok; yeni sayfa tasarımı (soru ayraçları, sütun çizgisi,
+  30mm çözüm alanı) uygulanmış.
+- Kalıcı yerleşim aktif (SISTEM.md §1): `sistem/` (motor), `temalar/01-tema/`
+  (sorular.html + manifest.json + assets + log), `cikti/` (versiyonlu PDF'ler).
+  `build_linux/` kaldırıldı, `qa/` köke taşındı.
+- **ID'ler donduruldu**: 01-tema için extract.py BİR DAHA ÇALIŞTIRILMAZ. Düzeltme =
+  sorular.html + manifest.json; elle blok eklerken id `t01-eNNN` serisinden (son
+  kullanılan: t01-e002); assemble.py mükerrer id'de hata verip durur.
+- Yeniden basım komutları CLAUDE.md üst bloğunda.
+- FAZ 1-2 (Windows) tarihi kayıtları bu dosyanın alt yarısında duruyor — Windows
+  yolları artık geçersiz. Font değişikliği kararı kapandı (gerekçesi kalmadı;
+  istenirse yeni iş).
+- SIRADAKİ OLASI İŞLER: (a) kullanıcı v3 onayı → proje kapanır, eski taslak PDF'ler
+  temizlenebilir (kullanıcı kararı); (b) yeni tema PDF'i gelirse SISTEM.md §4 akışı.
 
 ## FAZ 3 — Bitişik Kök + Düzenlenebilir HTML'in Yeniden Kurulması (Linux, 2026-07-04 gece)
 

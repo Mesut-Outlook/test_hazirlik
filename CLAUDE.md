@@ -8,18 +8,28 @@
 > (önce bu ikisini oku). Kısa özet:
 > - FAZ 1-2 çıktısı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; logo sol üstte, header
 >   yazısız, karekökler `.rad` yamalı) — bu dosya ve `1.tema_orijinal.pdf` SALT OKUNUR.
-> - FAZ 3 (sürüyor): v2'den düzenlenebilir HTML yeniden kuruldu (`build_linux/`),
->   kökler bitişik kök tekniği `.rt` ile (referans: `kok_bitisik_ornek.html`).
->   A4a tamam (`v3_taslak2.pdf`, 154 sf; metin bütünlüğü v2 ile doğrulandı), 2. tur
->   QA tamam (~110/135 sayfa temiz). Şu an A4b (AGY'de): kalan bulguların düzeltilmesi
->   — en önemlisi Chrome multicol kaynaklı sayfa sınırında blok tekrarı — ve nihai
->   `1.tema_egemen_sarikci_v3.pdf` üretimi. Sonrası: Q4 örneklem QA → kullanıcı onayı
->   → SISTEM.md §1 yerleşimine taşıma (A5).
-> - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA + A4b
->   AGY (Antigravity, COORDINATION.md üzerinden koordine).
-> - Font değişikliği kararı (FAZ 2'den kalan) muhtemelen ARTIK GEREKSİZ: `.rt` kök
->   çizimi font glifi kullanmıyor, v3 gömülü Comic Sans subset'iyle basılıyor —
->   kullanıcı estetik değişiklik istemezse kapatılabilir.
+> - **FAZ 3 TAMAMLANDI (2026-07-05):** v2'den düzenlenebilir HTML yeniden kuruldu,
+>   kökler bitişik kök tekniği `.rt` ile, yeni sayfa tasarımı (soru ayraç çizgileri,
+>   sütunlar arası dikey çizgi, 30mm çözüm alanı — örnek: 11.Köklü Sayılar.pdf,
+>   sadeleştirilerek). Nihai çıktı: **`cikti/1.tema_egemen_sarikci_v3.pdf`** (177
+>   sayfa; kökte kopyası var) — **kullanıcı onayı bekleniyor**.
+> - Kalıcı yerleşim aktif (SISTEM.md §1): motor `sistem/` (extract.py, assemble.py,
+>   print.mjs, flow.css, fonts), tema `temalar/01-tema/` (sorular.html +
+>   manifest.json + assets + log), çıktılar `cikti/`. `build_linux/` tarihe karıştı.
+> - **ID'ler DONDURULDU**: 01-tema için extract.py bir daha ÇALIŞTIRILMAZ (id'leri
+>   yeniden üretir). Düzeltme/soru ekleme-çıkarma-taşıma `sorular.html` +
+>   `manifest.json` üzerinden (SISTEM.md §2); elle eklenen bloklar `t01-eNNN`
+>   serisinden id alır — mevcut id kullanmak assemble'da içerik kaybettirir
+>   (assemble.py artık mükerrer id'de hata verip durur).
+> - Yeniden basım: `python3 sistem/assemble.py temalar/01-tema/manifest.json
+>   temalar/01-tema/sorular.html ../../sistem/flow.css temalar/01-tema/1tema.html`
+>   sonra `node sistem/print.mjs temalar/01-tema/1tema.html cikti/<ad>.pdf`.
+> - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA +
+>   büyük düzeltmeler AGY (Antigravity, COORDINATION.md üzerinden). DERS: ajan
+>   "tamam/sıfır hata" raporları mutlaka örneklemle çapraz doğrulanır (SISTEM.md §6).
+> - Font değişikliği kararı (FAZ 2'den kalan) KAPANDI sayılır: `.rt` kök çizimi font
+>   glifi kullanmıyor, v3 gömülü Comic Sans subset'iyle basılıyor — kullanıcı estetik
+>   değişiklik isterse yeni iş olarak açılır.
 
 ## Amaç
 
