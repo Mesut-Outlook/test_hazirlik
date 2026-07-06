@@ -56,15 +56,35 @@ def main():
         "işleminin sonucu kaçtır": 120,
     }
 
-    print(f"{'ifade':40s} {'v2':>6s} {'v3':>6s}  {'target':>6s}  durum")
+    # Tema 1 tespiti
+    v2_base = os.path.basename(v2).lower()
+    is_theme_1 = "01-tema" in v2 or "1.tema" in v2_base or "1_tema" in v2_base
+
+    if is_theme_1:
+        print(f"Tema 1 doğrulaması yapılıyor...")
+        print(f"{'ifade':40s} {'v2':>6s} {'v3':>6s}  {'target':>6s}  durum")
+    else:
+        print(f"Genel Tema doğrulaması yapılıyor...")
+        print(f"{'ifade':40s} {'v2':>6s} {'v3':>6s}  durum")
+        
     all_ok = True
     for p in PHRASES:
         c2 = len(re.findall(re.escape(p), t2, re.IGNORECASE))
         c3 = len(re.findall(re.escape(p), t3, re.IGNORECASE))
-        target = TARGET_V3[p]
-        ok = c3 == target
+        if is_theme_1:
+            target = TARGET_V3[p]
+            ok = c3 == target
+            print(f"{p:40s} {c2:6d} {c3:6d}  {target:6d}  {'OK' if ok else 'FARK'}")
+        else:
+            # Diğer temalarda:
+            # Başlıkların/etiketlerin sayısı azalabilir (mükerrer üst/alt bilgi temizliği yüzünden): c3 <= c2
+            # Soru kalıpları ("Kurgusu", "sonucu kaçtır") birebir aynı kalmalıdır: c3 == c2
+            if p in ["Kurgusu", "işleminin sonucu kaçtır"]:
+                ok = (c3 == c2)
+            else:
+                ok = (c3 <= c2)
+            print(f"{p:40s} {c2:6d} {c3:6d}  {'OK' if ok else 'FARK'}")
         all_ok = all_ok and ok
-        print(f"{p:40s} {c2:6d} {c3:6d}  {target:6d}  {'OK' if ok else 'FARK'}")
 
     print()
     print("120=120 kontrolu (bkz. gorev talimati):")
@@ -84,7 +104,12 @@ def main():
             print("  v3:", line)
 
     # Görsel-tekrar kontrolü:
-    sorular_path = os.path.join(REPO_ROOT, "temalar", "01-tema", "sorular.html")
+    theme_dir = os.path.dirname(os.path.dirname(os.path.abspath(v2)))
+    sorular_path = os.path.join(theme_dir, "sorular.html")
+    if not os.path.exists(sorular_path):
+        sorular_path = os.path.join(os.path.dirname(os.path.abspath(v2)), "sorular.html")
+    if not os.path.exists(sorular_path):
+        sorular_path = os.path.join(REPO_ROOT, "temalar", "01-tema", "sorular.html")
     if os.path.exists(sorular_path):
         print("\nGörsel Tekrar Kontrolü:")
         with open(sorular_path, "r", encoding="utf-8") as f:
