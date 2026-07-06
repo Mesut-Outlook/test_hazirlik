@@ -23,6 +23,11 @@ yeniden dizilir ve PDF olarak basılır:
   görsel olarak kırpılıp yerleştirilir.
 - **Soru düzeyinde düzenlenebilirlik**: soru silmek/taşımak/eklemek için PDF'e
   değil, `manifest.json` + `sorular.html` dosyalarına dokunulur.
+- **Sınır**: otomatik dönüştürme yalnızca **metin tabanlı** (yazısı seçilebilen)
+  PDF/Word belgelerde çalışır ve internet gerektirmez. Taranmış/fotoğraf
+  belgeler otomatik dönüştürülmez — bunlar için sayfalar görüntüye çevrilip
+  ajanlarla aktarım yapılır (SISTEM.md §4; ihtiyaç olursa arayüze "ajan aktarım
+  kuyruğu" olarak eklenebilir). Arayüz ana sayfasında da bu not görünür.
 
 ## Nasıl çalışır? (boru hattı)
 
