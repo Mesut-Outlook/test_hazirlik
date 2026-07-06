@@ -407,13 +407,23 @@ def match_root_bars(page_spans, thin_bars):
     return root_bar_for, used
 
 
-def collect_theory_boxes(drawings):
+def collect_theory_boxes(drawings, profile=None):
     boxes = []
+    r_min, r_max = 0.9, 0.95
+    g_min, g_max = 0.95, 0.98
+    b_min, b_max = 0.97, 0.99
+    
+    if profile and "theory_box_color" in profile:
+        color_conf = profile["theory_box_color"]
+        r_min, r_max = color_conf.get("r_range", [r_min, r_max])
+        g_min, g_max = color_conf.get("g_range", [g_min, g_max])
+        b_min, b_max = color_conf.get("b_range", [b_min, b_max])
+        
     for d in drawings:
         if d["type"] == "fs":
             rect = d["rect"]
             fill = d.get("fill")
-            if fill and 0.9 <= fill[0] <= 0.95 and 0.95 <= fill[1] <= 0.98 and 0.97 <= fill[2] <= 0.99:
+            if fill and r_min <= fill[0] <= r_max and g_min <= fill[1] <= g_max and b_min <= fill[2] <= b_max:
                 boxes.append(rect)
     return boxes
 
@@ -1023,6 +1033,8 @@ def main():
     parser.add_argument("--out", default="/home/mesuto/Documents/PROJELER/test_hazirlik/temalar/01-tema")
     parser.add_argument("--first-page", type=int, default=None, help="1-indexli, test için tek/az sayfa")
     parser.add_argument("--last-page", type=int, default=None)
+    parser.add_argument("--tema", default="01", help="Tema numarası (örn: 01, 02)")
+    parser.add_argument("--profil", default="metin_yayinlari", help="Kullanılacak yayınevi profili json adı veya yolu")
     args = parser.parse_args()
 
     os.makedirs(args.out, exist_ok=True)
@@ -1044,12 +1056,51 @@ def main():
 
     q_count = t_count = k_count = a_count = g_count = p_count = 0
     total_roots = 0
+    extraction_warnings = []
 
-    known_sections = [
-        "ISINMA HAREKETLERİ", "GÜNLÜK HAYAT UYGULAMALARI", "ÖSYM SORULARINA HAZIRLIK",
-        "ÖSYM KURGULARSA", "PİST ALANI", "KLASİKLEŞMİŞ UYGULAMALAR", "ARALIKLAR",
-        "SAYI ARALIKLARININ GÖSTERİMİ",
-    ]
+    # Varsayılan profil (Metin Yayınları)
+    profile = {
+        "known_sections": [
+            "ISINMA HAREKETLERİ", "GÜNLÜK HAYAT UYGULAMALARI", "ÖSYM SORULARINA HAZIRLIK",
+            "ÖSYM KURGULARSA", "PİST ALANI", "KLASİKLEŞMİŞ UYGULAMALAR", "ARALIKLAR",
+            "SAYI ARALIKLARININ GÖSTERİMİ"
+        ],
+        "theory_box_color": {
+            "r_range": [0.9, 0.95],
+            "g_range": [0.95, 0.98],
+            "b_range": [0.97, 0.99]
+        }
+    }
+
+    # Profil yükleme
+    if args.profil:
+        profile_path = args.profil
+        if not os.path.exists(profile_path):
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            candidate = os.path.join(script_dir, "profiller", args.profil)
+            if not candidate.endswith(".json"):
+                candidate += ".json"
+            if os.path.exists(candidate):
+                profile_path = candidate
+            else:
+                candidate_root = os.path.join(os.path.dirname(script_dir), "sistem", "profiller", args.profil)
+                if not candidate_root.endswith(".json"):
+                    candidate_root += ".json"
+                if os.path.exists(candidate_root):
+                    profile_path = candidate_root
+
+        if os.path.exists(profile_path):
+            try:
+                with open(profile_path, "r", encoding="utf-8") as f:
+                    loaded_profile = json.load(f)
+                profile.update(loaded_profile)
+                print(f"Loaded profile: {profile_path}")
+            except Exception as e:
+                print(f"Warning: Failed to parse profile file '{profile_path}': {e}. Using default.")
+        else:
+            print(f"Warning: Profile '{args.profil}' not found. Using default Metin Yayınları profile.")
+
+    known_sections = profile.get("known_sections", [])
 
     for pnum in page_range:
         page = doc[pnum]
@@ -1083,7 +1134,7 @@ def main():
                 continue
             fraction_bars.append((x0, y0, x1, y1))
 
-        theory_boxes = collect_theory_boxes(drawings)
+        theory_boxes = collect_theory_boxes(drawings, profile=profile)
 
         excluded_bar_keys = set(rect_key(b) for b in thin_bars)
         figure_regions = collect_figure_regions(drawings, theory_boxes, excluded_bar_keys, text_dict["blocks"])
@@ -1200,7 +1251,7 @@ def main():
 
             if block.get("type") == "image":
                 g_count_local_id = block.get("img_idx")
-                block_id = f"t01-g{len(blocks_db)+1:04d}"
+                block_id = f"t{args.tema}-g{len(blocks_db)+1:04d}"
                 html = (f'<section class="img-block" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n'
                         f'  <img src="{block["path"]}" />\n</section>')
                 blocks_db.append((block_id, html))
@@ -1255,7 +1306,7 @@ def main():
                     pieces = [text_str]
                 for piece_text in pieces:
                     k_count += 1
-                    block_id = f"t01-k{k_count:03d}"
+                    block_id = f"t{args.tema}-k{k_count:03d}"
                     html = f'<section class="kur-tag" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n  {piece_text}\n</section>'
                     blocks_db.append((block_id, html))
                     page_manifest_blocks.append(block_id)
@@ -1269,7 +1320,7 @@ def main():
                             sub_tokens = process_blocks_together([next_b])
                             sub_html = tokens_to_html(sub_tokens)
                             k_count += 1
-                            sub_id = f"t01-k{k_count:03d}"
+                            sub_id = f"t{args.tema}-k{k_count:03d}"
                             blocks_db.append((sub_id, f'<div class="section-sub" id="{sub_id}" data-kaynak-sayfa="{pnum+1}">{sub_html}</div>'))
                             page_manifest_blocks.append(sub_id)
                             current_block_idx += 1
@@ -1277,7 +1328,7 @@ def main():
 
             if is_ans_key:
                 a_count += 1
-                block_id = f"t01-a{a_count:03d}"
+                block_id = f"t{args.tema}-a{a_count:03d}"
                 ans_tokens = process_blocks_together([block])
                 ans_html = tokens_to_html(ans_tokens)
                 html = f'<section class="answer-key" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n  {ans_html}\n</section>'
@@ -1312,7 +1363,7 @@ def main():
                         k = current_block_idx + 1
                     theory_tokens = process_blocks_together(tb_blocks)
                     t_count += 1
-                    block_id = f"t01-t{t_count:03d}"
+                    block_id = f"t{args.tema}-t{t_count:03d}"
                     theory_html = tokens_to_html(theory_tokens)
                     html = f'<section class="theory-box" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n  {theory_html}\n</section>'
                     blocks_db.append((block_id, html))
@@ -1325,7 +1376,7 @@ def main():
             qnum, _qtext = get_qnum(text_str)
             if qnum is not None:
                 q_count += 1
-                block_id = f"t01-s{q_count:03d}"
+                block_id = f"t{args.tema}-s{q_count:03d}"
                 question_blocks = [block]
                 j = current_block_idx + 1
                 while j < len(final_blocks):
@@ -1402,7 +1453,8 @@ def main():
             fallback_html = tokens_to_html(fallback_tokens)
             if fallback_html.strip():
                 p_count += 1
-                block_id = f"t01-p{p_count:03d}"
+                block_id = f"t{args.tema}-p{p_count:03d}"
+                extraction_warnings.append(f"Sayfa {pnum+1}: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.")
                 html = f'<section class="para" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n  {fallback_html}\n</section>'
                 blocks_db.append((block_id, html))
                 page_manifest_blocks.append(block_id)
@@ -1420,7 +1472,9 @@ def main():
             f.write(html + "\n\n")
 
     manifest_data = {
-        "tema": "01", "baslik": "1. TEMA", "surum": 4,
+        "tema": args.tema, 
+        "baslik": f"{int(args.tema)}. TEMA" if args.tema.isdigit() else f"{args.tema}. TEMA", 
+        "surum": 1,
         "font": "Comic Sans MS Embedded",
         "akis": manifest_akis,
     }
@@ -1428,12 +1482,12 @@ def main():
     with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest_data, f, indent=2, ensure_ascii=False)
 
-    html_out_path = os.path.join(args.out, "1tema.html")
-    html_content = """<!DOCTYPE html>
+    html_out_path = os.path.join(args.out, f"{int(args.tema) if args.tema.isdigit() else args.tema}tema.html")
+    html_content = f"""<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="utf-8">
-  <title>1. Tema — Egemen Sarıkcı</title>
+  <title>{manifest_data['baslik']} — Egemen Sarıkcı</title>
   <link rel="stylesheet" href="../../sistem/flow.css">
 </head>
 <body>
@@ -1457,12 +1511,45 @@ def main():
     print(f"  Root symbols converted: {total_roots}")
     print(f"Saved files:\n  {sorular_path}\n  {manifest_path}\n  {html_out_path}")
 
+    # Write extract_report.txt
+    report_path = os.path.join(args.out, "extract_report.txt")
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write("========================================================================\n")
+        f.write("EXTRACTION REPORT\n")
+        f.write("========================================================================\n")
+        f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+        f.write(f"PDF Input: {args.pdf}\n")
+        f.write(f"Output Directory: {args.out}\n")
+        f.write(f"Tema No: {args.tema}\n")
+        f.write(f"Profile: {args.profil}\n")
+        f.write(f"Pages Processed: {len(page_range)}\n")
+        f.write(f"Total Pages in PDF: {len(doc)}\n")
+        f.write("------------------------------------------------------------------------\n")
+        f.write("STATISTICS:\n")
+        f.write(f"  Questions Found: {q_count}\n")
+        f.write(f"  Theory Boxes Found: {t_count}\n")
+        f.write(f"  Kur-tags Found: {k_count}\n")
+        f.write(f"  Answer Keys Found: {a_count}\n")
+        f.write(f"  Images Found (Raster + Figure crops): {g_count}\n")
+        f.write(f"  Fallback Paragraphs: {p_count}\n")
+        f.write(f"  Root Mathematical Symbols Converted: {total_roots}\n")
+        f.write("------------------------------------------------------------------------\n")
+        
+        if extraction_warnings:
+            f.write("WARNINGS & ERRORS:\n")
+            for warning in extraction_warnings:
+                f.write(f"  - [WARNING] {warning}\n")
+        else:
+            f.write("No warnings or errors reported during extraction.\n")
+        f.write("========================================================================\n")
+    print(f"Report saved to: {report_path}")
+
     log_dir = os.path.join(args.out, "log")
     os.makedirs(log_dir, exist_ok=True)
     runs_log_path = os.path.join(log_dir, "runs.jsonl")
     log_entry = {
         "ts": datetime.now().isoformat(),
-        "islem": "extract (A4a yapısal düzeltme)",
+        "islem": "extract",
         "girdi": args.pdf,
         "cikti": html_out_path,
         "sayfa": len(doc),
@@ -1471,16 +1558,15 @@ def main():
         "gorsel": g_count,
         "dogrulama": "ok",
         "sha256": "",
-        "ajan": "Claude-Sonnet #6",
+        "ajan": "Antigravity",
     }
     with open(runs_log_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
 
     gunluk_path = os.path.join(log_dir, "islem_gunlugu.md")
     with open(gunluk_path, "a", encoding="utf-8") as f:
-        f.write(f"\n## {datetime.now().strftime('%Y-%m-%d %H:%M')} (Claude-Sonnet #6 — A4a tamamlandı)\n")
-        f.write(f"- extract.py yapısal düzeltme (devam) çalıştırıldı: {q_count} soru, {g_count} görsel, {total_roots} kök.\n")
-        f.write("- #5'in kök taşması/kesir/satır düzeltmelerine ek olarak: kur-tag/tag-kurgusu figür-suppression regresyonu (dekoratif banner arka planları), split_span_at_bars ile kesir/kök sınırı span-bütünlüğü sorunları (√(1−11/36), 8√6/4√2, cevap anahtarı 5/6), turkish_upper() ile Türkçe büyük harf eşleşme hatası (Klasikleşmiş Uygulamalar), sort_blocks_reading_order() ile aynı-satır blok sırası, ve flow_linux.css'te .page-flow tek-akışlı sütunlama (sayfa şişmesi 185→154) düzeltildi.\n")
+        f.write(f"\n## {datetime.now().strftime('%Y-%m-%d %H:%M')} (Antigravity — F3 tamamlandı)\n")
+        f.write(f"- extract.py çalıştırıldı: {q_count} soru, {g_count} görsel, {total_roots} kök.\n")
 
 
 if __name__ == "__main__":

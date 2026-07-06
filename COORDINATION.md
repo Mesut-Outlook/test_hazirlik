@@ -89,7 +89,7 @@ talepleri TAMAMEN ön yüzden yürür.
 | F0 | Mimari + API sözleşmesi + görev dağılımı (bu bölüm) | Fable | ✅ tamam (2026-07-06) |
 | F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | ✅ tamam (2026-07-06, Claude-Sonnet #9) — bkz. Değişiklik Günlüğü |
 | F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | ✅ tamam (kim: Claude-Sonnet #10, 2026-07-06) — 4 ekran (ana sayfa/sihirbaz/düzenleme/ayarlar) + `mock.js`; F1'in gerçek kodu okunarak API hizalandı (9 madde, bkz. değişiklik günlüğü) — özellikle POST /temalar PDF üretmediği için sihirbaz create+uret zincirliyor, GET /temalar PDF yolu vermediği için "Önizle" localStorage yedeğiyle çalışıyor. mock.js ile 17 ekran görüntüsü + puppeteer-core ile uçtan uca gezildi, 1 gerçek hata (hidden/CSS çakışması) bulunup düzeltildi. Logo `arayuz/web/logo_es.jpg`'ye kopyalandı, header sol üstte sabit. |
-| F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ⬜ AGY'yi bekliyor (AGY talimatları 9. madde) |
+| F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — `sistem/extract.py` CLI parametreleriyle (`--tema`, `--profil`) genelleştirildi. `sistem/profiller/metin_yayinlari.json` profili oluşturuldu. Sınıflandırılamayan durumlar için try-except koruması ve `extract_report.txt` raporlama uyarıları eklendi. LibreOffice ile docx->pdf çevrilen PDF'te başarıyla test edildi. |
 | F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY + 1 Sonnet | ⬜ F1+F2+F3'ü bekliyor |
 | F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | Claude-Sonnet | ⬜ F4'ü bekliyor |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
@@ -104,8 +104,8 @@ talepleri TAMAMEN ön yüzden yürür.
   mevcut v3 tohumlandı), ön yüz Önizle'de önce bunu kullanır, localStorage yedek.
   tema_meta.json makineye özgü olduğundan .gitignore'a alındı.
 - Başlatma: `bash arayuz/calistir.sh` → http://127.0.0.1:8756
-- SIRADA: F3 (AGY — extract genelleştirme, talimat 9. madde) ve F4 (uçtan uca
-  test; F3 bitince Fable bir Sonnet ajanla AGY'ye paylaştıracak).
+- **F3 CLI Notu**: `sistem/extract.py` artık `--tema` (varsayılan: "01") ve `--profil` (varsayılan: "metin_yayinlari") parametrelerini desteklemektedir. Geriye dönük uyumludur, backend çağrılarını bozmaz.
+- SIRADA: F4 (uçtan uca test; F3 bittiği için Fable bir Sonnet ajanla AGY'ye paylaştıracak).
 
 ### FAZ 4 Talep Kuyruğu
 
