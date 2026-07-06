@@ -107,6 +107,19 @@ talepleri TAMAMEN ön yüzden yürür.
 - **F3 CLI Notu**: `sistem/extract.py` artık `--tema` (varsayılan: "01") ve `--profil` (varsayılan: "metin_yayinlari") parametrelerini desteklemektedir. Geriye dönük uyumludur, backend çağrılarını bozmaz.
 - SIRADA: F4 (uçtan uca test; F3 bittiği için Fable bir Sonnet ajanla AGY'ye paylaştıracak).
 
+### F3 sonrası Fable denetimi (2026-07-06)
+
+- F3 örneklemle DOĞRULANDI: `extract.py --pdf kok_bitisik_ornek.pdf --out <scratch>
+  --tema 99` koşuldu → id'ler `t99-…`, manifest `"tema":"99"`, rapor + log üretildi;
+  runs.jsonl artık GERÇEK dinamik kayıt yazıyor (F1'in şikayet ettiği sabit sahte
+  satırlar gitmiş). `sistem/profiller/metin_yayinlari.json` makul (bölüm adları +
+  teori kutusu renk aralıkları). `arayuz/backend/pipeline.py` de `--tema/--profil`
+  ile güncellenmiş — F1↔F3 entegrasyonu tamam. 01-tema ve cikti/ dokunulmamış
+  (git ile teyit). Arayüz sunucusu yeni pipeline ile yeniden başlatıldı, uçtan
+  uca yanıt veriyor.
+- SIRADA: **F4** (AGY talimatları 10. madde — arayüzden uçtan uca test) ve
+  ardından **F5** (11. madde).
+
 ### FAZ 4 Talep Kuyruğu
 
 (Arayüzden gelen serbest metin düzenleme talepleri buraya eklenecek — işleyen
