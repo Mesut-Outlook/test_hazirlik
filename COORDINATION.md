@@ -26,8 +26,78 @@ tuzaklar). Bu dosya sadece **görev atama ve ilerleme takibi** içindir.
 - FAZ 1-2 (Windows) tarihi kayıtları bu dosyanın alt yarısında duruyor — Windows
   yolları artık geçersiz. Font değişikliği kararı kapandı (gerekçesi kalmadı;
   istenirse yeni iş).
-- SIRADAKİ OLASI İŞLER: (a) kullanıcı v3 onayı → proje kapanır, eski taslak PDF'ler
-  temizlenebilir (kullanıcı kararı); (b) yeni tema PDF'i gelirse SISTEM.md §4 akışı.
+- SIRADAKİ İŞLER: (a) kullanıcı v3 onayı (bekliyor); (b) **FAZ 4 — ARAYÜZ
+  (başladı, 2026-07-06)**: aşağıdaki FAZ 4 bölümüne bak; (c) yeni tema PDF'i
+  gelirse SISTEM.md §4 akışı (yakında arayüzden).
+
+## FAZ 4 — Yerel Web Arayüzü (plan: Fable, 2026-07-06)
+
+### Amaç
+
+Bu hattı kod bilmeyen kullanıcı için tek başına kullanılabilir yapmak: kullanıcı
+bilgisayarından bir PDF/Word test dosyası ve giriş/çıkış klasörlerini seçer;
+dönüştürme SISTEM.md kurallarıyla arka planda koşar; ilerleme, sonuç PDF
+önizlemesi, soru düzenleme (sırala/sil/ekle) ve serbest metin düzenleme
+talepleri TAMAMEN ön yüzden yürür.
+
+### Mimari kararlar (Fable)
+
+- **Yerel web uygulaması**: Python **FastAPI + uvicorn** backend (mevcut venv;
+  pymupdf zaten Python), statik ön yüz dosyalarını da kendisi servis eder
+  (`http://127.0.0.1:8756`). Kurulum basit: `arayuz/calistir.sh`.
+- **Ön yüz**: framework'süz tek sayfa (index.html + app.js + style.css — build
+  adımı YOK). PDF önizleme `<embed>`/iframe ile backend'in PDF stream
+  endpoint'inden. Türkçe arayüz.
+- **Dosya/klasör seçimi**: tarayıcı yerel diski gezemez → backend `fs/list`
+  endpoint'i ile klasör gezgini diyaloğu (sadece kullanıcının ev dizini altı;
+  path traversal koruması). Varsayılan giriş/çıkış klasörleri `arayuz/ayarlar.json`.
+- **Word desteği**: .docx/.doc seçilirse backend LibreOffice headless ile
+  (`soffice --convert-to pdf`) önce PDF'e çevirir, hat aynen devam eder.
+- **İşler (job) modeli**: extract/print uzun sürer → job kuyruğu, ilerleme SSE
+  (`/api/jobs/{id}/events`) veya 1sn polling; her koşu SISTEM.md §5 gereği
+  `temalar/NN/log/runs.jsonl`'e de yazılır.
+- **Serbest metin talepler**: MVP'de talep `temalar/NN/istekler.md`'ye ve bu
+  dosyanın "FAZ 4 Talep Kuyruğu" bölümüne yazılır (ajanlar işler); ileride
+  (F6, opsiyonel) `claude` CLI headless entegrasyonuyla otomatik işlenebilir.
+- **Kural**: arayüz, id dondurma dahil SISTEM.md §2-§6'ya uyar — onaylı temada
+  extract'i YENİDEN koşturmaz, blok eklerken `tNN-eNNN` serisini kullanır,
+  üretim sonrası dogrula.py'yi otomatik çağırıp sonucu ön yüzde gösterir.
+
+### API sözleşmesi (F1 ve F2 buna göre PARALEL çalışır — sözleşme SABİT)
+
+- `GET  /api/ayarlar` / `PUT /api/ayarlar` — varsayılan giriş/çıkış klasörleri
+- `GET  /api/fs/list?path=&sadece=pdf,docx|dir` — klasör içeriği (ev dizini altı)
+- `GET  /api/temalar` — tema listesi (manifest özetleri: ad, sürüm, soru sayısı)
+- `POST /api/temalar` `{kaynak_dosya, ad, cikti_klasoru}` — tema klasörü kur,
+  kaynağı kopyala (docx→pdf çevir), extract job'ı başlat → `{tema_id, job_id}`
+- `GET  /api/jobs/{id}` + `GET /api/jobs/{id}/events` (SSE) — durum/ilerleme/log
+- `GET  /api/temalar/{id}/bloklar` — manifest akışı + blok özetleri
+  `{id, sinif, kaynak_sayfa, ozet(ilk 80 kr), bolum}`
+- `PATCH /api/temalar/{id}/manifest` `{akis:[...]}` — sıralama/silme (doğrulamalı)
+- `POST /api/temalar/{id}/bloklar` `{sinif, html_govde, konum}` — yeni blok
+  (id'yi BACKEND üretir: sıradaki tNN-eNNN)
+- `POST /api/temalar/{id}/uret` `{cikti_adi?}` — assemble+print+dogrula job'ı
+  → çıktı `cikti/` + kullanıcının seçtiği çıktı klasörüne kopya
+- `GET  /api/pdf?path=` — PDF stream (önizleme; sadece proje/çıktı klasörleri)
+- `POST /api/temalar/{id}/istek` `{metin}` — serbest talebi kuyruğa yaz
+- Hata gövdesi standardı: `{hata: "...", detay: "..."}`; tüm yollar UTF-8/Türkçe.
+
+### Görev Panosu — FAZ 4
+
+| Görev | Tanım | Kim | Durum |
+|---|---|---|---|
+| F0 | Mimari + API sözleşmesi + görev dağılımı (bu bölüm) | Fable | ✅ tamam (2026-07-06) |
+| F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | 🔄 devam ediyor (kim: Claude-Sonnet #9, Fable atadı) |
+| F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | 🔄 devam ediyor (kim: Claude-Sonnet #10, Fable atadı) |
+| F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ⬜ AGY'yi bekliyor (AGY talimatları 9. madde) |
+| F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY + 1 Sonnet | ⬜ F1+F2+F3'ü bekliyor |
+| F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | Claude-Sonnet | ⬜ F4'ü bekliyor |
+| F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
+
+### FAZ 4 Talep Kuyruğu
+
+(Arayüzden gelen serbest metin düzenleme talepleri buraya eklenecek — işleyen
+ajan talebin altına ✅ + özet yazar.)
 
 ## FAZ 3 — Bitişik Kök + Düzenlenebilir HTML'in Yeniden Kurulması (Linux, 2026-07-04 gece)
 
@@ -241,6 +311,24 @@ serbest ve teşvik edilir — sayfa aralıklarına göre paralel dağıt):
      kenarındaki soluk altyazı şeridi (figür bbox'ı altyazının bir kısmını içeriyor).
    - Bitince: regen (`1.tema_egemen_sarikci_v3.pdf` üzerine), dogrula.py, pano ✅ +
      changelog + log, commit(+push yapabiliyorsan). Fable sonra son Q4'ü koşacak.
+9. **YENİ GÖREV — F3 (FAZ 4, Fable 2026-07-06): extract.py genelleştirme.** Önce
+   yukarıdaki "FAZ 4" bölümünü oku (amaç + mimari). Senin parçan:
+   - `sistem/extract.py`'yi tema-bağımsız hale getir: tema numarası ve çıktı
+     klasörü CLI argümanı olsun (`--tema 02 --cikti temalar/02-ad/`), id ön eki
+     buna göre (`t02-sNNN`); "1.KUR" rozet listesi, bölüm adları, tag-kurgusu
+     kalıpları gibi yayınevine özgü kurallar `sistem/profiller/metin_yayinlari.json`
+     gibi bir profile taşınsın (`--profil` ile seçilir, varsayılan bu).
+   - Farklı düzenlere dayanıklılık: profil bulunamayan desenlerde çökme yerine
+     "sınıflandırılamadı" bloğu + rapora uyarı yaz.
+   - LibreOffice ile docx→pdf çevrilmiş en az bir örnek belgeyle test et
+     (`soffice --headless --convert-to pdf`); metin katmanlı çıktıda hattın
+     çalıştığını göster.
+   - KISIT: 01-tema'ya DOKUNMA (id'ler donmuş, extract o tema için koşulmaz);
+     geriye dönük uyumluluğu bozma (profil verilmezse mevcut davranış).
+     F1 (Sonnet #9) arayuz/backend/ üzerinde paralel çalışıyor — sistem/
+     scriptlerinin KOMUT SATIRI arayüzünü değiştirirsen bu bölümün altına
+     "F3 CLI notu" düş ki F1 subprocess çağrılarını ona göre yazsın.
+   - Bitince: pano F3 satırı ✅ + changelog + log + commit.
 
 ## AGY için Görev Ataması (dış ajan — bu dosya üzerinden koordine ediliyor)
 
