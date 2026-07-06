@@ -89,6 +89,12 @@ Tüm temalar aynı `sistem/flow.css`'i kullanır. Çekirdek sınıflar:
 - İçerik kuralları (değişmez): matematik birebir korunur (tahmin yok); yayınevi KUR
   rozetleri atılır, gerçek bölüm adları korunur; "2020 MSÜ Kurgusu" tipi etiketler
   içeriktir, korunur; her sorudan sonra çözüm boşluğu.
+- **Yasaklı metinler (2026-07-06, kullanıcı kuralı):** kaynak belgede geçen
+  "EGEMEN SARIKCI" yazısı görüldüğü HER yerde silinir (çıktının header'ı zaten
+  logo taşır). Uygulama: profildeki `yasakli_metinler` listesi — extract.py satır
+  düzeyinde, boşluk/harf-aralığı ve büyük-küçük harf duyarsız filtreler; silinen
+  satır sayısı extract_report.txt'ye yazılır. Yeni yasaklı ifade eklemek =
+  profil json'una eklemek.
 
 ## 4. Yeni Kaynak PDF Geldiğinde İş Akışı
 

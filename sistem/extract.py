@@ -635,6 +635,32 @@ def is_footer_block(block, page_height):
     return bool(re.fullmatch(r"\d{1,4}", text))
 
 
+def filter_banned_lines(text_dict, banned_texts):
+    """Profildeki yasakli_metinler'i (örn. kaynak sayfalardaki "EGEMEN SARIKCI"
+    banner'ı) satır düzeyinde siler. Karşılaştırma boşluk/harf-aralığı ve
+    büyük-küçük harf duyarsızdır ("E G E M E N  S A R I K C I" da yakalanır).
+    Dönen değer: silinen satır sayısı."""
+    if not banned_texts:
+        return 0
+    banned_condensed = [re.sub(r"\s+", "", b).upper() for b in banned_texts if b.strip()]
+    if not banned_condensed:
+        return 0
+    removed = 0
+    for block in text_dict.get("blocks", []):
+        if "lines" not in block:
+            continue
+        kept_lines = []
+        for line in block["lines"]:
+            line_text = "".join(sp.get("text", "") for sp in line.get("spans", []))
+            condensed = re.sub(r"\s+", "", line_text).upper()
+            if condensed and any(b in condensed for b in banned_condensed):
+                removed += 1
+                continue
+            kept_lines.append(line)
+        block["lines"] = kept_lines
+    return removed
+
+
 # ---------------------------------------------------------------------------
 # Token akışı: satır/şık boşluğu korunumu + kesir gruplama + kök gövdesi
 # ---------------------------------------------------------------------------
@@ -1069,7 +1095,10 @@ def main():
             "r_range": [0.9, 0.95],
             "g_range": [0.95, 0.98],
             "b_range": [0.97, 0.99]
-        }
+        },
+        # Kaynak belgede görüldüğü HER yerde silinecek metinler (banner/başlık
+        # kalıntıları). Çıktının header'ı zaten logo taşır; bu yazılar içerik değildir.
+        "yasakli_metinler": ["EGEMEN SARIKCI"]
     }
 
     # Profil yükleme
@@ -1101,6 +1130,7 @@ def main():
             print(f"Warning: Profile '{args.profil}' not found. Using default Metin Yayınları profile.")
 
     known_sections = profile.get("known_sections", [])
+    banned_removed_total = 0
 
     for pnum in page_range:
         page = doc[pnum]
@@ -1110,6 +1140,9 @@ def main():
         text_dict = page.get_text("rawdict")
         _enrich_rawdict_text(text_dict)
         text_dict["blocks"] = split_mixed_blocks(text_dict["blocks"])
+        banned_removed_total += filter_banned_lines(
+            text_dict, profile.get("yasakli_metinler", [])
+        )
         drawings = page.get_drawings()
 
         page_spans = []
@@ -1524,6 +1557,7 @@ def main():
         f.write(f"Profile: {args.profil}\n")
         f.write(f"Pages Processed: {len(page_range)}\n")
         f.write(f"Total Pages in PDF: {len(doc)}\n")
+        f.write(f"Yasaklı metin silinen satır sayısı (yasakli_metinler): {banned_removed_total}\n")
         f.write("------------------------------------------------------------------------\n")
         f.write("STATISTICS:\n")
         f.write(f"  Questions Found: {q_count}\n")
