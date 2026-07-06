@@ -87,7 +87,7 @@ talepleri TAMAMEN ön yüzden yürür.
 | Görev | Tanım | Kim | Durum |
 |---|---|---|---|
 | F0 | Mimari + API sözleşmesi + görev dağılımı (bu bölüm) | Fable | ✅ tamam (2026-07-06) |
-| F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | 🔄 devam ediyor (kim: Claude-Sonnet #9, Fable atadı) |
+| F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | ✅ tamam (2026-07-06, Claude-Sonnet #9) — bkz. Değişiklik Günlüğü |
 | F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | 🔄 devam ediyor (kim: Claude-Sonnet #10, Fable atadı) |
 | F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ⬜ AGY'yi bekliyor (AGY talimatları 9. madde) |
 | F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY + 1 Sonnet | ⬜ F1+F2+F3'ü bekliyor |
@@ -771,6 +771,48 @@ kopyala. **Orijinal `1.tema.pdf`'e DOKUNMA.**
   çizgisi tam boy, kur-tag öncesi boşluk belirgin, solve-space görsel olarak
   öncekinden geniş. 1 iterasyonda kabul edildi. Nihai v3 PDF bu görevde YENİDEN
   ÜRETİLMEDİ (A4c/sonrasında tek seferde yapılacak, AGY paralel çalışıyor olabilir).
+- 2026-07-06 (Claude-Sonnet #9 — F1 tamamlandı, arayüz backend'i): `arayuz/backend/`
+  altında FastAPI uygulaması yazıldı — API sözleşmesindeki TÜM endpoint'ler
+  (ayarlar, fs/list, temalar GET/POST, bloklar GET/POST, manifest PATCH, uret,
+  pdf stream, istek), tek işçili job kuyruğu + SSE (`jobs.py`), sistem/ script
+  çağrıları TEK `pipeline.py` modülünde toplandı (F3'ün extract.py'ye ekleyeceği
+  --tema/--profil CLI'ı için tek nokta). Kendi venv'i kuruldu
+  (`arayuz/backend/venv/`, requirements.txt: fastapi, uvicorn, pymupdf).
+  `arayuz/calistir.sh` venv kurar/tamamlar + uvicorn başlatır + xdg-open ile açar.
+  - **fs/list güvenliği**: ev dizini (`/home/mesuto`) dışına çıkış hem `..` hem
+    symlink kaçışına karşı `os.path.realpath` + containment kontrolüyle engellendi
+    (test edildi: `/etc` → 403, `../../../etc` normalize edilince ev dizini
+    dışına taştığı için 404).
+  - **Tema oluşturma**: `temalar/NN-ad/{kaynak,assets,log}` düzeni SISTEM.md §1'e
+    uygun; kaynak dosya kopyalanır (taşınmaz); .docx/.doc `soffice --headless
+    --convert-to pdf` ile çevrilir (soffice yoksa anlaşılır hata). Tema no
+    otomatik (mevcut en büyük+1).
+  - **Bulgu (F3'e not)**: `sistem/extract.py` şu an `tema`/`baslik`/`surum` ve
+    blok id öneklerini (`t01-...`) HARDCODE üretiyor (satır ~1423: `"tema":"01",
+    "baslik":"1. TEMA","surum":4`) — arayüzden yeni bir tema (ör. 02-...)
+    oluşturulduğunda üretilen `manifest.json`/`sorular.html` içindeki id'ler de
+    yanlışlıkla `t01-` önekini taşıyor. Ayrıca extract.py kendi içinde
+    `runs.jsonl`/`islem_gunlugu.md`'ye sabit "Claude-Sonnet #6 / A4a" gibi
+    metinler yazıyor (hangi ajan/araç çalıştırırsa çalıştırsın). Bunlar F3'ün
+    "--tema/--profil CLI" görevinin kapsamında; `arayuz/backend/pipeline.py`
+    çağrısı hazır, CLI parametresi eklenince yalnızca `run_extract()` fonksiyonu
+    güncellenecek.
+  - **Test**: sunucu başlatıldı, tüm endpoint'ler curl ile doğrulandı; 01-tema
+    üzerinde SADECE OKUMA yapıldı (bloklar listesi 894 kayıt, soru=567,
+    görsel=131 — mevcut loglarla eşleşiyor). Yazma testleri (blok ekleme,
+    manifest PATCH, uret, istek, docx→pdf, bozuk PDF hata senaryosu) gerçek
+    ama geçici tema klasörleriyle yapıldı (02/03/04-test-*), tam uçtan uca
+    (extract→assemble→print→dogrula→kopyala) doğrulandı, sonra silindi — 01-tema
+    hiç değişmedi (`git status` boş).
+  - **Bulgu (düzeltildi)**: `tema_meta.json`'a request thread'i (POST
+    /api/temalar dönerken `son_extract_job` yazıyor) ile job worker thread'i
+    (aynı anda `kaynak_pdf` yazıyor) kilitsiz eş zamanlı yazınca yarı-yazılmış
+    dosya okunup `JSONDecodeError` oluşuyordu — `tema_meta.py`'ye global kilit +
+    atomik `os.replace` yazımı eklenerek giderildi.
+  - `qa/dogrula.py` şu an 01-tema'ya göre kalibre (hedef sayılar ve mükerrer-
+    görsel taraması `temalar/01-tema/sorular.html`'i hardcode ediyor); `uret`
+    job'ı yine de kaynak/çıktı PDF'i vererek çalıştırıyor, başka temalarda
+    "FARK" çıkması beklenen/bilgi amaçlı bir durum, hata değil.
 
 ## FAZ 3 QA Bulguları
 

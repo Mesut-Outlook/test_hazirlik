@@ -2,6 +2,8 @@
 .~lock.*#
 __pycache__/
 node_modules/
+arayuz/backend/venv/
+arayuz/ayarlar.json
 
 # QA karşılaştırma görüntüleri (compare.py ile yeniden üretilebilir)
 qa/cmp_*.png
