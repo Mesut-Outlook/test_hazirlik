@@ -155,7 +155,7 @@ def post_tema(body: YeniTema):
             tema_meta.yaz(tema_dir, {"kaynak_pdf": pdf_yolu})
 
         job.log("extract.py çalıştırılıyor...")
-        pipeline.run_extract(pdf_yolu, tema_dir, job.log)
+        pipeline.run_extract(pdf_yolu, tema_dir, tema_no, job.log)
 
         sayimlar = blocks.sayim(tema_dir)
         sayfa = pipeline.pdf_sayfa_sayisi(pdf_yolu)
@@ -272,8 +272,11 @@ def post_uret(tema_id: str, body: UretIstek):
         cikti_klasoru = meta.get("cikti_klasoru")
         if cikti_klasoru and os.path.isdir(cikti_klasoru):
             kopya_yolu = os.path.join(cikti_klasoru, os.path.basename(cikti_pdf))
-            shutil.copy2(cikti_pdf, kopya_yolu)
-            job.log(f"Kopyalandı: {kopya_yolu}")
+            if os.path.realpath(cikti_pdf) != os.path.realpath(kopya_yolu):
+                shutil.copy2(cikti_pdf, kopya_yolu)
+                job.log(f"Kopyalandı: {kopya_yolu}")
+            else:
+                job.log(f"Çıktı zaten hedef klasörde: {cikti_pdf}")
 
         kaynak_pdf = meta.get("kaynak_pdf")
         dogrula_sonuc = {"calisti": False, "not": "kaynak PDF bilinmiyor"}

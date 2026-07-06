@@ -100,20 +100,28 @@ haritasında) LibreOffice headless.
 Kurallar: görev almadan önce panoyu TEKRAR oku (çakışma önlemi), her koşu
 `temalar/NN/log/runs.jsonl`'e loglanır, her önemli aşama commit + push edilir.
 
-## Yol haritası — FAZ 4: Arayüz
+## Yerel Web Arayüzü (Arayüz)
 
-Hattı kod bilmeyen bir kullanıcıya açan yerel web arayüzünün **MVP'si hazır**:
+Hattı kod bilmeyen kullanıcılar için yerel bir web arayüzü sunulmaktadır. Kullanıcı bilgisayarından bir PDF veya Word dosyası (.docx/.doc) seçer, dönüştürme arka planda koşar, canlı ilerleme durumu gösterilir, sorular/bloklar ön yüzde sürükle-bırak yöntemiyle sıralanabilir, silinebilir veya yeni bloklar eklenebilir. Sonuç PDF'leri basılarak ön izleme alanında görüntülenebilir.
+
+### Başlatma
+
+Arayüzü başlatmak için proje kök dizininde şu komutu çalıştırın:
 
 ```bash
-bash arayuz/calistir.sh     # → http://127.0.0.1:8756
+bash arayuz/calistir.sh
 ```
 
-PDF/Word dosyası ve giriş/çıkış klasörleri arayüzden seçilir, dönüştürme arka
-planda koşar (canlı ilerleme), sonuç PDF'i tarayıcıda önizlenir, soru
-düzenleme/sıralama/ekleme ve serbest metin düzenleme talepleri yine arayüzden
-verilir. Mimari, API sözleşmesi ve görev dağılımı: `COORDINATION.md` → **"FAZ 4"**
-bölümü. Süren işler: extract genelleştirme (F3), uçtan uca test (F4),
-paketleme (F5) — AGY'de.
+Arayüz otomatik olarak varsayılan tarayıcınızda `http://127.0.0.1:8756` adresinde açılacaktır.
+
+### Özellikler
+
+- **PDF & Word (.docx/.doc) Desteği**: Word belgesi seçildiğinde arka planda LibreOffice headless (`soffice`) ile PDF'e dönüştürülür ve otomatik işlenir.
+- **Yayınevi Profilleri**: Dönüşüm sırasında kullanılacak bilinen başlık ve renk profilleri (örn: `sistem/profiller/metin_yayinlari.json`) seçilebilir.
+- **Sürükle-Bırak Editör**: Soru ve bölümlerin yerleşimi ve sırası canlı olarak değiştirilebilir.
+- **Canlı Job Kuyruğu & SSE**: Extract ve Print (PDF Üretim) işleri arka planda asenkron çalışır; loglar ve ilerleme canlı olarak arayüzde gösterilir.
+- **Entegre Doğrulama**: Basılan her yeni PDF sürümünden sonra `qa/dogrula.py` otomatik olarak çalıştırılarak sonuçları ön yüzde listeler.
+- **Serbest İstek Kutusu**: Yapay zekadan istenecek ek sadakat ve tasarım düzenlemeleri arayüzden istek olarak gönderilebilir.
 
 ## Sürüm geçmişi (özet)
 

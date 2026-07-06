@@ -52,10 +52,9 @@ def docx_to_pdf(kaynak_dosya: str, hedef_dir: str, log) -> str:
     return beklenen
 
 
-def run_extract(pdf_path: str, tema_dir: str, log) -> None:
-    """sistem/extract.py çağrısı. Şimdilik --pdf/--out ile; F3 --tema/--profil
-    eklediğinde burada uyarlanacak."""
-    komut = [PY, EXTRACT_PY, "--pdf", pdf_path, "--out", tema_dir]
+def run_extract(pdf_path: str, tema_dir: str, tema_no: str, log, profil: str = "metin_yayinlari") -> None:
+    """sistem/extract.py çağrısı. --tema ve --profil parametreleri ile genelleştirildi."""
+    komut = [PY, EXTRACT_PY, "--pdf", pdf_path, "--out", tema_dir, "--tema", tema_no, "--profil", profil]
     _calistir(komut, log)
 
 
