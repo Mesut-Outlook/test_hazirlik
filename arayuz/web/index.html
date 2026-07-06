@@ -16,6 +16,7 @@
   </div>
   <span id="mock-rozeti" class="mock-rozeti" hidden>SAHTE VERİ MODU</span>
   <nav class="sekme-nav">
+    <button class="sekme-btn" data-gorunum="landing">Nedir?</button>
     <button class="sekme-btn" data-gorunum="anasayfa">Temalar</button>
     <button class="sekme-btn" data-gorunum="sihirbaz">Yeni Tema</button>
     <button class="sekme-btn" data-gorunum="ayarlar">Ayarlar</button>
@@ -23,6 +24,105 @@
 </header>
 
 <main class="ana-icerik">
+
+  <!-- ================= LANDING: NEDİR? / TANITIM EKRANI ================= -->
+  <section class="gorunum" id="view-landing">
+    <div class="landing-hero">
+      <div class="landing-hero__govde">
+        <h1 class="landing-hero__baslik">Matematik Testlerini Yeniden Tasarlayın</h1>
+        <p class="landing-hero__alt">Karışık ders notlarınızı tek tuşla temiz, iki sütunlu, düzenlenebilir ve basılabilir test sayfalarına dönüştürün.</p>
+        <button class="btn btn-birincil btn-buyuk landing-hero__btn" id="btn-landing-basla">Hemen Başlayın +</button>
+      </div>
+      <div class="landing-hero__kart-alani">
+        <div class="mock-tasarim">
+          <div class="mock-tasarim__baslik">
+            <div class="mock-tasarim__nokta kırmızı"></div>
+            <div class="mock-tasarim__nokta sarı"></div>
+            <div class="mock-tasarim__nokta yeşil"></div>
+            <span class="mock-tasarim__baslik-metin">Önizleme: 1. Tema PDF</span>
+          </div>
+          <div class="mock-tasarim__sayfa">
+            <div class="mock-tasarim__sayfa-sol">
+              <div class="mock-tasarim__logo-yeri"></div>
+              <div class="mock-tasarim__cizgi baslik"></div>
+              <div class="mock-tasarim__blok kur-tag">
+                <span>1. KUR</span>
+              </div>
+              <div class="mock-tasarim__blok soru">
+                <div class="mock-tasarim__cizgi soru-metni"></div>
+                <div class="mock-tasarim__cizgi soru-metni kisa"></div>
+                <div class="mock-tasarim__secenekler"></div>
+                <div class="mock-tasarim__cozum-alani"><span>Çözüm Alanı</span></div>
+              </div>
+              <div class="mock-tasarim__blok soru">
+                <div class="mock-tasarim__cizgi soru-metni"></div>
+                <div class="mock-tasarim__secenekler"></div>
+              </div>
+            </div>
+            <div class="mock-tasarim__sayfa-sag">
+              <div class="mock-tasarim__blok theory-box">
+                <div class="mock-tasarim__cizgi theory-baslik"></div>
+                <div class="mock-tasarim__cizgi theory-metin"></div>
+              </div>
+              <div class="mock-tasarim__blok soru">
+                <div class="mock-tasarim__cizgi soru-metni"></div>
+                <div class="mock-tasarim__secenekler"></div>
+                <div class="mock-tasarim__cozum-alani"><span>Çözüm Alanı</span></div>
+              </div>
+            </div>
+            <div class="mock-tasarim__sayfa-orta-cizgi"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-ozellikler">
+      <div class="landing-ozellikler__baslik">Neler Yapabilirsiniz?</div>
+      <div class="landing-ozellikler__izgara">
+        <div class="landing-ozellik-karti">
+          <div class="landing-ozellik-karti__ikon">📄</div>
+          <div class="landing-ozellik-karti__baslik">PDF ve Word (.docx) Desteği</div>
+          <div class="landing-ozellik-karti__aciklama">Ders notlarınızı veya taslak PDF/Word belgelerinizi yükleyin, sistem LibreOffice ile otomatik olarak PDF'e çevirip içeriği saniyeler içinde çıkarır.</div>
+        </div>
+        <div class="landing-ozellik-karti">
+          <div class="landing-ozellik-karti__ikon">📐</div>
+          <div class="landing-ozellik-karti__baslik">Bitişik Kök Teknolojisi</div>
+          <div class="landing-ozellik-karti__aciklama">Kök işareti SVG çengeliyle basılır. Matematik formülleri ve üslü/köklü gösterimler kayma olmaksızın, en yüksek çözünürlükte oluşturulur.</div>
+        </div>
+        <div class="landing-ozellik-karti">
+          <div class="landing-ozellik-karti__ikon">⇅</div>
+          <div class="landing-ozellik-karti__baslik">Soru Sıralama & Düzenleme</div>
+          <div class="landing-ozellik-karti__aciklama">Sorularınızı ve konu başlıklarınızı sürükleyip bırakarak sıralayın, istemediğiniz soruları tek tuşla silin veya yeni soru blokları ekleyin.</div>
+        </div>
+        <div class="landing-ozellik-karti">
+          <div class="landing-ozellik-karti__ikon">🛡️</div>
+          <div class="landing-ozellik-karti__baslik">Gelişmiş QA Doğrulaması</div>
+          <div class="landing-ozellik-karti__aciklama">Üretilen her test, arka planda otomatik doğrulama testlerine tabi tutulur; eksik soru ve görsel tekrarı anında tespit edilir.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-adimlar">
+      <div class="landing-adimlar__baslik">Çalışma Akışı</div>
+      <div class="landing-adimlar__akistele">
+        <div class="landing-adim-kutu">
+          <div class="landing-adim-kutu__sayi">1</div>
+          <h4>Belgeni Yükle</h4>
+          <p>Dosyalarını ve çıktı klasörlerini seç, dönüştürme tuşuna bas.</p>
+        </div>
+        <div class="landing-adim-kutu">
+          <div class="landing-adim-kutu__sayi">2</div>
+          <h4>İncele ve Sırala</h4>
+          <p>Çıkarılan blokları sürükle-bırak yöntemiyle düzenle.</p>
+        </div>
+        <div class="landing-adim-kutu">
+          <div class="landing-adim-kutu__sayi">3</div>
+          <h4>Tek Tıkla PDF Bas</h4>
+          <p>Yeni, iki sütunlu ve ayraç çizgili mükemmel test çıktını al.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ================= ANA SAYFA: TEMA LİSTESİ ================= -->
   <section class="gorunum" id="view-anasayfa">

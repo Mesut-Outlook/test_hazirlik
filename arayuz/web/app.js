@@ -520,6 +520,7 @@
   }
 
   el("#btn-yeni-tema-anasayfa").addEventListener("click", () => gotoView("sihirbaz"));
+  el("#btn-landing-basla").addEventListener("click", () => gotoView("sihirbaz"));
 
   // ---- PDF önizleme modalı (kartlardan / sonuç ekranından ortak) ----
 
@@ -833,7 +834,7 @@
     let ul = null;
 
     state.duzenle.akis.forEach((blok) => {
-      if (blok.bolum !== mevcutBolum) {
+      if (blok.bolum !== mevcutBolum || !ul) {
         mevcutBolum = blok.bolum;
         const grup = document.createElement("div");
         grup.className = "bolum-grup";
@@ -1137,6 +1138,6 @@
     } catch (err) {
       /* ayarlar alınamazsa sihirbaz varsayılansız devam eder */
     }
-    gotoView("anasayfa");
+    gotoView("landing");
   })();
 })();
