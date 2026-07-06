@@ -102,11 +102,18 @@ Kurallar: görev almadan önce panoyu TEKRAR oku (çakışma önlemi), her koşu
 
 ## Yol haritası — FAZ 4: Arayüz
 
-Sıradaki hedef, bu hattı **kod bilmeyen bir kullanıcının** kullanabilmesi:
-yerel bir web arayüzünden PDF/Word dosyası ve giriş/çıkış klasörleri seçilir,
-dönüştürme arka planda koşar, sonuç PDF'i tarayıcıda önizlenir, soru
-düzenleme/sıralama ve serbest metin düzenleme talepleri yine arayüzden verilir.
-Mimari, API sözleşmesi ve görev dağılımı: `COORDINATION.md` → **"FAZ 4"** bölümü.
+Hattı kod bilmeyen bir kullanıcıya açan yerel web arayüzünün **MVP'si hazır**:
+
+```bash
+bash arayuz/calistir.sh     # → http://127.0.0.1:8756
+```
+
+PDF/Word dosyası ve giriş/çıkış klasörleri arayüzden seçilir, dönüştürme arka
+planda koşar (canlı ilerleme), sonuç PDF'i tarayıcıda önizlenir, soru
+düzenleme/sıralama/ekleme ve serbest metin düzenleme talepleri yine arayüzden
+verilir. Mimari, API sözleşmesi ve görev dağılımı: `COORDINATION.md` → **"FAZ 4"**
+bölümü. Süren işler: extract genelleştirme (F3), uçtan uca test (F4),
+paketleme (F5) — AGY'de.
 
 ## Sürüm geçmişi (özet)
 

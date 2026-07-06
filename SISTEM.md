@@ -25,8 +25,12 @@ test_hazirlik/
 │       ├── manifest.json    sıra + bölüm + meta; soru ekle/çıkar/taşı BURADAN yapılır
 │       ├── assets/          o temanın görselleri (pNN_qNN_*.png)
 │       └── log/             islem_gunlugu.md (insan) + runs.jsonl (makine)
-└── cikti/                   üretilen PDF'ler — versiyonlu, ÜZERİNE YAZILMAZ
-    └── 1.tema_egemen_sarikci_v3.pdf
+├── cikti/                   üretilen PDF'ler — versiyonlu, ÜZERİNE YAZILMAZ
+│   └── 1.tema_egemen_sarikci_v3.pdf
+└── arayuz/                  yerel web arayüzü (FAZ 4)
+    ├── backend/             FastAPI (API sözleşmesi: COORDINATION.md "FAZ 4")
+    ├── web/                 framework'süz SPA (Türkçe; logo sol üstte)
+    └── calistir.sh          başlat → http://127.0.0.1:8756
 ```
 
 ## 2. İçerik Formatı — soru düzeyinde düzenlenebilirlik

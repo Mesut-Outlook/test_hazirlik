@@ -90,8 +90,8 @@ talepleri TAMAMEN ön yüzden yürür.
 | F1 | **Backend**: `arayuz/backend/` FastAPI uygulaması — yukarıdaki TÜM endpoint'ler, job kuyruğu+SSE, fs gezgini (güvenlik: ev dizini sınırı), docx→pdf (soffice), sistem/ scriptlerini subprocess ile çağırma, runs.jsonl log, `arayuz/calistir.sh` | Claude-Sonnet #9 | ✅ tamam (2026-07-06, Claude-Sonnet #9) — bkz. Değişiklik Günlüğü |
 | F2 | **Ön yüz**: `arayuz/web/` — sihirbaz akışı (1: dosya+klasör seç → 2: dönüştür/ilerleme → 3: önizleme+düzenle), klasör gezgini diyaloğu, PDF önizleme, blok listesi editörü (sürükle-sırala/sil/yeni blok formu), serbest talep kutusu, dogrula.py sonuç paneli. API sözleşmesine göre; backend hazır değilken `mock.js` ile geliştirir | Claude-Sonnet #10 | ✅ tamam (kim: Claude-Sonnet #10, 2026-07-06) — 4 ekran (ana sayfa/sihirbaz/düzenleme/ayarlar) + `mock.js`; F1'in gerçek kodu okunarak API hizalandı (9 madde, bkz. değişiklik günlüğü) — özellikle POST /temalar PDF üretmediği için sihirbaz create+uret zincirliyor, GET /temalar PDF yolu vermediği için "Önizle" localStorage yedeğiyle çalışıyor. mock.js ile 17 ekran görüntüsü + puppeteer-core ile uçtan uca gezildi, 1 gerçek hata (hidden/CSS çakışması) bulunup düzeltildi. Logo `arayuz/web/logo_es.jpg`'ye kopyalandı, header sol üstte sabit. |
 | F3 | **extract.py genelleştirme**: tema-bağımsız parametreler (tema no CLI ile, KUR/bölüm adları yapılandırılabilir `sistem/profiller/*.json`), farklı yayınevi düzenlerine dayanıklılık, docx'ten çevrilmiş PDF'lerle test | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — `sistem/extract.py` CLI parametreleriyle (`--tema`, `--profil`) genelleştirildi. `sistem/profiller/metin_yayinlari.json` profili oluşturuldu. Sınıflandırılamayan durumlar için try-except koruması ve `extract_report.txt` raporlama uyarıları eklendi. LibreOffice ile docx->pdf çevrilen PDF'te başarıyla test edildi. |
-| F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY + 1 Sonnet | ⬜ F1+F2+F3'ü bekliyor |
-| F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | Claude-Sonnet | ⬜ F4'ü bekliyor |
+| F4 | **Uçtan uca test + QA entegrasyonu**: örnek bir ikinci kaynak PDF ile tam akış (arayüzden), dogrula.py'nin job sonucuna bağlanması, hata senaryoları (bozuk PDF, izinsiz klasör, çift tema adı) | AGY (Antigravity) — kullanıcı devretti (2026-07-06) | ⬜ F3'ü bekliyor — AGY talimatları 10. madde |
+| F5 | Paketleme + README güncelleme (arayüz kullanım bölümü, ekran akışı) | AGY (Antigravity) — kullanıcı devretti (2026-07-06) | ⬜ F4'ü bekliyor — AGY talimatları 11. madde |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
 
 ### F1+F2 sonrası Fable denetimi (2026-07-06)
@@ -342,6 +342,27 @@ serbest ve teşvik edilir — sayfa aralıklarına göre paralel dağıt):
      scriptlerinin KOMUT SATIRI arayüzünü değiştirirsen bu bölümün altına
      "F3 CLI notu" düş ki F1 subprocess çağrılarını ona göre yazsın.
    - Bitince: pano F3 satırı ✅ + changelog + log + commit.
+10. **F4 — uçtan uca test (kullanıcı devretti, 2026-07-06).** F3'ün bitince:
+   - Arayüzü başlat (`bash arayuz/calistir.sh`, http://127.0.0.1:8756) ve GERÇEK
+     akışı arayüz API'siyle uçtan uca koş: yeni bir örnek kaynak PDF ile tema
+     oluştur (extract job + SSE ilerleme), blok düzenle (bir soru sil + bir soru
+     taşı + bir `tNN-eNNN` blok ekle), üret, `son_pdf` önizlemesini doğrula,
+     serbest talep gönder (Talep Kuyruğu'na düştüğünü gör).
+   - Hata senaryoları: bozuk/boş PDF, docx kaynağı (soffice çevrimi), ev dizini
+     dışı klasör isteği (403 beklenir), aynı adla ikinci tema.
+   - dogrula.py çıktısının job sonucunda ve ön yüz panelinde göründüğünü doğrula
+     (dogrula.py 01-tema'ya özgü kaldıysa F3 profiline bağlamak bu görevin parçası).
+   - Bulgu/düzeltme: arayuz/backend ve arayuz/web'e dokunabilirsin ama **API
+     sözleşmesini değiştirme** (mecbursan önce sözleşme bölümüne not düş);
+     01-tema'ya ve cikti/'deki v3'e DOKUNMA; test temalarını iş sonunda sil.
+   - Bitince: pano F4 ✅ + "FAZ 4" altına kısa test raporu + log + commit.
+11. **F5 — paketleme + README (kullanıcı devretti, 2026-07-06).** F4'ten sonra:
+   - README.md'ye "Arayüz" bölümü: başlatma (`calistir.sh`), ekran akışı (3 adım
+     sihirbaz + düzenleme + talepler), gereksinimlere LibreOffice notu.
+   - `arayuz/calistir.sh` sağlamlaştır: venv yoksa kur, bağımlılıkları
+     requirements.txt'ten sabit sürümle yükle, port doluysa anlaşılır mesaj.
+   - CLAUDE.md üst bloğuna "arayüz hazır" satırını işle; pano F5 ✅ + changelog +
+     commit. Fable son denetimi yapacak.
 
 ## AGY için Görev Ataması (dış ajan — bu dosya üzerinden koordine ediliyor)
 
