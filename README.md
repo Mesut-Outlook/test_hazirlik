@@ -86,6 +86,29 @@ node sistem/print.mjs temalar/01-tema/1tema.html cikti/1.tema_egemen_sarikci_v4.
 **Önemli:** Onaylanmış bir tema için `extract.py` bir daha ÇALIŞTIRILMAZ
 (id'leri yeniden üretir). Orijinal kaynak PDF'lere asla dokunulmaz.
 
+## İnce Ayarlar (Tüyo ve İpuçları)
+
+### 1. Resim Formatındaki Soruları Düzenleme ve Ekleme
+Eğer bir soru metin katmanı içermiyor ve tamamen görsel/resim olarak aktarılmışsa:
+* **Görsel bloğunu soruya çevirme**: `sorular.html` içinde o bloğun `<section class="img-block" id="...">` tanımını `<section class="question" id="...">` yapın ve görselden hemen sonra altına `<div class="solve-space"></div>` ekleyin. Böylece görsel soru bloğuna dönüşecek ve altına çözüm boşluğu gelecektir.
+* **Tamamen kaçan soruları manuel ekleme**:
+  1. PDF'ten veya belgeden sorunun ekran görüntüsünü (kırpıntı) alıp o temanın `assets/` klasörüne (örn. `ek_soru_1.png` adıyla) kaydedin.
+  2. `sorular.html` dosyasının en altına yeni bir soru bloğu yazın (Kimlik çakışmasını önlemek için sonuna `e` takılı id verin):
+     ```html
+     <section class="question" id="t01-e101">
+       <img src="assets/ek_soru_1.png" />
+       <div class="solve-space"></div>
+     </section>
+     ```
+  3. Bu bloğun kimliğini (`t01-e101`) `manifest.json` içindeki basılmasını istediğiniz yere yerleştirin ve PDF'i yeniden üretin.
+
+### 2. Sayfa ve Boşluk Düzeni İnce Ayarları
+Soruların sayfalara dengeli yayılması, gereksiz boşlukların önlenmesi ve sayfa altı taşmaların yönetimi için şu CSS sınıflarını kullanabilirsiniz:
+* **Kısa Boşluk (`solve-space-sm`)**: Çok kısa soruların altına gereksiz 30mm boşluk bırakıp sayfa taşmasını önlemek için `<div class="solve-space">` sınıfını `<div class="solve-space solve-space-sm">` yapın (15mm boşluk bırakır).
+* **Manuel Sütun Kesme (`force-break-column`)**: Bir bloğun (soru veya konu başlığı) zorunlu olarak bir sonraki sütuna geçmesini istiyorsanız, o bloğun class listesine `force-break-column` ekleyin (örn: `<section class="question force-break-column" id="...">`).
+* **Manuel Sayfa Kesme (`force-break-page`)**: Bir bloğun yeni bir sayfada başlamasını istiyorsanız, o bloğun class listesine `force-break-page` ekleyin.
+
+
 ## Gereksinimler
 
 Linux + `google-chrome-stable`, `node` (puppeteer-core), Python 3 (pymupdf,

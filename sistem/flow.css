@@ -281,10 +281,22 @@ body {
 .solve-space {
   min-height: 30mm;
 }
+/* Shorter solution space for simple/short questions */
+.solve-space.solve-space-sm {
+  min-height: 15mm;
+}
 /* çok parçalı (a,b,c,...) sorularda daha fazla boşluk gerektiğinde
    bu ek sınıf kullanılabilir (extract.py/A1 tarafından eklenir) */
 .solve-space.solve-space-lg {
   min-height: 44mm;
+}
+
+/* Manuel kesme yardımcıları (sayfalama ince ayarı için) */
+.force-break-column {
+  break-after: column !important;
+}
+.force-break-page {
+  break-after: page !important;
 }
 
 /* ---------- Görsel / tablo / şekil blokları ---------- */
