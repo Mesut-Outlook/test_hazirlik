@@ -13,3 +13,7 @@
 ## 2026-07-06T21:13:32+03:00 (Arayüz - üretim)
 - _0_sinif_tema1_Ver_2_v3.pdf üretildi (sürüm 3, 42 sayfa).
 - Doğrulama: ok
+
+## 2026-07-07T10:18:01+03:00 (Arayüz - üretim)
+- _0_sinif_tema1_Ver_2_v4.pdf üretildi (sürüm 4, 42 sayfa).
+- Doğrulama: ok
