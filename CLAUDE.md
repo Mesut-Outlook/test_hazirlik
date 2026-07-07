@@ -31,6 +31,11 @@
 >   F3 (extract genelleştirme), F4 (uçtan uca test & QA entegrasyonu) ve F5 (paketleme
 >   & README/tanıtım güncellemeleri) tamamlanarak depoya gönderildi. Matematiksel ifadelerin
 >   (integral, limit, Yunan/Latin harfleri vb.) sistem genelinde çözümlenmesi sağlandı.
+> - **SAYFA DÜZENİ VE RESİMLİ SORU YÖNETİMİ (2026-07-07):** Arayüzde basılan testlerdeki
+>   resim formatındaki soruları kurtarmak ve sayfa/boşluk düzenini ince ayarlamak için
+>   `sistem/flow.css`'e `.solve-space-sm` (15mm kısa çözüm boşluğu), `.force-break-column`
+>   ve `.force-break-page` sınıfları eklendi. Kılavuz `README.md`'ye "İnce Ayarlar" bölümü
+>   olarak işlendi.
 > - İş bölümü: planlama/denetim Fable (ana oturum), kod Sonnet alt-ajanları, QA +
 >   büyük düzeltmeler AGY (Antigravity, COORDINATION.md üzerinden). DERS: ajan
 >   "tamam/sıfır hata" raporları mutlaka örneklemle çapraz doğrulanır (SISTEM.md §6).

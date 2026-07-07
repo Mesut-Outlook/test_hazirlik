@@ -1466,3 +1466,7 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     kullanıcının 5 gerçek teması ve `cikti/`'deki PDF'ler dokunulmadan kaldı.
   - Sunucu `bash arayuz/calistir.sh` ile http://127.0.0.1:8756 üzerinde çalışır
     bırakıldı.
+
+- **Sayfa Düzeni ve Resimli Soru Desteği (AGY, 2026-07-07):**
+  - **CSS Geliştirmesi**: `sistem/flow.css` güncellenerek `.solve-space-sm` (15mm kısa çözüm boşluğu), `.force-break-column` (manuel sütun kesme) ve `.force-break-page` (manuel sayfa kesme) sınıfları eklendi.
+  - **Belgelendirme & Kılavuz**: `README.md` dosyasına resim formatındaki soruları soruya çevirme/manuel ekleme ve sayfa düzeni ince ayar sınıflarının kullanımını gösteren "İnce Ayarlar" bölümü eklendi.
