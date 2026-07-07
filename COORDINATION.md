@@ -97,7 +97,7 @@ talepleri TAMAMEN ön yüzden yürür.
 | F5 | **Paketleme + README güncelleme** (arayüz kullanım bölümü, ekran akışı) | AGY (Antigravity) | ✅ tamam (kim: AGY, 2026-07-06) — `README.md` dosyası yerel web arayüzünün başlatılması, özellikleri ve kullanımını detaylandıracak şekilde güncellenerek paketleme tamamlandı. |
 | F6 | (Opsiyonel, kullanıcı onayına bağlı) Serbest taleplerin `claude` CLI headless ile otomatik işlenmesi | — | ⬜ karar bekliyor |
 | F7 | Arayüz iyileştirmeleri (kullanıcı istekleri, 2026-07-06): (1) klasör gezgininde YENİ KLASÖR oluşturma (`POST /api/fs/mkdir`); (2) tema kartlarında SİLME (onaylı; `DELETE /api/temalar/{id}` → `temalar/.cop/`a taşınır, kalıcı silme yok); (3) bildirim (toast) kutuları ekranda TAM görünmüyor — konum/z-index/taşma düzeltilecek; (4) PDF önizleme modalı TAM EKRAN olacak (viewport'u doldursun, kapatma düğmesi erişilebilir) | Claude-Sonnet #11 → #12 | ✅ tamam (kim: Claude-Sonnet #12, 2026-07-06) — #11'in yarım bıraktığı `app.js`/`mock.js` tamamlandı: gezgin modalına "+ Yeni Klasör" akışı (`api.fsMkdir`, prompt→POST /api/fs/mkdir→liste tazelenir), tema kartına `btn-tehlike` "Sil" butonu + onay metni ("çöpe taşınır, geri alınabilir") + `api.temaSil` (DELETE), Esc tuşu ile PDF önizleme/gezgin modalı kapatma. mock.js'e aynı iki uç nokta sahte olarak eklendi. Backend (#11'in fs_api.py/temalar_api.py/jobs.py eklemeleri) + index.html/style.css (tam ekran modal, toast konumu) zaten sağlamdı, aynen korundu. **Bulunan ve düzeltilen gerçek hata**: `GET /api/temalar` (temalar_api.py) ve `utils.tema_klasorleri()` gizli `temalar/.cop/` klasörünü de bir tema sanıp listeye "İşleniyor…" kartı olarak ekliyordu — her silme sonrası arayüzde sahte bir ".cop" kartı beliriyordu; artık nokta (`.`) ile başlayan klasörler atlanıyor. Doğrulama: `node --check` (app.js, mock.js) temiz; curl ile mkdir (400/409/200) ve DELETE (404/200 + `.cop` taşıma) uçları test edildi; headless Chrome ile gerçek arayüzde 4 özellik de gözle doğrulandı (yeni klasör oluşturuldu ve listede göründü, sahte tema silindi ve `.cop` kartı ARTIK belirmedi, tam ekran PDF önizleme + Esc ile kapama çalıştı), konsolda hata yok. Test için oluşturulan sahte tema (`99-agent-ui-test`) ve klasör (`cikti/agent-test-klasoru`) doğrulama sonrası temizlendi; kullanıcının gerçek temaları/çıktıları (01-tema, 02-11-…, 03-ekonomi-6, 04-10-sinif-tema-1, 05-0-sinif-tema1-ver-2, `cikti/*.pdf`) dokunulmadan kaldı. |
-| F8 | DÖNÜŞÜM RAPORU (kullanıcı isteği, 2026-07-07): her dönüşümde `sistem/rapor.py` → `temalar/NN/log/donusum_raporu.md` + `rapor.json`. İçerik: (1) kaynak PDF'teki soru sayısı TAHMİNİ (metin katmanından soru-numarası deseni; "tahmin" diye etiketle), (2) çıktıdaki soru sayısı (sorular.html .question), (3) metin-formatında / görsel-içeren soru dağılımı (+ ayrıca salt img-block sayısı), (4) AKTARIM KONTROLÜ: her çıktı sorusunun ilk ~40 normalize karakteri kaynak metinde aranır → "eşleşti / eşleşmedi (elle kontrol önerilir)" sayıları + eşleşmeyenlerin id listesi; kaynakta bulunup çıktıda bulunamayan soru numaraları listesi. Backend: extract ve uret job'larının SONUNA bağla, job sonucuna özet koy; `GET /api/temalar/{id}/rapor` ucu. Ön yüz: sihirbaz Adım 3'te "Dönüşüm Raporu" tablosu + tema kartında/düzenleme ekranında "Rapor" butonu. Mevcut 5 tema için rapor GERİYE DÖNÜK üretilecek | Claude-Sonnet #13 | 🔄 devam ediyor (kim: Claude-Sonnet #13, Fable atadı) |
+| F8 | DÖNÜŞÜM RAPORU (kullanıcı isteği, 2026-07-07): her dönüşümde `sistem/rapor.py` → `temalar/NN/log/donusum_raporu.md` + `rapor.json`. İçerik: (1) kaynak PDF'teki soru sayısı TAHMİNİ (metin katmanından soru-numarası deseni; "tahmin" diye etiketle), (2) çıktıdaki soru sayısı (sorular.html .question), (3) metin-formatında / görsel-içeren soru dağılımı (+ ayrıca salt img-block sayısı), (4) AKTARIM KONTROLÜ: her çıktı sorusunun ilk ~40 normalize karakteri kaynak metinde aranır → "eşleşti / eşleşmedi (elle kontrol önerilir)" sayıları + eşleşmeyenlerin id listesi; kaynakta bulunup çıktıda bulunamayan soru numaraları listesi. Backend: extract ve uret job'larının SONUNA bağla, job sonucuna özet koy; `GET /api/temalar/{id}/rapor` ucu. Ön yüz: sihirbaz Adım 3'te "Dönüşüm Raporu" tablosu + tema kartında/düzenleme ekranında "Rapor" butonu. Mevcut 5 tema için rapor GERİYE DÖNÜK üretilecek | Claude-Sonnet #13 | ✅ tamam (kim: Claude-Sonnet #13, 2026-07-07) — bkz. Değişiklik Günlüğü |
 
 ### F1+F2 sonrası Fable denetimi (2026-07-06)
 
@@ -948,6 +948,64 @@ kopyala. **Orijinal `1.tema.pdf`'e DOKUNMA.**
     izlenemiyor (yalnızca oluşturma anındaki sihirbaz akışında görülür);
     manifest PATCH'in tek-grup basitleştirmesi (madde 5); talep durumu canlı
     güncellenmiyor (localStorage sabit "kuyrukta").
+- 2026-07-07 (Claude-Sonnet #13 — F8 tamamlandı, Dönüşüm Raporu): `sistem/rapor.py`
+  yazıldı (CLI: `--kaynak <pdf> --tema-dir <dir> [--cikti <pdf>]`, bağımsız çalışır,
+  yalnızca PyMuPDF + stdlib). 4 metrik: (1) kaynak soru sayısı TAHMİNİ — satır başı
+  `\d{1,3}[.)]` deseni, aynı satırda ≥2 "N.HARF" varsa (cevap anahtarı satırı) sayılmaz;
+  (2) çıktı soru sayısı — sorular.html'deki `class="question"` blokları, ama SADECE
+  manifest.json'un aktif `akis` sırasındakiler (silinenler hariç); (3) format dağılımı —
+  `<img>` var/yok (metin/görsel) + "salt görsel" alt kümesi (anlamlı metin <20 karakter);
+  (4) AKTARIM KONTROLÜ — her sorunun HTML'i düz metne çevrilip (`<br>`→boşluk, TÜM
+  etiketler boşluksuz silinir — bir önceki taslakta etiketleri boşlukla silmek
+  `.rt`/`.sup` içeriğine yapay ara boşluk sokuyordu, ör. "7<sup>x+2</sup>" → "7 x + 2"
+  oluyordu, DÜZELTİLDİ: artık "7x+2"; `.frac`'ın num/den'i arasına özel olarak BİR
+  boşluk eklendi çünkü kaynakta ayrı satırdırlar) kaynak PDF metninde (aynı normalize
+  ile) aranır; **kaynağın metin katmanında GERÇEKTEN var olan √ karakteri** kaldırılıp
+  karşılaştırılıyor (çıktının `.rt` sınıfı SVG çengelle çizildiği için √ metin
+  içermiyor — SISTEM.md §6.1'in zaten kabul ettiği tek fark). Bu iki düzeltme
+  01-tema'da eşleşme oranını 301/567 → 484/567'ye çıkardı (kalan 49 eşleşmeyen,
+  gözle örneklendi: iç içe kök `√√`, çok terimli kesir/üs karışımları — bilinen,
+  COORDINATION'da önceden kayıtlı PRE-EXISTING zorluklar, rapor.py hatası değil).
+  Kaynağın metin katmanı çok sınırlıysa (taranmış/görsel ağırlıklı belge — soru
+  numaraları dışında satır metni yok) `kaynak_metin_kisitli` bayrağı raporda AÇIKÇA
+  uyarıyor (03/04/05-temalarında tetiklendi, sessizce "0" göstermek yerine).
+  Çıktılar: `temalar/NN/log/donusum_raporu.md` (Türkçe, tarih damgalı, özet tablo +
+  eşleşmeyen id'ler + "kayıp olabilecek numaralar" — bu SONUNCUSU yaklaşık/global bir
+  küme farkı olduğu md içinde açıkça belirtiliyor, bölüm bazlı numara sıfırlanması
+  yüzünden kesin kanıt değil) + `rapor.json` (makine okunur, aynı sayılar + tam id
+  listeleri) + `runs.jsonl`'e `islem:"rapor"` satırı (üzerine yazılan md'nin geçmişi
+  böylece korunuyor). **Backend**: `pipeline.run_rapor()` eklendi (config.py'ye
+  `RAPOR_PY`); hem `POST /api/temalar` (extract sonrası, henüz PDF yokken `--cikti`
+  vermeden) hem `POST /api/temalar/{id}/uret` (dogrula.py'den SONRA, `--cikti
+  cikti_pdf` ile) işine bağlandı; her ikisinin `job.sonuc`'una `rapor_ozet` eklendi;
+  `GET /api/temalar/{id}/rapor` ucu (`{tema_id, md, ozet}`, rapor yoksa 404) eklendi.
+  **Ön yüz**: `app.js`'e `raporPaneliOlustur()` (özet tablo + `<details>` katlanabilir
+  eşleşmeyen/görsel-içerik id listeleri + `kaynak_metin_kisitli` uyarı rozeti) +
+  `raporModalAc()`/`raporModalKapat()` eklendi; sihirbaz Adım 3'e "Dönüşüm Raporu"
+  kutusu (`sonuc.rapor_ozet`'ten, ekstra istek YOK), düzenleme ekranının "Yeniden Üret"
+  sonuç panosuna aynı kutu, tema kartına + düzenleme ekranı üst çubuğuna "Rapor"
+  butonu (`GET /api/temalar/{id}/rapor` ile modal açar) eklendi; Esc tuşu rapor
+  modalını da kapatıyor. `mock.js`'e `sahteRaporUret()`/`sahteRaporMd()` + GET rapor
+  ucu + extract/uret job sonuçlarına `rapor_ozet` eklendi. `style.css`'e
+  `.rapor-tablosu` + `details summary` + `#rapor-modal` boyutu eklendi.
+  **Geriye dönük üretim**: depoda 5 değil **6 tema** vardı (`06-1-tema-yeni1` COORDINATION
+  yazıldıktan sonra eklenmiş görünüyor) — hepsi için SADECE `log/` klasörüne rapor
+  yazıldı (sorular.html/manifest.json'a dokunulmadı): 01-tema (kaynak 95~, çıktı 567,
+  484 eşleşti/49 eşleşmedi/34 görsel-içerik), 02-11-koklu-sayilar-es-ver-1 (kaynak
+  taranmış — `kaynak_metin_kisitli`, çıktı 44, hepsi görsel-içerik), 03-ekonomi-6
+  (tüm sayfalar tek img-block olarak çıkarılmış, 0 `question` bloğu — dürüstçe 0/0
+  raporlandı), 04/05-10-sinif-tema-1 (aynı kaynak PDF, ikisi de taranmış — 166 soru,
+  `kaynak_metin_kisitli`), 06-1-tema-yeni1 (kaynak 167~, çıktı 228, 79 eşleşti/44
+  eşleşmedi — kalanlar font/glif kodlama sorunlu kaynak sayfalarından, gözle
+  örneklendi). **Doğrulama**: 02-tema'da elle koşulup md okundu, sayılar makul
+  bulundu (yukarıdaki iki normalize düzeltmesi BUNU yaparken bulundu); kaynak PDF
+  `pdftotext`/fitz ile açılıp birkaç soru elle teyit edildi. Sunucu yeniden
+  başlatıldı; hem `?mock=1` hem GERÇEK backend ile headless Chrome + puppeteer-core
+  üzerinden 3 yüzey de ekran görüntüsüyle doğrulandı: ana sayfa tema kartı → Rapor
+  modalı, sihirbazın (mock) uçtan uca akışı → Adım 3'teki rapor kutusu, düzenleme
+  ekranı üst çubuğundaki Rapor butonu → modal; konsolda favicon 404'ü dışında hata
+  YOK. Kullanıcı verisi (5+1 tema, `cikti/*.pdf`) dokunulmadan kaldı — sadece
+  `temalar/NN/log/donusum_raporu.md` + `rapor.json` dosyaları eklendi.
 
 ## FAZ 3 QA Bulguları
 

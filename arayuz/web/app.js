@@ -122,6 +122,9 @@
     async bloklar(temaId) {
       return govdeAyristir(await fetch(`/api/temalar/${encodeURIComponent(temaId)}/bloklar`));
     },
+    async rapor(temaId) {
+      return govdeAyristir(await fetch(`/api/temalar/${encodeURIComponent(temaId)}/rapor`));
+    },
     async manifestGuncelle(temaId, akis) {
       return govdeAyristir(
         await fetch(`/api/temalar/${encodeURIComponent(temaId)}/manifest`, {
@@ -521,12 +524,14 @@
         <button class="btn" data-aksiyon="onizle" ${hazirDegil ? "disabled" : ""}>Önizle</button>
         <button class="btn btn-birincil" data-aksiyon="duzenle" ${hazirDegil ? "disabled" : ""}>Düzenle</button>
         <button class="btn" data-aksiyon="uret" ${hazirDegil ? "disabled" : ""}>Yeniden Üret</button>
+        <button class="btn" data-aksiyon="rapor" ${hazirDegil ? "disabled" : ""}>Rapor</button>
         <button class="btn btn-tehlike" data-aksiyon="sil" title="Temayı çöpe taşı">Sil</button>
       </div>
     `;
     kart.querySelector('[data-aksiyon="onizle"]').addEventListener("click", () => pdfOnizlemeAc(tema));
     kart.querySelector('[data-aksiyon="duzenle"]').addEventListener("click", () => duzenleAc(tema.tema_id));
     kart.querySelector('[data-aksiyon="uret"]').addEventListener("click", () => temaYenidenUret(tema));
+    kart.querySelector('[data-aksiyon="rapor"]').addEventListener("click", () => raporModalAc(tema));
     kart.querySelector('[data-aksiyon="sil"]').addEventListener("click", () => temaSilOnayla(tema));
     return kart;
   }
@@ -608,6 +613,10 @@
     if (e.key !== "Escape") return;
     if (el("#pdf-onizleme-modal").classList.contains("acik")) {
       pdfOnizlemeKapat();
+      return;
+    }
+    if (el("#rapor-modal").classList.contains("acik")) {
+      raporModalKapat();
       return;
     }
     if (el("#gezgin-modal").classList.contains("acik")) {
@@ -831,6 +840,106 @@
     return sarmalayici;
   }
 
+  // job.sonuc.rapor_ozet = sistem/rapor.py'nin ürettiği rapor.json (F8 — Dönüşüm
+  // Raporu): kaynak_soru_tahmini, cikti_soru_sayisi, metin_sayisi, gorsel_sayisi,
+  // eslesen_sayisi, eslesmeyen_sayisi (+idler), gorsel_icerik_sayisi (+idler),
+  // kaynak_metin_kisitli (kaynak taranmış/görsel ağırlıklıysa tahmin güvensiz).
+  // Job üretilmediyse (eski job / rapor.py atlandıysa) `ozet` null olabilir —
+  // bu durumda GET /api/temalar/{id}/rapor ile (varsa) en son rapor ayrıca çekilir.
+  function raporOzetTablosuOlustur(ozet) {
+    const satirlar = [
+      ["Kaynaktaki soru sayısı (tahmin)", ozet.kaynak_soru_tahmini],
+      ["Çıktıya aktarılan soru sayısı", ozet.cikti_soru_sayisi],
+      ["— metin formatında", ozet.metin_sayisi],
+      ["— görsel içeren", ozet.gorsel_sayisi],
+      ["Düzgün aktarıldığı doğrulanan (eşleşti)", ozet.eslesen_sayisi],
+      ["Elle kontrol önerilir (eşleşmedi)", ozet.eslesmeyen_sayisi],
+      ["Görsel içerikli (karşılaştırılamadı)", ozet.gorsel_icerik_sayisi],
+    ];
+    const tablo = document.createElement("table");
+    tablo.className = "rapor-tablosu";
+    tablo.innerHTML = `<tbody>${satirlar
+      .map(
+        ([etiket, deger]) =>
+          `<tr><td>${kacisliMetin(etiket)}</td><td><strong>${
+            deger != null ? kacisliMetin(deger) : "—"
+          }</strong></td></tr>`
+      )
+      .join("")}</tbody>`;
+    return tablo;
+  }
+
+  function raporKatlanabilirListe(baslik, idler) {
+    if (!idler || !idler.length) return null;
+    const detay = document.createElement("details");
+    detay.style.marginTop = "10px";
+    const ozetEl = document.createElement("summary");
+    ozetEl.textContent = `${baslik} (${idler.length})`;
+    detay.appendChild(ozetEl);
+    const liste = document.createElement("div");
+    liste.className = "log-paneli";
+    liste.style.marginTop = "6px";
+    liste.style.maxHeight = "160px";
+    liste.textContent = idler.join(", ");
+    detay.appendChild(liste);
+    return detay;
+  }
+
+  function raporPaneliOlustur(ozet) {
+    const sarmalayici = document.createElement("div");
+    if (!ozet) {
+      sarmalayici.innerHTML = `<div class="rozet" style="background:var(--renk-uyari-zemin); color:var(--renk-uyari);">
+        <span class="rozet__isaret" style="background:var(--renk-uyari);">i</span>
+        <span>Dönüşüm raporu bulunamadı — bu tema için henüz üretilmemiş olabilir.</span>
+      </div>`;
+      return sarmalayici;
+    }
+    if (ozet.kaynak_metin_kisitli) {
+      const uyari = document.createElement("div");
+      uyari.className = "rozet";
+      uyari.style.background = "var(--renk-uyari-zemin)";
+      uyari.style.color = "var(--renk-uyari)";
+      uyari.style.marginBottom = "10px";
+      uyari.innerHTML = `<span class="rozet__isaret" style="background:var(--renk-uyari);">!</span>
+        <span>Kaynak PDF'in metin katmanı sınırlı görünüyor (muhtemelen taranmış/görsel ağırlıklı) —
+        kaynaktaki soru sayısı tahmini güvenilir değildir.</span>`;
+      sarmalayici.appendChild(uyari);
+    }
+    sarmalayici.appendChild(raporOzetTablosuOlustur(ozet));
+    const eslesmeyenListe = raporKatlanabilirListe("Eşleşmeyen sorular — elle kontrol önerilir", ozet.eslesmeyen_idler);
+    if (eslesmeyenListe) sarmalayici.appendChild(eslesmeyenListe);
+    const gorselListe = raporKatlanabilirListe("Görsel içerikli — karşılaştırılamadı", ozet.gorsel_icerik_idler);
+    if (gorselListe) sarmalayici.appendChild(gorselListe);
+    return sarmalayici;
+  }
+
+  // Tema kartı / düzenleme ekranı "Rapor" butonu: GET /api/temalar/{id}/rapor ile
+  // en son üretilmiş raporu çeker (job sonucu elde değilse de çalışır).
+  function raporModalAc(tema) {
+    el("#rapor-modal-baslik").textContent = (tema && tema.ad ? `"${tema.ad}" — ` : "") + "Dönüşüm Raporu";
+    const govde = el("#rapor-modal-govde");
+    govde.innerHTML = '<p class="yukleniyor-metni">Rapor yükleniyor…</p>';
+    el("#rapor-modal").classList.add("acik");
+    api
+      .rapor(tema.tema_id)
+      .then((veri) => {
+        govde.innerHTML = "";
+        govde.appendChild(raporPaneliOlustur(veri.ozet));
+      })
+      .catch((err) => {
+        govde.innerHTML = `<div class="bos-durum">Rapor alınamadı: ${kacisliMetin(err.message)}</div>`;
+      });
+  }
+
+  function raporModalKapat() {
+    el("#rapor-modal").classList.remove("acik");
+  }
+
+  el("#rapor-modal-kapat").addEventListener("click", raporModalKapat);
+  el("#rapor-modal").addEventListener("click", (e) => {
+    if (e.target.id === "rapor-modal") raporModalKapat();
+  });
+
   function adim3Doldur(sonuc) {
     const pdfYolu = sonuc.kopya || sonuc.cikti_pdf;
     if (pdfYolu) {
@@ -842,6 +951,11 @@
     el("#adim3-cikti-notu").innerHTML = pdfYolu
       ? `PDF şu konuma kaydedildi:<br><code>${kacisliMetin(pdfYolu)}</code><br>Dosya yöneticinizden bu klasöre giderek dosyayı bulabilirsiniz.`
       : "Çıktı konumu bilgisi alınamadı.";
+    const raporKutu = el("#adim3-rapor-kutusu");
+    if (raporKutu) {
+      raporKutu.innerHTML = "";
+      raporKutu.appendChild(raporPaneliOlustur(sonuc.rapor_ozet));
+    }
   }
 
   el("#btn-adim3-duzenle").addEventListener("click", () => {
@@ -876,6 +990,7 @@
       }
     }
     el("#duzenle-tema-baslik").textContent = tema ? `"${tema.ad}" — Düzenle` : "Tema Düzenle";
+    state.duzenle.ad = tema ? tema.ad : null;
 
     try {
       const veri = await api.bloklar(temaId);
@@ -1002,6 +1117,10 @@
   }
 
   el("#btn-duzenle-anasayfa").addEventListener("click", () => gotoView("anasayfa"));
+  el("#btn-duzenle-rapor").addEventListener("click", () => {
+    if (!state.duzenle.temaId) return;
+    raporModalAc({ tema_id: state.duzenle.temaId, ad: state.duzenle.ad });
+  });
 
   el("#btn-duzenle-kaydet").addEventListener("click", async () => {
     const temaId = state.duzenle.temaId;
@@ -1054,6 +1173,11 @@
             if (dogrulamaKutu) {
               dogrulamaKutu.innerHTML = "";
               dogrulamaKutu.appendChild(dogrulamaPaneliOlustur(s.dogrulama));
+            }
+            const raporKutu = el("#duzenle-uretim-rapor");
+            if (raporKutu) {
+              raporKutu.innerHTML = "";
+              raporKutu.appendChild(raporPaneliOlustur(s.rapor_ozet));
             }
             el("#duzenle-uretim-sonuc").hidden = false;
             bildirimGoster("Yeni PDF üretildi.", "basari");

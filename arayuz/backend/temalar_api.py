@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import shutil
@@ -161,6 +162,10 @@ def post_tema(body: YeniTema):
         job.log("extract.py çalıştırılıyor...")
         pipeline.run_extract(pdf_yolu, tema_dir, tema_no, job.log)
 
+        job.log("rapor.py çalıştırılıyor (F8 — dönüşüm raporu)...")
+        rapor_sonuc = pipeline.run_rapor(pdf_yolu, tema_dir, job.log)
+        rapor_ozet = rapor_sonuc.get("ozet") if rapor_sonuc.get("calisti") else None
+
         sayimlar = blocks.sayim(tema_dir)
         sayfa = pipeline.pdf_sayfa_sayisi(pdf_yolu)
         runs_jsonl_yaz(
@@ -186,7 +191,7 @@ def post_tema(body: YeniTema):
                 f"extract.py ile {sayimlar['soru']} soru, {sayimlar['gorsel']} görsel çıkarıldı.",
             ],
         )
-        job.bitir({"tema_id": tema_id, "sayimlar": sayimlar})
+        job.bitir({"tema_id": tema_id, "sayimlar": sayimlar, "rapor_ozet": rapor_ozet})
 
     job = job_manager.yeni_is("extract", calistir, tema_id=tema_id)
     tema_meta.yaz(tema_dir, {"son_extract_job": job.id})
@@ -198,6 +203,23 @@ def post_tema(body: YeniTema):
 def get_bloklar(tema_id: str):
     tema_dir = tema_dir_by_id(tema_id)
     return {"tema_id": tema_id, "bloklar": blocks.bloklar_listesi(tema_dir)}
+
+
+# ------------------------------------------------------- GET /api/temalar/{id}/rapor
+@router.get("/api/temalar/{tema_id}/rapor")
+def get_rapor(tema_id: str):
+    """F8 — en son üretilen dönüşüm raporu: {md, ozet}. Rapor henüz üretilmediyse
+    (extract/uret hiç çalışmadıysa veya rapor.py atlandıysa) 404 döner."""
+    tema_dir = tema_dir_by_id(tema_id)
+    md_yol = os.path.join(tema_dir, "log", "donusum_raporu.md")
+    json_yol = os.path.join(tema_dir, "log", "rapor.json")
+    if not os.path.exists(md_yol) or not os.path.exists(json_yol):
+        raise ApiHata(404, "rapor bulunamadı", "Bu tema için henüz bir dönüşüm raporu üretilmedi.")
+    with open(md_yol, "r", encoding="utf-8") as f:
+        md = f.read()
+    with open(json_yol, "r", encoding="utf-8") as f:
+        ozet = json.load(f)
+    return {"tema_id": tema_id, "md": md, "ozet": ozet}
 
 
 # ------------------------------------------------------- PATCH /api/temalar/{id}/manifest
@@ -288,6 +310,10 @@ def post_uret(tema_id: str, body: UretIstek):
             job.log("qa/dogrula.py çalıştırılıyor...")
             dogrula_sonuc = pipeline.run_dogrula(kaynak_pdf, cikti_pdf, job.log)
 
+        job.log("rapor.py çalıştırılıyor (F8 — dönüşüm raporu)...")
+        rapor_sonuc = pipeline.run_rapor(kaynak_pdf, tema_dir, job.log, cikti_pdf=cikti_pdf)
+        rapor_ozet = rapor_sonuc.get("ozet") if rapor_sonuc.get("calisti") else None
+
         sayimlar = blocks.sayim(tema_dir)
         sayfa = pipeline.pdf_sayfa_sayisi(cikti_pdf)
         dogrulama_str = "ok"
@@ -328,6 +354,7 @@ def post_uret(tema_id: str, body: UretIstek):
                 "surum": surum_yeni,
                 "sayimlar": sayimlar,
                 "dogrulama": dogrula_sonuc,
+                "rapor_ozet": rapor_ozet,
             }
         )
 

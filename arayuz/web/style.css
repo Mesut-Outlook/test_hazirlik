@@ -492,6 +492,38 @@ button {
 .rozet.ok .rozet__isaret { background: var(--renk-basari); }
 .rozet.hata .rozet__isaret { background: var(--renk-hata); }
 
+/* ---------- F8: Dönüşüm Raporu ---------- */
+
+.rapor-tablosu {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.rapor-tablosu td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--renk-kenar);
+}
+
+.rapor-tablosu td:first-child { color: var(--renk-metin-soluk); }
+.rapor-tablosu td:last-child { text-align: right; white-space: nowrap; }
+.rapor-tablosu tr:last-child td { border-bottom: none; }
+
+details summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--renk-ana-koyu);
+}
+
+#rapor-modal-govde {
+  padding: 16px 22px 22px;
+}
+
+#rapor-modal .modal-kutu {
+  max-width: 720px;
+}
+
 .cikti-klasoru-notu {
   background: var(--renk-ana-acik);
   border-radius: var(--radius-kucuk);

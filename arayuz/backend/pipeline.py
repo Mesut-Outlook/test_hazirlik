@@ -5,11 +5,12 @@ CLI değiştiğinde yalnızca buradaki fonksiyonlar güncellenecek, çağıran k
 """
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 
-from config import ASSEMBLE_PY, DOGRULA_PY, EXTRACT_PY, FLOW_CSS, PRINT_MJS, REPO_ROOT
+from config import ASSEMBLE_PY, DOGRULA_PY, EXTRACT_PY, FLOW_CSS, PRINT_MJS, RAPOR_PY, REPO_ROOT
 
 PY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "bin", "python3")
 if not os.path.exists(PY):
@@ -93,3 +94,27 @@ def run_dogrula(kaynak_pdf: str, cikti_pdf: str, log) -> dict:
     komut = [PY, DOGRULA_PY, kaynak_pdf, cikti_pdf]
     cikti = _calistir(komut, log, izin_verilen_donus=(0, 1))
     return {"calisti": True, "cikti": cikti}
+
+
+def run_rapor(kaynak_pdf: str, tema_dir: str, log, cikti_pdf: str | None = None) -> dict:
+    """sistem/rapor.py (F8 — Dönüşüm Raporu). extract ve uret job'larının
+    SONUNDA çağrılır; temalar/NN/log/donusum_raporu.md + rapor.json üretir,
+    bu fonksiyon rapor.json'daki özet sayıları döner (job.sonuc.rapor_ozet)."""
+    if not os.path.exists(RAPOR_PY):
+        return {"calisti": False, "not": "sistem/rapor.py bulunamadı, atlandı"}
+    if not kaynak_pdf or not os.path.exists(kaynak_pdf):
+        return {"calisti": False, "not": "kaynak PDF bilinmiyor, rapor atlandı"}
+    komut = [PY, RAPOR_PY, "--kaynak", kaynak_pdf, "--tema-dir", tema_dir]
+    if cikti_pdf:
+        komut += ["--cikti", cikti_pdf]
+    try:
+        _calistir(komut, log, izin_verilen_donus=(0,))
+    except KomutHatasi as exc:
+        log(f"rapor.py başarısız oldu, atlanıyor: {exc}")
+        return {"calisti": False, "not": f"rapor.py hata verdi: {exc}"}
+    json_yol = os.path.join(tema_dir, "log", "rapor.json")
+    if not os.path.exists(json_yol):
+        return {"calisti": False, "not": "rapor.json üretilemedi"}
+    with open(json_yol, "r", encoding="utf-8") as f:
+        ozet = json.load(f)
+    return {"calisti": True, "ozet": ozet}

@@ -166,6 +166,7 @@
       ],
     },
     ekSayaci: { "01-uslu-ve-koklu-sayilar": 2, "02-fonksiyonlar-taslak": 0 },
+    raporlarByTema: {},
     jobs: {},
     jobSayaci: 0,
   };
@@ -225,6 +226,54 @@
       "Çift basım taraması: tekrar bulunamadı",
       "SONUÇ: fark yok.",
     ].join("\n");
+  }
+
+  // F8 — Dönüşüm Raporu (sistem/rapor.py'nin ürettiği rapor.json ile AYNI alan
+  // adları): kaynak_soru_tahmini, cikti_soru_sayisi, metin_sayisi, gorsel_sayisi,
+  // eslesen_sayisi, eslesmeyen_sayisi(+idler), gorsel_icerik_sayisi(+idler),
+  // kaynak_metin_kisitli.
+  function sahteRaporUret(temaId) {
+    const bloklar = DB.bloklarByTema[temaId] || [];
+    const sorular = bloklar.filter((b) => b.sinif === "question");
+    const gorselli = sorular.filter((b) => /şekil|görsel|figür/i.test(b.ozet || ""));
+    const cikti = sorular.length;
+    const gorsel = gorselli.length;
+    const metin = cikti - gorsel;
+    const eslesmeyenIdler = sorular.length > 2 ? [sorular[sorular.length - 1].id] : [];
+    const eslesen = Math.max(0, cikti - eslesmeyenIdler.length - Math.min(1, gorsel));
+    return {
+      olusturuldu: new Date().toISOString(),
+      tema: temaId.slice(0, 2),
+      baslik: (DB.temalar.find((t) => t.tema_id === temaId) || {}).ad || temaId,
+      surum: (DB.temalar.find((t) => t.tema_id === temaId) || {}).surum || 1,
+      kaynak_pdf: "(mock)/kaynak.pdf",
+      cikti_pdf: null,
+      cikti_sayfa: null,
+      kaynak_soru_tahmini: Math.max(cikti, cikti + 1),
+      cikti_soru_sayisi: cikti,
+      metin_sayisi: Math.max(0, metin),
+      gorsel_sayisi: gorsel,
+      salt_gorsel_sayisi: Math.min(gorsel, 1),
+      eslesen_sayisi: eslesen,
+      eslesmeyen_sayisi: eslesmeyenIdler.length,
+      gorsel_icerik_sayisi: Math.min(1, gorsel),
+      eslesmeyen_idler: eslesmeyenIdler,
+      gorsel_icerik_idler: gorsel ? [gorselli[0].id] : [],
+      olasi_kayip_numaralar: [],
+      kaynak_metin_kisitli: false,
+      yontem_notu:
+        "(mock) Kaynak soru sayısı bir TAHMİNDİR; aktarım kontrolü ilk ~40 normalize karakteri arar — " +
+        "kaba ama dürüst bir yöntemdir.",
+    };
+  }
+
+  function sahteRaporMd(ozet) {
+    return (
+      `# Dönüşüm Raporu — ${ozet.baslik} (mock)\n\n` +
+      `Çıktıya aktarılan soru sayısı: ${ozet.cikti_soru_sayisi}\n` +
+      `Eşleşen: ${ozet.eslesen_sayisi}, Eşleşmeyen: ${ozet.eslesmeyen_sayisi}, ` +
+      `Görsel içerikli: ${ozet.gorsel_icerik_sayisi}\n`
+    );
   }
 
   // ---------------- Yanıt yardımcıları ----------------
@@ -324,7 +373,8 @@
           blokUret(`t${temaId.slice(0, 2)}-s003`, "question", "GİRİŞ", "2) (mock) İkinci örnek soru metni.", 2),
         ];
         DB.ekSayaci[temaId] = 0;
-        return { tema_id: temaId, sayimlar };
+        DB.raporlarByTema[temaId] = sahteRaporUret(temaId);
+        return { tema_id: temaId, sayimlar, rapor_ozet: DB.raporlarByTema[temaId] };
       });
       yeniTema.job_id = jobId;
       return jsonYanit({ tema_id: temaId, job_id: jobId });
@@ -344,6 +394,16 @@
       const bloklar = DB.bloklarByTema[eslesme[1]];
       if (!bloklar) return hataYanit("tema bulunamadı", eslesme[1], 404);
       return jsonYanit({ tema_id: eslesme[1], bloklar });
+    }
+
+    // GET /api/temalar/{id}/rapor -> {tema_id, md, ozet} (F8) — henüz üretilmediyse 404.
+    eslesme = yol.match(/^\/api\/temalar\/([^/]+)\/rapor$/);
+    if (eslesme && yontem === "GET") {
+      const temaId = eslesme[1];
+      if (!DB.bloklarByTema[temaId]) return hataYanit("tema bulunamadı", temaId, 404);
+      if (!DB.raporlarByTema[temaId]) DB.raporlarByTema[temaId] = sahteRaporUret(temaId);
+      const ozet = DB.raporlarByTema[temaId];
+      return jsonYanit({ tema_id: temaId, md: sahteRaporMd(ozet), ozet });
     }
 
     // POST /api/temalar/{id}/bloklar body: {sinif, html_govde, konum:{sonra_id}|null}
@@ -414,12 +474,14 @@
         const dosyaAdi = tema.ad.replace(/[^A-Za-z0-9._-]+/g, "_") + `_v${surumYeni}.pdf`;
         const ciktiPdf = "/home/kullanici/test_hazirlik-mock/cikti/" + dosyaAdi;
         const kopya = DB.ayarlar.cikti_klasoru.replace(/\/$/, "") + "/" + dosyaAdi;
+        DB.raporlarByTema[temaId] = sahteRaporUret(temaId);
         return {
           cikti_pdf: ciktiPdf,
           kopya,
           surum: surumYeni,
           sayimlar,
           dogrulama: { calisti: true, cikti: sahteDogrulaCiktisi() },
+          rapor_ozet: DB.raporlarByTema[temaId],
         };
       });
       return jsonYanit({ tema_id: temaId, job_id: jobId });

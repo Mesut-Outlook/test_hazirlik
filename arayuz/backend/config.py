@@ -31,6 +31,7 @@ ASSEMBLE_PY = os.path.join(SISTEM_DIR, "assemble.py")
 FLOW_CSS = os.path.join(SISTEM_DIR, "flow.css")
 PRINT_MJS = os.path.join(SISTEM_DIR, "print.mjs")
 DOGRULA_PY = os.path.join(QA_DIR, "dogrula.py")
+RAPOR_PY = os.path.join(SISTEM_DIR, "rapor.py")
 
 # fs/list ve dosya seçimi bu kökle sınırlı (path-traversal koruması, bkz. utils.py)
 EV_DIZINI = os.path.realpath(os.path.expanduser("~"))

@@ -210,6 +210,8 @@
           <h3>Doğrulama Sonucu</h3>
           <div class="rozet-listesi" id="adim3-dogrulama-listesi"></div>
           <div class="cikti-klasoru-notu" id="adim3-cikti-notu"></div>
+          <h3 style="margin-top:22px;">Dönüşüm Raporu</h3>
+          <div id="adim3-rapor-kutusu"></div>
           <div class="form-eylemleri" style="justify-content:flex-start; margin-top:22px;">
             <button class="btn btn-birincil" id="btn-adim3-duzenle">Soruları Düzenle</button>
             <button class="btn" id="btn-adim3-anasayfa">Ana Sayfaya Dön</button>
@@ -230,6 +232,7 @@
         <button class="btn" id="btn-duzenle-anasayfa">← Temalara Dön</button>
         <button class="btn btn-birincil" id="btn-duzenle-kaydet">Sıralamayı Kaydet</button>
         <button class="btn btn-birincil" id="btn-duzenle-uret">Yeniden Üret</button>
+        <button class="btn" id="btn-duzenle-rapor">Rapor</button>
       </div>
     </div>
 
@@ -247,6 +250,8 @@
       <div class="log-paneli" id="duzenle-uretim-log"></div>
       <div id="duzenle-uretim-sonuc" hidden style="margin-top:18px;">
         <div id="duzenle-uretim-dogrulama" style="margin-bottom:16px;"></div>
+        <h4 style="margin-bottom:8px;">Dönüşüm Raporu</h4>
+        <div id="duzenle-uretim-rapor" style="margin-bottom:16px;"></div>
         <h4 style="margin-bottom:8px;">Yeni PDF Önizleme</h4>
         <div class="pdf-onizleme-kutu">
           <embed id="duzenle-uretim-embed" type="application/pdf">
@@ -357,6 +362,19 @@
       <div class="pdf-onizleme-kutu">
         <embed id="pdf-onizleme-embed" type="application/pdf">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= DÖNÜŞÜM RAPORU MODALI (tema kartı + düzenleme ekranı "Rapor" butonu) ================= -->
+<div class="modal-perde" id="rapor-modal">
+  <div class="modal-kutu">
+    <div class="modal-baslik">
+      <h3 id="rapor-modal-baslik">Dönüşüm Raporu</h3>
+      <button class="modal-kapat" id="rapor-modal-kapat" aria-label="Kapat">×</button>
+    </div>
+    <div class="modal-govde" id="rapor-modal-govde">
+      <p class="yukleniyor-metni">Yükleniyor…</p>
     </div>
   </div>
 </div>
