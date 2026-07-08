@@ -12,6 +12,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from config import WEB_DIR
 import ayarlar
@@ -21,6 +22,12 @@ import pdf_api
 import temalar_api
 
 app = FastAPI(title="Test Hazırlık — Arayüz Backend")
+
+# DNS rebinding koruması: sunucu yalnızca 127.0.0.1'i dinliyor ama kötü niyetli
+# bir site kendi alan adını 127.0.0.1'e çözdürüp tarayıcı üzerinden API'ye
+# istek atabilir (Host başlığı o sitenin adı olur). Yerel adlar dışındaki
+# Host'ları reddet.
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
 
 @app.exception_handler(StarletteHTTPException)

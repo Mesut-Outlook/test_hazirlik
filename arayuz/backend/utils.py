@@ -1,7 +1,6 @@
 """Ortak yardımcılar: güvenli yol çözümleme, id üretimi, loglama."""
 from __future__ import annotations
 
-import glob
 import json
 import os
 import re
@@ -81,9 +80,6 @@ def islem_gunlugu_yaz(tema_dir: str, baslik: str, satirlar: list[str]) -> None:
     gövde = f"\n## {simdi_iso()} ({baslik})\n" + "\n".join(f"- {s}" for s in satirlar) + "\n"
     with open(yol, "a", encoding="utf-8") as f:
         f.write(gövde)
-
-
-_ID_PATTERN = re.compile(r'id="(t(\d+)-e(\d+))"')
 
 
 def sonraki_ek_id(sorular_html_path: str, tema_no: str) -> str:

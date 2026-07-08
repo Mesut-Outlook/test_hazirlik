@@ -1470,3 +1470,22 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
 - **Sayfa Düzeni ve Resimli Soru Desteği (AGY, 2026-07-07):**
   - **CSS Geliştirmesi**: `sistem/flow.css` güncellenerek `.solve-space-sm` (15mm kısa çözüm boşluğu), `.force-break-column` (manuel sütun kesme) ve `.force-break-page` (manuel sayfa kesme) sınıfları eklendi.
   - **Belgelendirme & Kılavuz**: `README.md` dosyasına resim formatındaki soruları soruya çevirme/manuel ekleme ve sayfa düzeni ince ayar sınıflarının kullanımını gösteren "İnce Ayarlar" bölümü eklendi.
+
+- **Proje Denetimi — güvenlik/mimari taraması (Fable, 2026-07-08):**
+  - Tüm depo tarandı (backend, motor betikleri, ön yüz, depo hijyeni). Genel durum SAĞLAM:
+    yol güvenliği (`realpath` + kapsama), `shell=True`'suz subprocess, ön yüzde tutarlı
+    `kacisliMetin` kaçışlama, sunucunun yalnızca 127.0.0.1'i dinlemesi doğrulandı; depoda
+    gizli anahtar/parola yok.
+  - **Düzeltme 1 (orta)**: `arayuz/backend/main.py` — `TrustedHostMiddleware` eklendi
+    (yalnızca `127.0.0.1`/`localhost` Host başlığı kabul edilir). DNS rebinding ile uzak
+    bir sitenin yerel API'ye erişme yolu kapatıldı. Test: sahte Host → 400, normal → 200.
+  - **Düzeltme 2 (orta)**: `arayuz/backend/pdf_api.py` — `/api/pdf` artık yalnızca `.pdf`
+    uzantılı dosyaları servis eder (önceden ev dizinindeki HERHANGİ bir dosya
+    "application/pdf" olarak indirilebiliyordu). Test: README.md → 400, gerçek PDF → 200.
+  - **Temizlik**: `arayuz/backend/utils.py` — kullanılmayan `glob` import'u ve ölü
+    `_ID_PATTERN` deseni kaldırıldı.
+  - **Bilinen/kabul edilen riskler (yerel tek kullanıcılı araç)**: `print.mjs`'in
+    `--no-sandbox` + `--allow-file-access-from-files` ile Chrome başlatması ve blok
+    ekleme HTML'inin sterilize edilmemesi (kullanıcının kendi girdisi); `BLOK_PATTERN`
+    regex'inin `blocks.py` ve `assemble.py`'de mükerrer tanımı (ayrışma riski — format
+    değişirse İKİSİ birden güncellenmeli).
