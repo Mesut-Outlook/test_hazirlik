@@ -1513,3 +1513,68 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
   - Eski geçmişin TAM yedeği: `../test_hazirlik_gecmis_yedegi.bundle` (114 MB;
     silinen 03-ekonomi-6 dahil her şey gerekirse buradan kurtarılır:
     `git clone test_hazirlik_gecmis_yedegi.bundle eski_hali`).
+
+## F9 — img-block'ların soruya dönüştürülmesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet)
+
+**Sorun:** Taranmış kaynaklarda sorular `img-block` olarak akışa girer; soru sayılmadığı
+için altına çözüm boşluğu (`.solve-space`) konmaz. Kurtarma bugün manuel (README "İnce
+Ayarlar"). Örnek: 08 temasında 166 `question` yanında 174 bağımsız `img-block` var.
+
+**Kapsam (iki parça):**
+1. **Arayüzden tek tıkla dönüştürme (öncelikli — mevcut temalara değer):**
+   - `arayuz/backend/blocks.py`: `blok_sinif_degistir(tema_dir, blok_id, yeni_sinif,
+     solve_space: bool)` — sorular.html'de bloğun class'ını değiştirir (id ve
+     data-kaynak-sayfa AYNEN korunur, ID dondurma kuralı ihlal edilmez), `question`'a
+     çevrilirken `</img ...>` satırından sonra blok içine `<div class="solve-space"></div>`
+     ekler (zaten varsa eklemez). Geri dönüş de desteklenir (question→img-block:
+     solve-space'i kaldırır).
+   - `arayuz/backend/temalar_api.py`: `PATCH /api/temalar/{id}/bloklar/{blok_id}`
+     gövde `{sinif: "question"|"img-block"}`; işlem_gunlugu'ne yazılır; hata gövdesi
+     sözleşmesi `{hata, detay}`.
+   - `arayuz/web/app.js`: blok düzenleme listesinde `img-block` satırlarına
+     "Soruya çevir" (ve question+salt görsel satırlara "Görsele çevir") düğmesi;
+     `mock.js`'e sahte karşılığı.
+2. **extract.py'de OCR ile otomatik sınıflandırma (yeni temalar için):**
+   - Bağımsız img-block yazılmadan önce, kırpılmış PNG'nin SOL-ÜST köşesi
+     (genişliğin ~%35'i × yüksekliğin ~%25'i) tesseract ile SADECE rakam+nokta
+     beyaz-listesiyle okunur (`tesseract <png> stdout --psm 6
+     -c tessedit_char_whitelist=0123456789.)`; dil paketi olarak sistemde yalnız
+     `afr`+`osd` var — rakamlar için yeterli, `-l` VERME ya da mevcutla yetin).
+   - Çıktı `^\d{1,3}[.)]` desenine uyarsa blok `class="question"` +
+     `<div class="solve-space"></div>` ile yazılır (id serisi s-serisi DEĞİL,
+     mevcut g-serisi id'si korunur — sayaçlar karışmasın).
+   - tesseract yoksa/başarısızsa SESSİZCE img-block olarak devam (davranış bugünkü
+     gibi), extract_report'a "OCR atlandı" notu.
+   - Mevcut temalara extract ASLA yeniden koşulmaz (ID dondurma, SISTEM.md §2).
+
+**Kabul ölçütleri:** (a) 08 temasının bir KOPYASINDA (temalar/ dışında, scratch'te)
+PATCH ile 2-3 img-block soruya çevrilip assemble+print sonrası PDF'te çözüm boşluğu
+gözle doğrulanır; (b) 08 kaynağıyla scratch'e extract koşulup OCR'ın kaç img-block'u
+soruya çevirdiği raporlanır (yanlış pozitifler örneklenir); (c) çalışan 8756
+sunucusuna DOKUNULMAZ, test 8758 portunda yapılır; (d) node --check app.js mock.js temiz.
+
+## F10 — rapor.py taranmış kaynak güvencesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet)
+
+**Sorun:** Taranmış/metin katmanı zayıf kaynaklarda `kaynak_soru_tahmini=0` kalıyor
+(örn. 08 teması: tahmin 0, çıktı 166 soru + 174 img-block) → soru atlaması otomatik
+yakalanamıyor; `kaynak_metin_kisitli=true` bayrağından öteye geçmiyor.
+
+**Kapsam (yalnızca `sistem/rapor.py`):**
+1. **Tahmin iyileştirme:** 08 kaynağında (depoda:
+   `temalar/08-10-sinif-tema-1/kaynak/10.sınıf tema1.pdf`) tahminin neden 0 kaldığını
+   İNCELE (muhtemelen soru numarası span'ları satır birleştirmede kayboluyor);
+   `page.get_text("dict")` span bazlı ikinci bir deneme ekle (satır başı span'ı
+   `^\d{1,3}[.)]$` ise say). İki yöntemin BÜYÜĞÜ tahmin olur, yöntem notuna yazılır.
+2. **Sayfa bazlı görsel karşılaştırma:** Kaynak PDF'te sayfa başına görsel-bölge
+   sayısı (fitz: `page.get_images()` + büyük çizim kümeleri, extract.py'deki eşiklerin
+   BASİTLEŞTİRİLMİŞ hali yeterli) ile çıktıda o sayfaya (`data-kaynak-sayfa`) bağlı
+   `<img>` sayısı karşılaştırılır. `sayfa_gorsel_karsilastirma: [{sayfa, kaynak, cikti}]`
+   rapor.json'a; kaynak>cikti olan sayfalar `olasi_eksik_gorsel_sayfalar` listesine ve
+   donusum_raporu.md'ye "DİKKAT" bölümü olarak yazılır.
+3. Geriye uyumluluk: mevcut alan adları DEĞİŞMEZ (arayüz app.js rapor özetini okuyor),
+   yalnızca YENİ alan eklenir. CLI arayüzü aynı kalır.
+
+**Kabul ölçütleri:** (a) 08 temasında yeni tahmin > 0 olur ya da neden olamadığı
+raporda dürüstçe açıklanır; (b) 01-tema ve 08 için rapor.py scratch çıktılarıyla
+koşulur, rapor.json şeması eski alanları aynen içerir; (c) sahte bir eksik-görsel
+senaryosu (çıktı html'inden birkaç img silinmiş kopya) uyarı listesine düşer.
