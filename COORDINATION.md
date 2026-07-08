@@ -1489,3 +1489,17 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     ekleme HTML'inin sterilize edilmemesi (kullanıcının kendi girdisi); `BLOK_PATTERN`
     regex'inin `blocks.py` ve `assemble.py`'de mükerrer tanımı (ayrışma riski — format
     değişirse İKİSİ birden güncellenmeli).
+
+- **Depo Temizliği (Fable, 2026-07-08, kullanıcı onaylı):**
+  - Yeniden üretilebilir dosyalar silindi: `qa/qa_venv/` (102M), `qa/r2/` (61M),
+    `qa/r3/` (55M), `qa/cmp_*.png` + `qa/text_diff.txt` (~40M), `__pycache__` klasörleri.
+  - `temalar/.cop/` çöp klasörü boşaltıldı (03-ekonomi-6 git geçmişinden geri
+    getirilebilir; 99-agent-ui-test F7 test artığıydı).
+  - Kökteki mükerrer/bayat dosyalar git'ten çıkarıldı (geçmişte duruyorlar):
+    `1.tema_egemen_sarikci.pdf` (FAZ 1, aşıldı), `..._v2.pdf` (birebir kopyası
+    `temalar/01-tema/kaynak/`ta), `..._v3.pdf` (birebir kopyası `cikti/`da),
+    `logo_es.jpg` (kopyaları `sistem/` ve `arayuz/web/`de; kod yalnızca onları
+    kullanır), `font_ornekleri.pdf` (font kararı kapalı).
+  - KORUNANLAR: `1.tema_orijinal.pdf` (tek orijinal), `kok_bitisik_ornek.html/pdf`
+    (onaylı referans), `CLAUDE_TASKS.md` (tarihsel kayıt), `cikti/` ve tüm temalar.
+  - Sonuç: çalışma kopyası (git/node_modules/venv hariç) ~400M → 140M.

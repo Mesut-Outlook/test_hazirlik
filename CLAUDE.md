@@ -7,12 +7,14 @@
 > **`SISTEM.md`**, canlı görev panosu ve değişiklik günlüğü: **`COORDINATION.md`**
 > (önce bu ikisini oku). Kısa özet:
 > - FAZ 1-2 çıktısı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; logo sol üstte, header
->   yazısız, karekökler `.rad` yamalı) — bu dosya ve `1.tema_orijinal.pdf` SALT OKUNUR.
+>   yazısız, karekökler `.rad` yamalı) — artık `temalar/01-tema/kaynak/` altında; bu dosya
+>   ve kökteki `1.tema_orijinal.pdf` SALT OKUNUR (kök kopyası 2026-07-08 temizliğinde
+>   kaldırıldı, birebir aynısı kaynak klasöründe).
 > - **FAZ 3 TAMAMLANDI (2026-07-05):** v2'den düzenlenebilir HTML yeniden kuruldu,
 >   kökler bitişik kök tekniği `.rt` ile, yeni sayfa tasarımı (soru ayraç çizgileri,
 >   sütunlar arası dikey çizgi, 30mm çözüm alanı — örnek: 11.Köklü Sayılar.pdf,
 >   sadeleştirilerek). Nihai çıktı: **`cikti/1.tema_egemen_sarikci_v3.pdf`** (177
->   sayfa; kökte kopyası var) — **kullanıcı onayı bekleniyor**.
+>   sayfa) — **kullanıcı onayı bekleniyor**.
 > - Kalıcı yerleşim aktif (SISTEM.md §1): motor `sistem/` (extract.py, assemble.py,
 >   print.mjs, flow.css, fonts), tema `temalar/01-tema/` (sorular.html +
 >   manifest.json + assets + log), çıktılar `cikti/`. `build_linux/` tarihe karıştı.
