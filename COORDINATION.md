@@ -1503,3 +1503,13 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
   - KORUNANLAR: `1.tema_orijinal.pdf` (tek orijinal), `kok_bitisik_ornek.html/pdf`
     (onaylı referans), `CLAUDE_TASKS.md` (tarihsel kayıt), `cikti/` ve tüm temalar.
   - Sonuç: çalışma kopyası (git/node_modules/venv hariç) ~400M → 140M.
+
+- **GitHub Geçmiş Temizliği (Fable, 2026-07-08, kullanıcı onaylı):**
+  - `git-filter-repo` ile geçmişte olup HEAD'de olmayan tüm yollar geçmişten çıkarıldı
+    (`build_linux/**`, `temalar/03-ekonomi-6/**`, kökteki eski v1/v2/v3 PDF'leri,
+    `font_ornekleri.pdf`, `logo_es.jpg`); main dalı GitHub'a force-push edildi.
+  - Paket boyutu: 113.7 MiB → 54.5 MiB. TÜM commit hash'leri değişti — başka
+    makinedeki klonlar `git pull` YAPAMAZ, yeniden klonlanmalı.
+  - Eski geçmişin TAM yedeği: `../test_hazirlik_gecmis_yedegi.bundle` (114 MB;
+    silinen 03-ekonomi-6 dahil her şey gerekirse buradan kurtarılır:
+    `git clone test_hazirlik_gecmis_yedegi.bundle eski_hali`).
