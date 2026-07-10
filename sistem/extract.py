@@ -73,8 +73,10 @@ import re
 import json
 import shutil
 import argparse
+import difflib
 import subprocess
 import tempfile
+import unicodedata
 from datetime import datetime
 import fitz  # PyMuPDF
 
@@ -700,15 +702,22 @@ def ocr_detect_question_number(page, bbox, ocr_stats):
                 pass
 
 
+_TR_FOLD = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
+
+
 def normalize_ocr_text(s):
-    """OCR/karşılaştırma için normalize: Türkçe büyük harfe çevirir (turkish_upper),
-    sonra harf/rakam DIŞINDAKİ HER ŞEYİ (boşluk, noktalama, tesseract gürültüsü)
-    atar. Hem profildeki yasaklı ifadeler (örn. "EGEMEN SARIKCI") hem
-    tesseract'ın okuduğu kelimeler AYNI şekilde normalize edilip
-    karşılaştırılır — böylece harf aralığı ("E G E M E N"), büyük/küçük harf
-    ve Türkçe İ/ı farkları eşleşmeyi bozmaz."""
-    s = turkish_upper(s or "")
-    return re.sub(r"[^A-ZÇĞİÖŞÜ0-9]", "", s)
+    """OCR/karşılaştırma için normalize: Türkçe harfleri ASCII'ye KATLAR
+    (ç→c, ğ→g, ı/İ→i, ö→o, ş→s, ü→u), aksanlı harflerin aksanını atar
+    (NFKD), büyük harfe çevirir ve harf/rakam DIŞINDAKİ HER ŞEYİ (boşluk,
+    noktalama, tesseract gürültüsü) atar. Hem profildeki yasaklı ifadeler
+    (örn. "EGEMEN SARIKCI") hem tesseract'ın okuduğu kelimeler AYNI şekilde
+    normalize edilip karşılaştırılır — böylece harf aralığı ("E G E M E N"),
+    büyük/küçük harf, "Sarıkçı/Sarıkcı" gibi yazım farkları ve eng dil
+    paketinin Türkçe harfleri bozuk okuması eşleşmeyi bozmaz."""
+    s = (s or "").translate(_TR_FOLD)
+    s = unicodedata.normalize("NFKD", s)
+    s = "".join(c for c in s if not unicodedata.combining(c))
+    return re.sub(r"[^A-Z0-9]", "", s.upper())
 
 
 def _parse_tesseract_tsv(tsv_text):
@@ -753,7 +762,7 @@ def _parse_tesseract_tsv(tsv_text):
     return words
 
 
-def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
+def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0, psm="3"):
     """F12 — tam-sayfa render edilmiş bir Pixmap üzerinde profildeki
     yasakli_metinler'i tesseract TSV (bbox'lı) çıktısıyla arar; eşleşen
     kelime dizisinin bbox BİRLEŞİMİNİ (küçük pay ile) BEYAZ doldurur.
@@ -781,7 +790,7 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
         os.close(fd)
         pix.save(tmp_path)
         sonuc = subprocess.run(
-            [TESSERACT_BIN, tmp_path, "stdout", "-l", _tesseract_lang(), "--psm", "3", "tsv"],
+            [TESSERACT_BIN, tmp_path, "stdout", "-l", _tesseract_lang(), "--psm", psm, "tsv"],
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
         )
         if sonuc.returncode != 0:
@@ -803,6 +812,38 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
 
     silinen = 0
     white = (255,) * pix.n
+
+    def _beyazla(matched_words):
+        nonlocal silinen
+        x0 = min(w["left"] for w in matched_words) - pad
+        y0 = min(w["top"] for w in matched_words) - pad
+        x1 = max(w["left"] + w["width"] for w in matched_words) + pad
+        y1 = max(w["top"] + w["height"] for w in matched_words) + pad
+        irect = fitz.IRect(
+            max(0, int(x0)), max(0, int(y0)),
+            min(pix.width, int(x1)), min(pix.height, int(y1)),
+        )
+        if not irect.is_empty:
+            pix.set_rect(irect, white)
+            silinen += 1
+
+    # Yasaklı ifadelerin TEK KELİMELİK parçaları (örn. "EGEMEN", "SARIKCI") —
+    # logo/başlıkta alt alta yazılıp AYRI tesseract satırları olarak okunan
+    # parçaları yakalamak için (2026-07-10 kaçak analizi: p050 vakası).
+    banned_tokens = set()
+    for b in banned_texts:
+        for tok in (b or "").split():
+            nt = normalize_ocr_text(tok)
+            if len(nt) >= 5:
+                banned_tokens.add(nt)
+
+    # Eşikler 2026-07-10 kaçak analizine göre kalibre edildi: gerçek kaçaklar
+    # ("SARIKC/", "SARIKCl") ≥0.92 benzerlikte; soru metnindeki masum benzer
+    # kelimeler ("gelen", "geçen", "sarı", "sartını", "öğretmen") ≤0.73'te
+    # kalıyor. Eşik ikisinin ortasında — yanlış pozitif riski düşük.
+    ESIK_IFADE = 0.85
+    ESIK_KELIME = 0.86
+
     for line_words in lines.values():
         line_words.sort(key=lambda w: w["word_num"])
         condensed = ""
@@ -817,6 +858,7 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
         if not condensed:
             continue
         for banned in banned_norm:
+            # 1) Birebir alt-dize (hızlı yol)
             search_from = 0
             while True:
                 pos = condensed.find(banned, search_from)
@@ -825,18 +867,30 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
                 end = pos + len(banned)
                 matched_words = [w for (s, e, w) in spans if s < end and e > pos]
                 if matched_words:
-                    x0 = min(w["left"] for w in matched_words) - pad
-                    y0 = min(w["top"] for w in matched_words) - pad
-                    x1 = max(w["left"] + w["width"] for w in matched_words) + pad
-                    y1 = max(w["top"] + w["height"] for w in matched_words) + pad
-                    irect = fitz.IRect(
-                        max(0, int(x0)), max(0, int(y0)),
-                        min(pix.width, int(x1)), min(pix.height, int(y1)),
-                    )
-                    if not irect.is_empty:
-                        pix.set_rect(irect, white)
-                        silinen += 1
+                    _beyazla(matched_words)
                 search_from = pos + 1
+            # 2) Bulanık pencere: ardışık kelimelerin birleşimi yasaklı
+            #    ifadeye ≥ESIK_IFADE benziyorsa sil — OCR "SARIKÇI"yı
+            #    "SARIKC/" ya da "SARIKCl" okusa da yakalanır.
+            for i in range(len(spans)):
+                acc = ""
+                for j in range(i, len(spans)):
+                    acc += condensed[spans[j][0]:spans[j][1]]
+                    if len(acc) > len(banned) + 3:
+                        break
+                    if (abs(len(acc) - len(banned)) <= 3 and
+                            difflib.SequenceMatcher(None, acc, banned).ratio() >= ESIK_IFADE):
+                        _beyazla([spans[k][2] for k in range(i, j + 1)])
+                        break
+        # 3) Tek kelime: ifadenin parçaları ayrı satırlara/bloklara düşmüşse
+        #    (alt alta logo yazısı) her parça kendi başına da aranır.
+        for (s, e, w) in spans:
+            kelime = condensed[s:e]
+            if len(kelime) >= 5 and any(
+                difflib.SequenceMatcher(None, kelime, t).ratio() >= ESIK_KELIME
+                for t in banned_tokens
+            ):
+                _beyazla([w])
     return silinen
 
 
@@ -854,6 +908,10 @@ def render_full_page_tam_sayfa(page, pnum, assets_dir, banned_texts):
     if banned_texts and TESSERACT_BIN:
         try:
             silinen = _redact_banned_text_on_pixmap(pix, banned_texts)
+            if silinen == 0:
+                # psm 3 hiçbir bölge bulamadıysa seyrek-metin modunda (psm 11)
+                # ikinci geçiş — sayfa kenarındaki izole başlıkları yakalar.
+                silinen = _redact_banned_text_on_pixmap(pix, banned_texts, psm="11")
         except Exception:
             pass
     img_name = f"p{pnum+1:03d}_tam.png"
@@ -912,7 +970,10 @@ def filter_banned_lines(text_dict, banned_texts):
     Dönen değer: silinen satır sayısı."""
     if not banned_texts:
         return 0
-    banned_condensed = [re.sub(r"\s+", "", b).upper() for b in banned_texts if b.strip()]
+    # F12 düzeltmesi: normalize_ocr_text ile aynı katlama kullanılır —
+    # "Sarıkçı"/"SARIKCI"/"Sarikci" hepsi aynı dizeye iner.
+    banned_condensed = [normalize_ocr_text(b) for b in banned_texts if b.strip()]
+    banned_condensed = [b for b in banned_condensed if b]
     if not banned_condensed:
         return 0
     removed = 0
@@ -922,7 +983,7 @@ def filter_banned_lines(text_dict, banned_texts):
         kept_lines = []
         for line in block["lines"]:
             line_text = "".join(sp.get("text", "") for sp in line.get("spans", []))
-            condensed = re.sub(r"\s+", "", line_text).upper()
+            condensed = normalize_ocr_text(line_text)
             if condensed and any(b in condensed for b in banned_condensed):
                 removed += 1
                 continue
