@@ -26,7 +26,22 @@ import puppeteer from "puppeteer-core";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CHROME_PATH = "/usr/bin/google-chrome-stable";
+let CHROME_PATH = "/usr/bin/google-chrome-stable";
+if (process.platform === "win32") {
+  const winPaths = [
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+    "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+  ];
+  for (const winPath of winPaths) {
+    if (fs.existsSync(winPath)) {
+      CHROME_PATH = winPath;
+      break;
+    }
+  }
+}
+
 const LOGO_PATH = path.join(__dirname, "logo_es.jpg");
 
 function usageAndExit() {
@@ -55,10 +70,11 @@ async function main() {
   const logoB64 = fs.readFileSync(LOGO_PATH).toString("base64");
   const logoDataUri = `data:image/jpeg;base64,${logoB64}`;
 
+  // Logo ÜST ORTADA (kullanıcı kararı 2026-07-10, önceki: sol üst).
   const headerTemplate = `
     <div style="width:100%; font-size:0px; margin:0; padding:0;">
       <img src="${logoDataUri}"
-           style="height:52px; width:auto; margin-left:10.5mm; margin-top:2mm;
+           style="height:52px; width:auto; margin:2mm auto 0 auto;
                   border-radius:3px; display:block;" />
     </div>`;
 

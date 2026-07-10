@@ -660,6 +660,168 @@ def ocr_detect_question_number(page, bbox, ocr_stats):
                 pass
 
 
+def normalize_ocr_text(s):
+    """OCR/karşılaştırma için normalize: Türkçe büyük harfe çevirir (turkish_upper),
+    sonra harf/rakam DIŞINDAKİ HER ŞEYİ (boşluk, noktalama, tesseract gürültüsü)
+    atar. Hem profildeki yasaklı ifadeler (örn. "EGEMEN SARIKCI") hem
+    tesseract'ın okuduğu kelimeler AYNI şekilde normalize edilip
+    karşılaştırılır — böylece harf aralığı ("E G E M E N"), büyük/küçük harf
+    ve Türkçe İ/ı farkları eşleşmeyi bozmaz."""
+    s = turkish_upper(s or "")
+    return re.sub(r"[^A-ZÇĞİÖŞÜ0-9]", "", s)
+
+
+def _parse_tesseract_tsv(tsv_text):
+    """`tesseract ... tsv` çıktısını kelime düzeyinde (level==5) satırlara
+    ayrıştırır. Sütun sırası sürüme göre değişebileceği için başlık
+    satırından isimle eşlenir (pozisyon varsayılmaz)."""
+    lines = tsv_text.splitlines()
+    if not lines:
+        return []
+    header = lines[0].split("\t")
+    idx = {name: i for i, name in enumerate(header)}
+    required = ("level", "block_num", "par_num", "line_num", "word_num",
+                "left", "top", "width", "height", "text")
+    if not all(r in idx for r in required):
+        return []
+    words = []
+    for line in lines[1:]:
+        if not line.strip():
+            continue
+        cols = line.split("\t")
+        if len(cols) < len(header):
+            continue
+        try:
+            if int(cols[idx["level"]]) != 5:
+                continue
+            text = cols[idx["text"]]
+            if not text.strip():
+                continue
+            words.append({
+                "block_num": int(cols[idx["block_num"]]),
+                "par_num": int(cols[idx["par_num"]]),
+                "line_num": int(cols[idx["line_num"]]),
+                "word_num": int(cols[idx["word_num"]]),
+                "left": int(cols[idx["left"]]),
+                "top": int(cols[idx["top"]]),
+                "width": int(cols[idx["width"]]),
+                "height": int(cols[idx["height"]]),
+                "text": text,
+            })
+        except (ValueError, KeyError):
+            continue
+    return words
+
+
+def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
+    """F12 — tam-sayfa render edilmiş bir Pixmap üzerinde profildeki
+    yasakli_metinler'i tesseract TSV (bbox'lı) çıktısıyla arar; eşleşen
+    kelime dizisinin bbox BİRLEŞİMİNİ (küçük pay ile) BEYAZ doldurur.
+
+    F9'daki (ocr_detect_question_number) çağrı deseniyle AYNI ikili/dil
+    (TESSERACT_BIN, -l afr — sistemde eng yok) kullanılır, ama burada TÜM
+    sayfa taranacağı ve kelimelerin sayfa üzerindeki KONUMU gerektiği için
+    `stdout` metin çıktısı yerine `tsv` (bbox'lı) config kullanılır.
+
+    Eşleştirme satır bazlı yapılır: aynı (block,par,line) içindeki kelimeler
+    normalize edilip (normalize_ocr_text) birleştirilir, yasaklı ifade bu
+    birleşik dizede aranır — böylece "EGEMEN SARIKCI" iki ayrı kelime olarak
+    okunsa da (ya da OCR gürültüsüyle bitişik/ayrık okunsa da) yakalanır.
+    tesseract çağrısı başarısız olursa (binary yok/timeout/hata) SESSİZCE 0
+    döner; TESSERACT_BIN'in var olup olmadığını çağıran taraf ayrıca
+    kontrol edip rapora UYARI yazar (bu fonksiyon o kararı vermez)."""
+    banned_norm = [normalize_ocr_text(b) for b in banned_texts if b and b.strip()]
+    banned_norm = [b for b in banned_norm if b]
+    if not banned_norm or not TESSERACT_BIN:
+        return 0
+
+    tmp_path = None
+    try:
+        fd, tmp_path = tempfile.mkstemp(suffix=".png")
+        os.close(fd)
+        pix.save(tmp_path)
+        sonuc = subprocess.run(
+            [TESSERACT_BIN, tmp_path, "stdout", "-l", "afr", "--psm", "3", "tsv"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
+        )
+        if sonuc.returncode != 0:
+            return 0
+        words = _parse_tesseract_tsv(sonuc.stdout)
+    except Exception:
+        return 0
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+
+    lines = {}
+    for w in words:
+        key = (w["block_num"], w["par_num"], w["line_num"])
+        lines.setdefault(key, []).append(w)
+
+    silinen = 0
+    white = (255,) * pix.n
+    for line_words in lines.values():
+        line_words.sort(key=lambda w: w["word_num"])
+        condensed = ""
+        spans = []  # (start, end, word) — normalize edilmiş dizedeki aralık
+        for w in line_words:
+            norm = normalize_ocr_text(w["text"])
+            if not norm:
+                continue
+            start = len(condensed)
+            condensed += norm
+            spans.append((start, len(condensed), w))
+        if not condensed:
+            continue
+        for banned in banned_norm:
+            search_from = 0
+            while True:
+                pos = condensed.find(banned, search_from)
+                if pos == -1:
+                    break
+                end = pos + len(banned)
+                matched_words = [w for (s, e, w) in spans if s < end and e > pos]
+                if matched_words:
+                    x0 = min(w["left"] for w in matched_words) - pad
+                    y0 = min(w["top"] for w in matched_words) - pad
+                    x1 = max(w["left"] + w["width"] for w in matched_words) + pad
+                    y1 = max(w["top"] + w["height"] for w in matched_words) + pad
+                    irect = fitz.IRect(
+                        max(0, int(x0)), max(0, int(y0)),
+                        min(pix.width, int(x1)), min(pix.height, int(y1)),
+                    )
+                    if not irect.is_empty:
+                        pix.set_rect(irect, white)
+                        silinen += 1
+                search_from = pos + 1
+    return silinen
+
+
+def render_full_page_tam_sayfa(page, pnum, assets_dir, banned_texts):
+    """F12 — 'tam_sayfa' modunda resim tabanlı bir sayfayı 200dpi PNG olarak
+    render eder (fitz), tesseract varsa profildeki yasaklı metinleri beyaz
+    dolgu ile siler, ve assets/pNNN_tam.png olarak kaydeder.
+
+    Dönen değer: (goreli_yol, silinen_bolge_sayisi, tesseract_eksik_mi).
+    tesseract_eksik_mi: yasaklı metin listesi DOLU ama TESSERACT_BIN yoksa
+    True (çağıran taraf bunu rapora tek seferlik UYARI olarak yazar)."""
+    pix = page.get_pixmap(dpi=200, alpha=False)
+    tesseract_eksik = bool(banned_texts) and not TESSERACT_BIN
+    silinen = 0
+    if banned_texts and TESSERACT_BIN:
+        try:
+            silinen = _redact_banned_text_on_pixmap(pix, banned_texts)
+        except Exception:
+            pass
+    img_name = f"p{pnum+1:03d}_tam.png"
+    img_path = os.path.join(assets_dir, img_name)
+    pix.save(img_path)
+    return f"assets/{img_name}", silinen, tesseract_eksik
+
+
 def sort_blocks_reading_order(blocks):
     """Bir sütun içindeki blokları GÖRSEL SATIR okuma sırasına göre dizer.
 
@@ -1153,6 +1315,11 @@ def main():
     extraction_warnings = []
     ocr_stats = {}  # F9 — img-block -> question OCR sınıflandırma sayaçları
 
+    # F12 — resim tabanlı ("tam sayfa") sayfa modu sayaçları
+    tam_sayfa_count = 0
+    tam_sayfa_silinen_toplam = 0
+    tam_sayfa_tesseract_uyarisi = False
+
     # Varsayılan profil (Metin Yayınları)
     profile = {
         "known_sections": [
@@ -1167,7 +1334,14 @@ def main():
         },
         # Kaynak belgede görüldüğü HER yerde silinecek metinler (banner/başlık
         # kalıntıları). Çıktının header'ı zaten logo taşır; bu yazılar içerik değildir.
-        "yasakli_metinler": ["EGEMEN SARIKCI"]
+        "yasakli_metinler": ["EGEMEN SARIKCI"],
+        # F12 (2026-07-10) — resim tabanlı (taranmış) sayfa davranışı:
+        # "tam_sayfa" (varsayılan) = sayfa TEK görüntü bloğu olarak korunur;
+        # "parcala" = eski davranış (bölge bölge kırpıp akışa dağıtma).
+        "taranmis_sayfa_modu": "tam_sayfa",
+        # Bir sayfanın "resim tabanlı" sayılması için eşikler (bkz. COORDINATION.md F12).
+        "tam_sayfa_metin_esigi": 60,
+        "tam_sayfa_alan_orani": 0.70,
     }
 
     # Profil yükleme
@@ -1200,6 +1374,10 @@ def main():
 
     known_sections = profile.get("known_sections", [])
     banned_removed_total = 0
+    banned_texts = profile.get("yasakli_metinler", [])
+    taranmis_sayfa_modu = profile.get("taranmis_sayfa_modu", "tam_sayfa")
+    tam_sayfa_metin_esigi = profile.get("tam_sayfa_metin_esigi", 60)
+    tam_sayfa_alan_orani = profile.get("tam_sayfa_alan_orani", 0.70)
 
     for pnum in page_range:
         page = doc[pnum]
@@ -1240,6 +1418,46 @@ def main():
 
         excluded_bar_keys = set(rect_key(b) for b in thin_bars)
         figure_regions = collect_figure_regions(drawings, theory_boxes, excluded_bar_keys, text_dict["blocks"])
+
+        # --- F12 (2026-07-10): resim tabanlı sayfa sınıflandırma + tam-sayfa modu ---
+        # Bir sayfa "resim tabanlı" sayılır ⇔ metin katmanı eşik altı (boşluk hariç
+        # karakter sayımı) VEYA tek bir görsel/çizim bölgesi sayfa alanının
+        # tam_sayfa_alan_orani'ndan fazlasını kaplıyor. Eşik ve mod profilden
+        # okunur (bkz. yukarıdaki profile sözlüğü/known_sections'ın hemen altı).
+        page_area = page.rect.width * page.rect.height
+        raw_text_len = len(re.sub(r"\s+", "", page.get_text("text")))
+        raw_image_bboxes = []
+        for img in page.get_image_info(xrefs=True):
+            ix0, iy0, ix1, iy1 = img["bbox"]
+            if iy0 < 70 and ix0 < 100:
+                continue  # header logosu (extract_page_images ile aynı filtre)
+            raw_image_bboxes.append(img["bbox"])
+        max_region_ratio = 0.0
+        if page_area > 0:
+            for rb in raw_image_bboxes + figure_regions:
+                rx0, ry0, rx1, ry1 = rb
+                area = max(0.0, rx1 - rx0) * max(0.0, ry1 - ry0)
+                max_region_ratio = max(max_region_ratio, area / page_area)
+
+        is_image_page = (raw_text_len < tam_sayfa_metin_esigi) or (max_region_ratio > tam_sayfa_alan_orani)
+
+        if is_image_page and taranmis_sayfa_modu == "tam_sayfa":
+            tam_sayfa_count += 1
+            rel_path, silinen, tesseract_eksik = render_full_page_tam_sayfa(
+                page, pnum, assets_dir, banned_texts
+            )
+            tam_sayfa_silinen_toplam += silinen
+            if tesseract_eksik:
+                tam_sayfa_tesseract_uyarisi = True
+            block_id = f"t{args.tema}-g{len(blocks_db)+1:04d}"
+            html = (
+                f'<section class="img-block tam-sayfa" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n'
+                f'  <img src="{rel_path}" alt="Sayfa {pnum+1} (taranmış)">\n</section>'
+            )
+            blocks_db.append((block_id, html))
+            g_count += 1
+            manifest_akis.append({"sayfa": pnum + 1, "bloklar": [block_id]})
+            continue  # bu sayfa için başka blok ÜRETİLMEZ (metin/görsel çıkarımı atlanır)
 
         # Shrink figure regions to exclude non-suppressed text blocks
         shrunken_figure_regions = []
@@ -1619,6 +1837,9 @@ def main():
     print(f"  Questions: {q_count}  Theory boxes: {t_count}  Kur-tags: {k_count}")
     print(f"  Answer keys: {a_count}  Images: {g_count}  Para(fallback): {p_count}")
     print(f"  Root symbols converted: {total_roots}")
+    print(f"  Tam sayfa (resim tabanlı) mod: {taranmis_sayfa_modu} — {tam_sayfa_count} sayfa, {tam_sayfa_silinen_toplam} bölge silindi")
+    if tam_sayfa_tesseract_uyarisi:
+        print("  UYARI: tesseract yok, tam-sayfa görüntülerde yasaklı metin taraması yapılamadı")
     print(f"Saved files:\n  {sorular_path}\n  {manifest_path}\n  {html_out_path}")
 
     # Write extract_report.txt
@@ -1635,6 +1856,12 @@ def main():
         f.write(f"Pages Processed: {len(page_range)}\n")
         f.write(f"Total Pages in PDF: {len(doc)}\n")
         f.write(f"Yasaklı metin silinen satır sayısı (yasakli_metinler): {banned_removed_total}\n")
+        f.write("------------------------------------------------------------------------\n")
+        f.write("TAM SAYFA MODU (F12 — resim tabanlı sayfalar):\n")
+        f.write(f"  Mod: {taranmis_sayfa_modu}\n")
+        f.write(f"  Tam sayfa modu: {tam_sayfa_count} sayfa; yasaklı metin silinen bölge: {tam_sayfa_silinen_toplam}\n")
+        if tam_sayfa_tesseract_uyarisi:
+            f.write("  UYARI: tesseract yok, tam-sayfa görüntülerde yasaklı metin taraması yapılamadı\n")
         f.write("------------------------------------------------------------------------\n")
         f.write("STATISTICS:\n")
         f.write(f"  Questions Found: {q_count}\n")

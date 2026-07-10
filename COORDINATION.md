@@ -1578,3 +1578,139 @@ yakalanamıyor; `kaynak_metin_kisitli=true` bayrağından öteye geçmiyor.
 raporda dürüstçe açıklanır; (b) 01-tema ve 08 için rapor.py scratch çıktılarıyla
 koşulur, rapor.json şeması eski alanları aynen içerir; (c) sahte bir eksik-görsel
 senaryosu (çıktı html'inden birkaç img silinmiş kopya) uyarı listesine düşer.
+
+---
+
+## F11 — Vision extract: taranmış (resim tabanlı) PDF'lerden GERÇEK matematiksel içerik — ❌ İPTAL/RAFA (2026-07-10)
+
+> **İptal gerekçesi (kullanıcı kararı, 2026-07-10):** Resim tabanlı soruların
+> olduğu sayfalar OLDUĞU GİBİ bırakılacak (transkripsiyon yok) — yalnızca
+> "Egemen Sarıkcı" yazısı görüntüden silinecek ve logo sayfanın üst ortasına
+> konacak. Bkz. **F12**. API anahtarı gerekmiyor. Aşağıdaki plan ileride
+> "soruyu düzenlenebilir matematiğe çevir" özelliği istenirse referans olarak
+> duruyor.
+
+**Sorun:** Taranmış kaynaklarda extract.py sayfaları/soruları `img-block` olarak
+kırpıyor (F9 tesseract ile yalnızca sınıfı `question` yapabiliyor) — içerik hâlâ
+resim: düzenlenemiyor, yeniden akıtılamıyor, matematiksel ifade yok. Hedef: sayfa
+görüntülerini bir vision LLM'e okutarak metin tabanlı kaynaklarla AYNI §2 blok
+formatını (SISTEM.md) üretmek — matematik `.rt/.frac/.sup/.sub` sınıflarıyla
+düzenlenebilir HTML, tablo `<table>`, şekil/diyagram bbox ile kırpılmış `<img>`.
+
+**Model/API kararı (Fable, 2026-07-10):**
+- **Claude API + Opus 4.8 (`claude-opus-4-8`)** transkripsiyon modeli. Gerekçe:
+  yüksek çözünürlüklü vision (2576px uzun kenar, 200dpi A4 = 2339px → küçültmesiz
+  girer; koordinatlar piksel-birebir → bbox'lar doğrudan kırpmada kullanılır),
+  structured outputs (json_schema — çıktı garantili parse edilir), prompt caching,
+  Batch API (%50 indirim). Fable 5 ÖNERİLMEDİ: 2× fiyat ($10/$50 vs $5/$25),
+  OCR-transkripsiyonda ölçülebilir kazanç yok, refusal sınıflandırıcıları gereksiz risk.
+- Ucuz mod: `claude-sonnet-5` ($2/$10 tanıtım, 2026-08-31'e kadar) profil ayarıyla
+  seçilebilir; görsel QA örneklemleri `claude-haiku-4-5`.
+- OpenAI/Gemini ELENDİ: mevcut hat (skill altyapısı, QA ajanları, SDK) Claude
+  tabanlı; tek satıcı = tek SDK + prompt cache + batch bütünlüğü.
+- **Maliyet tahmini (Opus 4.8):** sayfa görseli ~4.8K token + cache'li sistem
+  prompt'u + ~2-3K çıktı ≈ **~0,09 $/sayfa** → 100 sayfalık tema ≈ 9 $, Batch ile
+  ≈ 4,5 $; Sonnet 5 ile ≈ 3,5 $ / Batch 1,75 $. 3 sayfalık pilot ≈ 0,30 $.
+
+**Kapsam:**
+1. **`sistem/vision_extract.py` (yeni):**
+   - Sayfa bazlı yol seçimi: `page.get_text()` uzunluğu eşik altındaysa vision
+     yolu (karışık kaynaklarda sayfa sayfa karar; extract.py'deki mevcut metin
+     yolu AYNEN kalır).
+   - Sayfa → 200dpi PNG (PyMuPDF render).
+   - Claude çağrısı (python `anthropic` SDK, `client.messages.create`): system
+     prompt = transkripsiyon kural kitabı (matematik BİREBİR — tahmin yok; KUR
+     rozetleri atılır, gerçek bölüm adları `.kur-tag`; "…Kurgusu" etiketleri
+     korunur; yasaklı metinler filtrelenir; kök `.rt`, kesir `.frac`, üs/alt
+     `.sup/.sub`; tablo `<table>`; şekil = bbox) + 1-2 few-shot örnek —
+     `cache_control` breakpoint'li, sayfa görseli sonda (cache bozulmaz).
+   - `output_config.format` json_schema: `{"bloklar":[{"tur":"question|theory-box|
+     kur-tag|img-block|answer-key","html":"…","soru_no":"…","duz_metin":"…",
+     "sekiller":[{"bbox":[x0,y0,x1,y1],"yer_tutucu":"FIG1"}]}]}`.
+   - Şekil kırpma: dönen bbox'lar Pillow ile sayfa PNG'sinden kesilir →
+     `assets/pNN_qNN_fig.png`; html'deki yer tutucular `<img>`'e bağlanır.
+   - ID/manifest/rapor: extract.py konvansiyonları (tNN-sNNN, extract_report,
+     runs.jsonl'a sayfa başına token+maliyet); refusal/max_tokens/429 için
+     yeniden deneme, kalıcı hatada sayfa `img-block`'a düşer (asla sessiz kayıp).
+   - İki koşu modu: `--canli` (sayfa sayfa, arayüzde ilerleme) ve `--batch`
+     (Message Batches, %50 — custom_id=sayfa no, sonuçlar sırasız gelir).
+2. **Doğrulama (taranmışta pdftotext diff YOK, yerine):** (a) modelin `duz_metin`
+   alanı ↔ tesseract OCR gevşek eşleştirme (varsa); (b) soru numarası süreklilik
+   kontrolü; (c) F10 sayfa-görsel karşılaştırması; (d) Haiku ile örneklem görsel
+   QA (kaynak PNG ↔ çıktı PNG: matematik birebir mi, KUR kalmış mı) ZORUNLU.
+3. **Arayüz entegrasyonu:** `pipeline.py`'ye `run_vision_extract`; extract job'u
+   taranmış kaynağı otomatik vision yoluna yönlendirir (profil: `vision:
+   otomatik|hep|asla`, model seçimi, bütçe üst sınırı). API anahtarı:
+   `ANTHROPIC_API_KEY` env veya `arayuz/.env` (dotenv zaten mevcut) — anahtar
+   asla loglanmaz/commit edilmez.
+4. **Bağımlılıklar:** `arayuz/backend/requirements.txt`'e `anthropic`, `pillow`.
+
+**İş bölümü (token-verimli):** plan/prompt+şema tasarımı/denetim Fable (ana
+oturum); kod AGY veya Sonnet alt-ajan (bu görev tanımı yeterli spec); QA örneklem
+Haiku. Pilot: kullanıcıdan anahtar gelince önce 08 temasından 3 sayfa canlı koşu
+(~0,30 $) ile prompt kalibrasyonu → Fable çıktıyı kaynakla karşılaştırır →
+onaydan sonra tam koşu (tercihen Batch).
+
+**Kabul ölçütleri:** (a) 3 sayfalık pilotta matematik birebir (örneklem gözle +
+Haiku QA); (b) 08 temasında bağımsız img-block sayısı ≥%80 azalır, şekil/tablolar
+korunur; (c) üretilen sorular.html mevcut assemble.py+print.mjs ile değişiklik
+gerektirmeden basılır; (d) sayfa başına maliyet log'lanır ve tahminle uyumludur;
+(e) anahtar yokken sistem bugünkü davranışa (img-block) sessizce DÜŞMEZ — açık
+uyarı verir.
+
+---
+
+## F12 — Resim tabanlı sayfalar: tam sayfa koru + isim sil + logo üst orta (AÇILDI 2026-07-10, plan: Fable, kod: Sonnet alt-ajan) — ✅ tamam (2026-07-10, Fable çapraz doğrulamalı)
+
+> **Sonuç (2026-07-10):** extract.py (+229 satır), flow.css (+32), print.mjs
+> güncellendi. 08 kaynağıyla scratch testi: 36 sayfanın 34'ü tam-sayfa oldu
+> (5 ve 13 metinli → eski yol), 34/34 sayfada "EGEMEN SARIKCI" görüntüden
+> silindi (tesseract `winget UB-Mannheim.TesseractOCR` ile kuruldu; sistemde
+> yalnız afr+osd dil paketi var — mevcut F9 konvansiyonu `-l afr` kullanıldı;
+> ajan ayrıca Windows cp1254/UTF-8 subprocess hatası yakalayıp düzeltti).
+> assemble+print sonrası PDF: tam-sayfa görüntüler tek sayfaya sığıyor, boş ara
+> sayfa yok, logo her sayfada üst ortada. Fable örneklemle görsel doğruladı
+> (p001_tam.png: isim silinmiş, içerik bozulmamış; preview-02.png: logo ortada).
+> **Bilinen kısıt (kullanıcı kararıyla uyumlu):** tam-sayfa korunan sayfalarda
+> soru başına `.solve-space` eklenmez (sayfa olduğu gibi kalır); istisna
+> gereken kaynaklarda profil `taranmis_sayfa_modu: "parcala"` kaçış yoludur.
+
+**Kullanıcı isteği (2026-07-10):** (1) Resim tabanlı soruların olduğu sayfalar
+OLDUĞU GİBİ bırakılsın (bugünkü bölge bölge kırpıp iki sütuna akıtma yerine);
+(2) o sayfalarda "Egemen Sarıkcı" yazısı varsa görüntüden KALDIRILSIN;
+(3) logo TÜM sayfalarda üst ortaya alınsın (önceki: sol üst).
+
+**Yapılanlar / Kapsam:**
+1. ✅ `sistem/print.mjs`: headerTemplate logosu üst ortaya alındı
+   (`margin: 2mm auto 0 auto`) — Fable, doğrudan.
+2. `sistem/extract.py` (Sonnet alt-ajan):
+   - **Sayfa sınıflandırma:** bir sayfa "resim tabanlı" sayılır ⇔ metin katmanı
+     eşik altı (örn. <60 karakter) VEYA tek görsel bölge sayfa alanının >%70'ini
+     kaplıyor. Eşikler profil json'undan ayarlanabilir.
+   - **Tam sayfa modu (yeni varsayılan):** resim tabanlı sayfa TEK tam-sayfa
+     `img-block` olur: sayfa 200dpi PNG render (fitz) → `assets/pNNN_tam.png`,
+     blok `<section class="img-block tam-sayfa" id="..." data-kaynak-sayfa="N">`.
+     Eski davranış profil bayrağıyla korunur:
+     `taranmis_sayfa_modu: "tam_sayfa" (varsayılan) | "parcala"`.
+   - **İsim silme (görüntü içinden):** profildeki `yasakli_metinler` listesi
+     (EGEMEN SARIKCI dahil) tam-sayfa PNG üzerinde tesseract ile aranır
+     (büyük/küçük harf, harf-aralığı, Türkçe karakter toleranslı — F9'daki
+     normalize yaklaşımı); eşleşen kelime/satır bbox'ları PNG kaydedilmeden
+     BEYAZ dolgu ile silinir (fitz Pixmap üzerinde, örn. `clear_with`).
+     tesseract YOKSA sessiz geçilmez: extract_report.txt'ye açık UYARI yazılır.
+     Silinen bölge sayısı rapora işlenir.
+   - Metin katmanlı sayfaların mevcut davranışı DEĞİŞMEZ; F9 OCR yolu parcala
+     modunda aynen kalır.
+3. `sistem/flow.css` (Sonnet alt-ajan): `.img-block.tam-sayfa` — iki sütunlu
+   akış içinde tam genişlik (`column-span: all`), sayfa başına bir kaynak sayfa
+   (`break-before/after: page`), `img { width:100% }`; kenar boşlukları mevcut
+   print marginlerine uyumlu (taşma/ikinci boş sayfa üretmemeli).
+
+**Kabul ölçütleri:** (a) 08 teması kaynağıyla scratch'e extract koşulur: resim
+tabanlı sayfalar tek tam-sayfa img-block olur, metinli sayfalar eskisi gibi;
+(b) "EGEMEN SARIKCI" içeren örnek sayfalarda isim görüntüden silinmiş olur
+(çıktı PNG gözle/ajan ile doğrulanır), yanlış pozitif (soru metni silinmesi)
+olmaz; (c) assemble+print sonrası PDF'te tam-sayfa görüntüler tek sayfaya
+sığar, logo her sayfada üst ortada; (d) 01-tema yeniden ÜRETİLMEZ (ID
+dondurma), değişiklik yalnızca yeni koşuları etkiler; (e) tesseract'sız
+ortamda davranış: sayfa yine tam sayfa korunur + rapora uyarı düşer.
