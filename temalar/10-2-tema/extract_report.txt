@@ -1,0 +1,90 @@
+========================================================================
+EXTRACTION REPORT
+========================================================================
+Timestamp: 2026-07-10T13:58:05.751422
+PDF Input: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\temalar\10-2-tema\kaynak\2.tema.pdf
+Output Directory: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\temalar\10-2-tema
+Tema No: 10
+Profile: metin_yayinlari
+Pages Processed: 84
+Total Pages in PDF: 84
+Yasaklı metin silinen satır sayısı (yasakli_metinler): 84
+------------------------------------------------------------------------
+STATISTICS:
+  Questions Found: 111
+  Theory Boxes Found: 0
+  Kur-tags Found: 0
+  Answer Keys Found: 0
+  Images Found (Raster + Figure crops): 169
+  Fallback Paragraphs: 64
+  Root Mathematical Symbols Converted: 0
+------------------------------------------------------------------------
+OCR (F9 — img-block -> question sınıflandırma):
+  OCR atlandı: tesseract bulunamadı (davranış OCR-öncesi ile aynı).
+------------------------------------------------------------------------
+WARNINGS & ERRORS:
+  - [WARNING] Sayfa 1: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 6: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 7: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 8: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 9: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 10: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 11: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 12: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 13: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 14: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 15: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 16: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 17: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 18: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 19: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 20: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 21: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 22: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 23: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 24: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 25: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 26: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 27: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 28: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 29: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 30: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 31: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 32: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 33: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 34: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 35: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 36: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 37: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 38: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 39: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 40: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 41: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 42: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 43: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 44: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 45: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 48: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 49: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 57: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 58: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 59: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 60: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 64: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 67: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 70: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 71: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 72: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 73: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 74: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 75: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 76: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 77: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 78: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 79: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 80: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 81: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 82: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 83: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+  - [WARNING] Sayfa 84: Sınıflandırılamayan metin bloğu fallback paragrafa (para) düştü.
+========================================================================

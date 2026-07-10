@@ -1,0 +1,587 @@
+{
+  "olusturuldu": "2026-07-10T13:58:18+03:00",
+  "tema_dir": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\temalar\\10-2-tema",
+  "tema": "10",
+  "baslik": "10. TEMA",
+  "surum": 2,
+  "kaynak_pdf": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\temalar\\10-2-tema\\kaynak\\2.tema.pdf",
+  "cikti_pdf": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\cikti\\2.TEMA_v2.pdf",
+  "cikti_sayfa": 35,
+  "kaynak_soru_tahmini": 111,
+  "cikti_soru_sayisi": 111,
+  "metin_sayisi": 33,
+  "gorsel_sayisi": 78,
+  "salt_gorsel_sayisi": 78,
+  "eslesen_sayisi": 0,
+  "eslesmeyen_sayisi": 0,
+  "gorsel_icerik_sayisi": 111,
+  "eslesmeyen_idler": [],
+  "gorsel_icerik_idler": [
+    "t10-s001",
+    "t10-s002",
+    "t10-s003",
+    "t10-s004",
+    "t10-s005",
+    "t10-s006",
+    "t10-s007",
+    "t10-s008",
+    "t10-s009",
+    "t10-s010",
+    "t10-s011",
+    "t10-s012",
+    "t10-s013",
+    "t10-s014",
+    "t10-s015",
+    "t10-s016",
+    "t10-s017",
+    "t10-s018",
+    "t10-s019",
+    "t10-s020",
+    "t10-s021",
+    "t10-s022",
+    "t10-s023",
+    "t10-s024",
+    "t10-s025",
+    "t10-s026",
+    "t10-s027",
+    "t10-s028",
+    "t10-s029",
+    "t10-s030",
+    "t10-s031",
+    "t10-s032",
+    "t10-s033",
+    "t10-s034",
+    "t10-s035",
+    "t10-s036",
+    "t10-s037",
+    "t10-s038",
+    "t10-s039",
+    "t10-s040",
+    "t10-s041",
+    "t10-s042",
+    "t10-s043",
+    "t10-s044",
+    "t10-s045",
+    "t10-s046",
+    "t10-s047",
+    "t10-s048",
+    "t10-s049",
+    "t10-s050",
+    "t10-s051",
+    "t10-s052",
+    "t10-s053",
+    "t10-s054",
+    "t10-s055",
+    "t10-s056",
+    "t10-s057",
+    "t10-s058",
+    "t10-s059",
+    "t10-s060",
+    "t10-s061",
+    "t10-s062",
+    "t10-s063",
+    "t10-s064",
+    "t10-s065",
+    "t10-s066",
+    "t10-s067",
+    "t10-s068",
+    "t10-s069",
+    "t10-s070",
+    "t10-s071",
+    "t10-s072",
+    "t10-s073",
+    "t10-s074",
+    "t10-s075",
+    "t10-s076",
+    "t10-s077",
+    "t10-s078",
+    "t10-s079",
+    "t10-s080",
+    "t10-s081",
+    "t10-s082",
+    "t10-s083",
+    "t10-s084",
+    "t10-s085",
+    "t10-s086",
+    "t10-s087",
+    "t10-s088",
+    "t10-s089",
+    "t10-s090",
+    "t10-s091",
+    "t10-s092",
+    "t10-s093",
+    "t10-s094",
+    "t10-s095",
+    "t10-s096",
+    "t10-s097",
+    "t10-s098",
+    "t10-s099",
+    "t10-s100",
+    "t10-s101",
+    "t10-s102",
+    "t10-s103",
+    "t10-s104",
+    "t10-s105",
+    "t10-s106",
+    "t10-s107",
+    "t10-s108",
+    "t10-s109",
+    "t10-s110",
+    "t10-s111"
+  ],
+  "olasi_kayip_numaralar": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55
+  ],
+  "kaynak_metin_kisitli": false,
+  "kaynak_soru_tahmini_satir_bazli": 0,
+  "kaynak_soru_tahmini_span_bazli": 111,
+  "kaynak_soru_tahmini_yontemi": "span_bazli",
+  "sayfa_gorsel_karsilastirma": [
+    {
+      "sayfa": 6,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 7,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 8,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 9,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 10,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 11,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 12,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 13,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 14,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 15,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 16,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 17,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 18,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 19,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 20,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 21,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 22,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 23,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 24,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 25,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 26,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 27,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 28,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 29,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 30,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 31,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 32,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 33,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 34,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 35,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 36,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 37,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 38,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 39,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 40,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 41,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 42,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 43,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 44,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 45,
+      "kaynak": 2,
+      "cikti": 2
+    },
+    {
+      "sayfa": 46,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 47,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 48,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 50,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 51,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 52,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 53,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 54,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 55,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 56,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 57,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 58,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 59,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 60,
+      "kaynak": 3,
+      "cikti": 3
+    },
+    {
+      "sayfa": 61,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 62,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 63,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 64,
+      "kaynak": 5,
+      "cikti": 5
+    },
+    {
+      "sayfa": 65,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 66,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 67,
+      "kaynak": 5,
+      "cikti": 5
+    },
+    {
+      "sayfa": 68,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 69,
+      "kaynak": 6,
+      "cikti": 6
+    },
+    {
+      "sayfa": 70,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 71,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 72,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 73,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 74,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 75,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 76,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 77,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 78,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 79,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 80,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 81,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 82,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 83,
+      "kaynak": 1,
+      "cikti": 1
+    },
+    {
+      "sayfa": 84,
+      "kaynak": 1,
+      "cikti": 1
+    }
+  ],
+  "olasi_eksik_gorsel_sayfalar": [],
+  "yontem_notu": "Kaynak soru sayısı için İKİ bağımsız TAHMİN hesaplanır — (1) satır bazlı: satır başında '12.'/'12)' + AYNI SATIRDA devam metni arar; (2) span bazlı (F10): get_text('dict')'te satırın İLK span'ı tam olarak '12.'/'12)' ise sayar (taranmış/görsel ağırlıklı kaynaklarda soru numarası kendi satırında yalnız durur, devam metni resim olduğu için satırda YOKTUR — yöntem 1 bunu kaçırır). Nihai tahmin ikisinin BÜYÜĞÜdür (bu koşuda: span_bazli); her iki ham değer de kaynak_soru_tahmini_satir_bazli / kaynak_soru_tahmini_span_bazli alanlarında saklanır. Cevap anahtarı satırları (örn. '1.B 2.A 3.C') her iki yöntemde de elenir. Aktarım kontrolü her çıktı sorusunun ilk ~40 normalize karakterini kaynak metninde arar, kısa/salt-görsel sorular karşılaştırma dışı tutulur. Sayfa bazlı görsel karşılaştırması (sayfa_gorsel_karsilastirma / olasi_eksik_gorsel_sayfalar) kaynaktaki basitleştirilmiş görsel-bölge sayımını (extract.py'nin gömülü görüntü + büyük vektör çizim kümesi mantığının basit bir kopyası, extract.py'nin kendisi ÇALIŞTIRILMADI) çıktıdaki aynı kaynak sayfaya bağlı <img> sayısıyla karşılaştırır — extract.py'nin banner/tekil-dolgu istisnaları burada yok, bu yüzden bir miktar yanlış pozitif (abartılı 'olası eksik') beklenir; kesin/otomatik doğrulama için qa/dogrula.py'ye bakın."
+}
