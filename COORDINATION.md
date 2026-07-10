@@ -1514,7 +1514,7 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
     silinen 03-ekonomi-6 dahil her şey gerekirse buradan kurtarılır:
     `git clone test_hazirlik_gecmis_yedegi.bundle eski_hali`).
 
-## F9 — img-block'ların soruya dönüştürülmesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet)
+## F9 — img-block'ların soruya dönüştürülmesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet) — ✅ tamam (2026-07-10)
 
 **Sorun:** Taranmış kaynaklarda sorular `img-block` olarak akışa girer; soru sayılmadığı
 için altına çözüm boşluğu (`.solve-space`) konmaz. Kurtarma bugün manuel (README "İnce
@@ -1553,7 +1553,7 @@ gözle doğrulanır; (b) 08 kaynağıyla scratch'e extract koşulup OCR'ın kaç
 soruya çevirdiği raporlanır (yanlış pozitifler örneklenir); (c) çalışan 8756
 sunucusuna DOKUNULMAZ, test 8758 portunda yapılır; (d) node --check app.js mock.js temiz.
 
-## F10 — rapor.py taranmış kaynak güvencesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet)
+## F10 — rapor.py taranmış kaynak güvencesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet) — ✅ tamam (2026-07-10)
 
 **Sorun:** Taranmış/metin katmanı zayıf kaynaklarda `kaynak_soru_tahmini=0` kalıyor
 (örn. 08 teması: tahmin 0, çıktı 166 soru + 174 img-block) → soru atlaması otomatik
