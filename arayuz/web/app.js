@@ -32,6 +32,10 @@
                                       verdiği için F2 tek grupta gönderiyor, bkz. not)
      POST /api/temalar/{id}/bloklar body: { sinif, html_govde, konum: {sonra_id}|null }
                                       -> { id, sinif, kaynak_sayfa }
+     PATCH /api/temalar/{id}/bloklar/{blokId} body: { sinif } -> { id, sinif,
+                                      kaynak_sayfa, solve_space } (F9 — img-block <->
+                                      question dönüşümü; id/kaynak_sayfa DEĞİŞMEZ,
+                                      question'a çevrilince solve-space eklenir/idempotenttir)
      POST /api/temalar/{id}/uret    -> { tema_id, job_id }; job.sonuc =
                                       { cikti_pdf, kopya, surum, sayimlar, dogrulama:
                                         {calisti:bool, cikti?(dogrula.py ham çıktısı), not?} }
@@ -140,6 +144,17 @@
           method: "POST",
           headers: JSON_BASLIK,
           body: JSON.stringify(veri),
+        })
+      );
+    },
+    // F9 — img-block <-> question dönüşümü: PATCH /bloklar/{id} {sinif} ->
+    // {id, sinif, kaynak_sayfa, solve_space}
+    async blokSinifDegistir(temaId, blokId, sinif) {
+      return govdeAyristir(
+        await fetch(`/api/temalar/${encodeURIComponent(temaId)}/bloklar/${encodeURIComponent(blokId)}`, {
+          method: "PATCH",
+          headers: JSON_BASLIK,
+          body: JSON.stringify({ sinif }),
         })
       );
     },
@@ -1034,12 +1049,28 @@
     });
   }
 
+  // F9 — img-block'ları soruya (ve içeriği sadece görsel olan question'ları geri
+  // img-block'a) çevirme düğmesi. "Salt görsel" question'ı ayırt etmek için
+  // ozet(metin özeti) boş mu diye bakılıyor — arayüz tam HTML gövdesini almıyor,
+  // yalnızca bloklar_listesi()'nin döndürdüğü {id,sinif,kaynak_sayfa,ozet,bolum}
+  // alanlarına sahip, bu yüzden elimizdeki en güvenilir sinyal bu.
+  function blokDonusumDugmesi(blok) {
+    if (blok.sinif === "img-block") {
+      return { eylem: "soruya-cevir", metin: "Soruya çevir", hedefSinif: "question" };
+    }
+    if (blok.sinif === "question" && !(blok.ozet || "").trim()) {
+      return { eylem: "gorsele-cevir", metin: "Görsele çevir", hedefSinif: "img-block" };
+    }
+    return null;
+  }
+
   function blokOgesiOlustur(blok) {
     const li = document.createElement("li");
     li.className = "blok-ogesi";
     li.draggable = true;
     li.dataset.id = blok.id;
     const tur = turEtiket(blok.sinif);
+    const donusum = blokDonusumDugmesi(blok);
     li.innerHTML = `
       <span class="blok-ogesi__tut" title="Sürükleyerek sırala">⠿</span>
       <div class="blok-ogesi__govde">
@@ -1050,10 +1081,15 @@
         <div class="blok-ogesi__ozet">${kacisliMetin(blok.ozet || "")}</div>
       </div>
       <div class="blok-ogesi__eylemler">
+        ${donusum ? `<button class="btn-metin" title="${kacisliMetin(donusum.metin)}" data-eylem="donustur">${kacisliMetin(donusum.metin)}</button>` : ""}
         <button class="icon-btn sil" title="Sil" data-eylem="sil">🗑</button>
       </div>
     `;
     li.querySelector('[data-eylem="sil"]').addEventListener("click", () => blokSil(blok.id));
+    const donusumBtn = li.querySelector('[data-eylem="donustur"]');
+    if (donusumBtn) {
+      donusumBtn.addEventListener("click", () => blokSinifiDegistir(blok, donusum.hedefSinif));
+    }
 
     li.addEventListener("dragstart", () => {
       state.duzenle.suruklenenId = blok.id;
@@ -1103,6 +1139,27 @@
     // kendi bölüm başlığı altında yeniden gruplanır. Bu; öğretmenin serbestçe
     // sıralamasına izin verirken bölüm etiketini bilgi amaçlı tutar.
     blokListesiRenderEt();
+  }
+
+  // F9 — img-block <-> question dönüşümü PATCH /bloklar/{id} çağırır ve
+  // sunucudaki gerçek sonucu (id/kaynak_sayfa sabit kalır) yerel listeye yansıtır.
+  async function blokSinifiDegistir(blok, hedefSinif) {
+    const temaId = state.duzenle.temaId;
+    if (!temaId) return;
+    try {
+      const sonuc = await api.blokSinifDegistir(temaId, blok.id, hedefSinif);
+      const yerelBlok = state.duzenle.akis.find((b) => b.id === blok.id);
+      if (yerelBlok) yerelBlok.sinif = sonuc.sinif;
+      blokListesiRenderEt();
+      bildirimGoster(
+        hedefSinif === "question"
+          ? "Blok soruya çevrildi (çözüm boşluğu eklendi)."
+          : "Blok görsele çevrildi (çözüm boşluğu kaldırıldı).",
+        "basari"
+      );
+    } catch (err) {
+      bildirimGoster("Sınıf değiştirilemedi: " + err.message, "hata");
+    }
   }
 
   function blokSil(blokId) {

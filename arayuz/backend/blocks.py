@@ -188,6 +188,95 @@ def blok_ekle(tema_dir: str, tema_no: str, sinif: str, html_govde: str, konum: d
     return {"id": yeni_id, "sinif": sinif, "kaynak_sayfa": kaynak_sayfa}
 
 
+_IMG_TAG_RE = re.compile(r"<img\b[^>]*/?>")
+_SOLVE_SPACE_TAG_RE = re.compile(r'<div class="solve-space"></div>')
+
+
+def _solve_space_var_mi(ic_html: str) -> bool:
+    return bool(_SOLVE_SPACE_TAG_RE.search(ic_html))
+
+
+def _solve_space_ekle(ic_html: str) -> str:
+    """İlk `<img .../>` etiketinden sonra solve-space div'i ekler; zaten varsa
+    DOKUNMAZ (F9 — ikinci çevirmede çiftlenme olmaz)."""
+    if _solve_space_var_mi(ic_html):
+        return ic_html
+    ekleme = '\n  <div class="solve-space"></div>'
+    m = _IMG_TAG_RE.search(ic_html)
+    if not m:
+        # img yoksa (beklenmez, savunma amaçlı) içeriğin sonuna ekle
+        return ic_html.rstrip("\n") + ekleme + "\n"
+    idx = m.end()
+    return ic_html[:idx] + ekleme + ic_html[idx:]
+
+
+def _solve_space_kaldir(ic_html: str) -> str:
+    """solve-space div'ini (varsa, satır başındaki boşlukla birlikte) kaldırır."""
+    return re.sub(r'[ \t]*<div class="solve-space"></div>\n?', "", ic_html)
+
+
+def blok_sinif_degistir(tema_dir: str, blok_id: str, yeni_sinif: str, solve_space: bool) -> dict:
+    """PATCH /bloklar/{id} — F9: img-block <-> question sınıf değişimi.
+
+    id ve data-kaynak-sayfa AYNEN korunur (SISTEM.md §2 id dondurma kuralı ihlal
+    edilmez — yalnızca class ve iç içerik değişir, blok kimliği sabit kalır).
+    `solve_space=True` iken içerikte `<div class="solve-space"></div>` yoksa
+    ilk `<img>` etiketinden hemen sonra eklenir (varsa DOKUNULMAZ — idempotent).
+    `solve_space=False` iken solve-space (varsa) kaldırılır.
+    """
+    if yeni_sinif not in BILINEN_SINIFLAR:
+        raise ApiHata(
+            400,
+            "bilinmeyen sınıf",
+            f"'{yeni_sinif}' desteklenmiyor, izin verilenler: {sorted(BILINEN_SINIFLAR)}",
+        )
+
+    sorular_yol = os.path.join(tema_dir, "sorular.html")
+    html_metin = sorular_html_oku(tema_dir)
+    bloklar, mukerrer = parse_sorular(html_metin)
+
+    if blok_id in mukerrer:
+        raise ApiHata(
+            409,
+            "mükerrer id",
+            f"'{blok_id}' sorular.html içinde birden fazla kez geçiyor — önce elle düzeltilmeli",
+        )
+    if blok_id not in bloklar:
+        raise ApiHata(404, "blok bulunamadı", blok_id)
+
+    blok = bloklar[blok_id]
+    tag = blok["tag"]
+    kaynak_sayfa = blok["kaynak_sayfa"]
+    ic = blok["ic"]
+
+    yeni_ic = _solve_space_ekle(ic) if solve_space else _solve_space_kaldir(ic)
+
+    desen = re.compile(
+        r'<' + re.escape(tag) + r'\s+class="[^"]+"\s+id="' + re.escape(blok_id)
+        + r'"\s+data-kaynak-sayfa="[^"]+"[^>]*>.*?</' + re.escape(tag) + r'>',
+        re.DOTALL,
+    )
+    yeni_blok_tam = (
+        f'<{tag} class="{yeni_sinif}" id="{blok_id}" data-kaynak-sayfa="{kaynak_sayfa}">'
+        f"{yeni_ic}</{tag}>"
+    )
+
+    yeni_html, n = desen.subn(lambda _m: yeni_blok_tam, html_metin, count=1)
+    if n != 1:
+        raise ApiHata(
+            500,
+            "blok değiştirilemedi",
+            f"'{blok_id}' sorular.html içinde beklenen desenle tam olarak bulunamadı (eşleşme={n})",
+        )
+
+    if os.path.exists(sorular_yol):
+        shutil.copy2(sorular_yol, sorular_yol + ".bak")
+    with open(sorular_yol, "w", encoding="utf-8") as f:
+        f.write(yeni_html)
+
+    return {"id": blok_id, "sinif": yeni_sinif, "kaynak_sayfa": kaynak_sayfa, "solve_space": solve_space}
+
+
 def sayim(tema_dir: str) -> dict:
     """Aktif (manifest'teki) blokların kaba sayımı — runs.jsonl bilgi alanları için.
     Kesin doğrulama qa/dogrula.py'nin işidir; bu yalnızca özet bilgi amaçlıdır."""

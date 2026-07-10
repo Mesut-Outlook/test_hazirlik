@@ -263,6 +263,27 @@ def post_blok(tema_id: str, body: YeniBlok):
     return sonuc
 
 
+# ------------------------------------------------------- PATCH /api/temalar/{id}/bloklar/{blok_id}
+class BlokSinifPatch(BaseModel):
+    sinif: str
+
+
+@router.patch("/api/temalar/{tema_id}/bloklar/{blok_id}")
+def patch_blok_sinif(tema_id: str, blok_id: str, body: BlokSinifPatch):
+    """F9 — img-block <-> question dönüşümü. `question`'a çevrilirken solve-space
+    eklenir (idempotent); `img-block`'a çevrilirken kaldırılır. id/data-kaynak-sayfa
+    değişmez (SISTEM.md §2 id dondurma kuralı)."""
+    tema_dir = tema_dir_by_id(tema_id)
+    solve_space = body.sinif == "question"
+    sonuc = blocks.blok_sinif_degistir(tema_dir, blok_id, body.sinif, solve_space)
+    islem_gunlugu_yaz(
+        tema_dir,
+        "Arayüz - blok sınıf değiştirme",
+        [f"{blok_id}: sınıf -> {body.sinif} (solve_space={solve_space})"],
+    )
+    return sonuc
+
+
 # ------------------------------------------------------- POST /api/temalar/{id}/uret
 class UretIstek(BaseModel):
     cikti_adi: str | None = None

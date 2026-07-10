@@ -71,7 +71,10 @@ Bulunan kök nedenler ve bu sürümdeki düzeltmeler:
 import os
 import re
 import json
+import shutil
 import argparse
+import subprocess
+import tempfile
 from datetime import datetime
 import fitz  # PyMuPDF
 
@@ -592,6 +595,71 @@ def extract_figure_crops(page, pnum, figure_regions, assets_dir, start_idx=0):
     return figs
 
 
+TESSERACT_BIN = shutil.which("tesseract")
+OCR_QNUM_RE = re.compile(r"^\s*\d{1,3}[.)]")
+
+
+def ocr_detect_question_number(page, bbox, ocr_stats):
+    """F9 — bağımsız img-block yazılmadan önce SOL-ÜST köşesine (genişliğin ~%35'i x
+    yüksekliğin ~%25'i) bakıp orada bir soru numarası ("12." / "7)") olup olmadığını
+    tesseract ile denetler (SADECE rakam+nokta+parantez beyaz-listesiyle, --psm 6).
+
+    Sistemde `eng` dil paketi YOK (yalnız afr+osd) — `-l eng` denemek her zaman
+    "Failed loading language" hatasıyla başarısız olur, bu yüzden `-l afr`
+    kullanılır (rakam tanımada dil script'i Latin olduğu sürece fark etmiyor).
+    tesseract kurulu değilse/başarısız olursa SESSİZCE False döner — davranış
+    OCR öncesiyle birebir aynı kalır (img-block olarak devam), bkz. ocr_stats.
+    """
+    ocr_stats["denendi"] = ocr_stats.get("denendi", 0) + 1
+    if not TESSERACT_BIN:
+        ocr_stats["atlandi_arac_yok"] = ocr_stats.get("atlandi_arac_yok", 0) + 1
+        return False
+
+    x0, y0, x1, y1 = bbox
+    w, h = x1 - x0, y1 - y0
+    if w <= 1 or h <= 1:
+        ocr_stats["atlandi_gecersiz_bbox"] = ocr_stats.get("atlandi_gecersiz_bbox", 0) + 1
+        return False
+    corner = (x0, y0, x0 + 0.35 * w, y0 + 0.25 * h)
+
+    tmp_path = None
+    try:
+        pix = page.get_pixmap(clip=corner, dpi=300)
+        fd, tmp_path = tempfile.mkstemp(suffix=".png")
+        os.close(fd)
+        pix.save(tmp_path)
+        sonuc = subprocess.run(
+            [
+                TESSERACT_BIN, tmp_path, "stdout",
+                "-l", "afr", "--psm", "6",
+                "-c", "tessedit_char_whitelist=0123456789.)",
+            ],
+            capture_output=True, text=True, timeout=10,
+        )
+        if sonuc.returncode != 0:
+            ocr_stats["atlandi_tesseract_hatasi"] = ocr_stats.get("atlandi_tesseract_hatasi", 0) + 1
+            return False
+        metin = sonuc.stdout.strip()
+        ilk_satir = metin.splitlines()[0].strip() if metin else ""
+        if OCR_QNUM_RE.match(ilk_satir):
+            ocr_stats["donusturuldu"] = ocr_stats.get("donusturuldu", 0) + 1
+            return True
+        ocr_stats["eslesmedi"] = ocr_stats.get("eslesmedi", 0) + 1
+        return False
+    except subprocess.TimeoutExpired:
+        ocr_stats["atlandi_zaman_asimi"] = ocr_stats.get("atlandi_zaman_asimi", 0) + 1
+        return False
+    except Exception:
+        ocr_stats["atlandi_beklenmeyen_hata"] = ocr_stats.get("atlandi_beklenmeyen_hata", 0) + 1
+        return False
+    finally:
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+
+
 def sort_blocks_reading_order(blocks):
     """Bir sütun içindeki blokları GÖRSEL SATIR okuma sırasına göre dizer.
 
@@ -1083,6 +1151,7 @@ def main():
     q_count = t_count = k_count = a_count = g_count = p_count = 0
     total_roots = 0
     extraction_warnings = []
+    ocr_stats = {}  # F9 — img-block -> question OCR sınıflandırma sayaçları
 
     # Varsayılan profil (Metin Yayınları)
     profile = {
@@ -1285,8 +1354,16 @@ def main():
             if block.get("type") == "image":
                 g_count_local_id = block.get("img_idx")
                 block_id = f"t{args.tema}-g{len(blocks_db)+1:04d}"
-                html = (f'<section class="img-block" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n'
-                        f'  <img src="{block["path"]}" />\n</section>')
+                # F9 — OCR ile bağımsız img-block'un aslında bir soru olup olmadığı
+                # denetlenir (id g-serisinden devam eder, s-serisi sayaçlarına
+                # karışmaz — SISTEM.md id dondurma kuralı + COORDINATION.md F9).
+                if ocr_detect_question_number(page, block["bbox"], ocr_stats):
+                    html = (f'<section class="question" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n'
+                            f'  <img src="{block["path"]}" />\n'
+                            f'  <div class="solve-space"></div>\n</section>')
+                else:
+                    html = (f'<section class="img-block" id="{block_id}" data-kaynak-sayfa="{pnum+1}">\n'
+                            f'  <img src="{block["path"]}" />\n</section>')
                 blocks_db.append((block_id, html))
                 page_manifest_blocks.append(block_id)
                 current_block_idx += 1
@@ -1568,7 +1645,18 @@ def main():
         f.write(f"  Fallback Paragraphs: {p_count}\n")
         f.write(f"  Root Mathematical Symbols Converted: {total_roots}\n")
         f.write("------------------------------------------------------------------------\n")
-        
+        f.write("OCR (F9 — img-block -> question sınıflandırma):\n")
+        if not TESSERACT_BIN:
+            f.write("  OCR atlandı: tesseract bulunamadı (davranış OCR-öncesi ile aynı).\n")
+        else:
+            f.write(f"  Denendi: {ocr_stats.get('denendi', 0)}\n")
+            f.write(f"  Soruya çevrildi: {ocr_stats.get('donusturuldu', 0)}\n")
+            f.write(f"  Eşleşmedi (img-block kaldı): {ocr_stats.get('eslesmedi', 0)}\n")
+            atlanan = sum(v for k, v in ocr_stats.items() if k.startswith("atlandi_"))
+            if atlanan:
+                f.write(f"  Atlandı (hata/zaman aşımı, img-block kaldı): {atlanan}\n")
+        f.write("------------------------------------------------------------------------\n")
+
         if extraction_warnings:
             f.write("WARNINGS & ERRORS:\n")
             for warning in extraction_warnings:

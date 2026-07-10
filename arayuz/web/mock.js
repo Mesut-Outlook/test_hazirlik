@@ -431,6 +431,25 @@
       return jsonYanit({ id: yeniId, sinif: govde.sinif, kaynak_sayfa: kaynakSayfa });
     }
 
+    // PATCH /api/temalar/{id}/bloklar/{blokId} body: {sinif} -> {id, sinif, kaynak_sayfa,
+    // solve_space} (F9 — img-block <-> question dönüşümü). id/kaynak_sayfa DEĞİŞMEZ.
+    eslesme = yol.match(/^\/api\/temalar\/([^/]+)\/bloklar\/([^/]+)$/);
+    if (eslesme && yontem === "PATCH") {
+      const temaId = eslesme[1];
+      const blokId = eslesme[2];
+      const bloklar = DB.bloklarByTema[temaId];
+      if (!bloklar) return hataYanit("tema bulunamadı", temaId, 404);
+      const blok = bloklar.find((b) => b.id === blokId);
+      if (!blok) return hataYanit("blok bulunamadı", blokId, 404);
+      const govde = await govdeOku(secenekler);
+      if (!BILINEN_SINIFLAR.includes(govde.sinif)) {
+        return hataYanit("bilinmeyen sınıf", `'${govde.sinif}' desteklenmiyor, izin verilenler: ${BILINEN_SINIFLAR.join(", ")}`, 400);
+      }
+      blok.sinif = govde.sinif;
+      blok.solve_space = govde.sinif === "question";
+      return jsonYanit({ id: blok.id, sinif: blok.sinif, kaynak_sayfa: blok.kaynak_sayfa, solve_space: blok.solve_space });
+    }
+
     // PATCH /api/temalar/{id}/manifest body: {akis:[{sayfa,bloklar:[id,...]}, ...]}
     eslesme = yol.match(/^\/api\/temalar\/([^/]+)\/manifest$/);
     if (eslesme && yontem === "PATCH") {
