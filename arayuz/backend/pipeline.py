@@ -12,9 +12,9 @@ import subprocess
 
 from config import ASSEMBLE_PY, DOGRULA_PY, EXTRACT_PY, FLOW_CSS, PRINT_MJS, RAPOR_PY, REPO_ROOT
 
-PY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "bin", "python3")
-if not os.path.exists(PY):
-    PY = shutil.which("python3") or "python3"
+import sys
+
+PY = sys.executable
 
 
 class KomutHatasi(RuntimeError):
