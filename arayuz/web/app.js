@@ -167,12 +167,12 @@
         })
       );
     },
-    async istekGonder(temaId, metin) {
+    async istekGonder(temaId, metin, otomatik) {
       return govdeAyristir(
         await fetch(`/api/temalar/${encodeURIComponent(temaId)}/istek`, {
           method: "POST",
           headers: JSON_BASLIK,
-          body: JSON.stringify({ metin }),
+          body: JSON.stringify({ metin, otomatik: otomatik !== false }),
         })
       );
     },
@@ -1323,6 +1323,17 @@
       });
   }
 
+  // F6: bir talebin durum rozetini id'siyle bulup günceller (localStorage + ekran).
+  function talepDurumGuncelle(temaId, talepId, durum) {
+    const talepler = talepleriOku(temaId);
+    const t = talepler.find((x) => x.id === talepId);
+    if (t) {
+      t.durum = durum;
+      talepleriYaz(temaId, talepler);
+    }
+    if (state.duzenle.temaId === temaId) talepListesiRenderEt(temaId);
+  }
+
   el("#btn-talep-gonder").addEventListener("click", async () => {
     const temaId = state.duzenle.temaId;
     if (!temaId) return;
@@ -1331,14 +1342,36 @@
       bildirimGoster("Lütfen talebinizi yazın.", "hata");
       return;
     }
+    const otomatikKutu = el("#talep-otomatik");
+    const otomatik = !otomatikKutu || otomatikKutu.checked;
     try {
-      const sonuc = await api.istekGonder(temaId, metin);
+      const sonuc = await api.istekGonder(temaId, metin, otomatik);
+      const talepId = Date.now();
       const talepler = talepleriOku(temaId);
-      talepler.push({ id: (sonuc && sonuc.id) || Date.now(), metin, durum: (sonuc && sonuc.durum) || "kuyrukta" });
+      let durum = "kuyrukta";
+      if (sonuc && sonuc.job_id) durum = "Claude işliyor…";
+      else if (sonuc && sonuc.not) durum = "kuyrukta (CLI yok)";
+      talepler.push({ id: talepId, metin, durum });
       talepleriYaz(temaId, talepler);
       talepListesiRenderEt(temaId);
       el("#serbest-talep-metin").value = "";
-      bildirimGoster("Talebiniz ajanlara iletildi.", "basari");
+      if (sonuc && sonuc.job_id) {
+        bildirimGoster("Talep Claude'a iletildi — arka planda uygulanıyor.", "basari");
+        jobIzle(sonuc.job_id, {
+          guncelle() {},
+          bitti(veri) {
+            if (veri.durum === "tamam") {
+              talepDurumGuncelle(temaId, talepId, "uygulandı ✓ — Yeniden Üret ile basın");
+              bildirimGoster("Talep uygulandı. PDF'e yansıtmak için 'Yeniden Üret'.", "basari");
+            } else {
+              talepDurumGuncelle(temaId, talepId, "hata ✗");
+              bildirimGoster("Talep işlenemedi: " + (veri.hata || "bilinmeyen hata"), "hata");
+            }
+          },
+        });
+      } else {
+        bildirimGoster((sonuc && sonuc.not) || "Talebiniz kuyruğa yazıldı.", "basari");
+      }
     } catch (err) {
       bildirimGoster("Talep gönderilemedi: " + err.message, "hata");
     }

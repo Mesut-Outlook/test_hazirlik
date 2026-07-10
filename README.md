@@ -171,7 +171,7 @@ Arayüz otomatik olarak varsayılan tarayıcınızda `http://127.0.0.1:8756` adr
 - **Sürükle-Bırak Editör**: Soru ve bölümlerin yerleşimi ve sırası canlı olarak değiştirilebilir.
 - **Canlı Job Kuyruğu & SSE**: Extract ve Print (PDF Üretim) işleri arka planda asenkron çalışır; loglar ve ilerleme canlı olarak arayüzde gösterilir.
 - **Entegre Doğrulama**: Basılan her yeni PDF sürümünden sonra `qa/dogrula.py` otomatik olarak çalıştırılarak sonuçları ön yüzde listeler.
-- **Serbest İstek Kutusu**: Yapay zekadan istenecek ek sadakat ve tasarım düzenlemeleri arayüzden istek olarak gönderilebilir.
+- **Serbest İstek Kutusu (F6 ile otomatik)**: Ek düzenleme talepleri kendi cümlelerinizle yazılır; "Claude ile otomatik uygula" açıkken talep arka planda headless `claude` CLI (sonnet) tarafından SISTEM.md kurallarına uygun biçimde doğrudan tema dosyalarına uygulanır, durum rozeti canlı güncellenir; bitince "Yeniden Üret" ile PDF'e yansıtılır. `claude` CLI kurulu değilse talep yalnızca kuyruğa yazılır.
 - **Tema Kartlarında Zaman Rozeti**: Her kartta temanın son güncelleme zamanı (🕒 gün.ay.yıl saat:dakika) görünür — extract, blok düzenleme ve yeniden üretim bu saati günceller.
 
 ## Sürüm geçmişi (özet)

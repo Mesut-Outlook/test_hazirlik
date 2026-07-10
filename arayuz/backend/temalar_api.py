@@ -10,6 +10,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -17,7 +18,7 @@ from pydantic import BaseModel
 import blocks
 import pipeline
 import tema_meta
-from config import CIKTI_DIR, FLOW_CSS, TEMALAR_DIR
+from config import CIKTI_DIR, FLOW_CSS, REPO_ROOT, TEMALAR_DIR
 from jobs import Job, job_manager
 from utils import (
     TR_TZ,
@@ -411,6 +412,7 @@ def post_uret(tema_id: str, body: UretIstek):
 # ------------------------------------------------------- POST /api/temalar/{id}/istek
 class TalepIstek(BaseModel):
     metin: str
+    otomatik: bool = True  # F6: claude CLI ile otomatik uygulama
 
 
 COORDINATION_MD = os.path.join(os.path.dirname(TEMALAR_DIR), "COORDINATION.md")
@@ -440,7 +442,84 @@ def post_istek(tema_id: str, body: TalepIstek):
             with open(COORDINATION_MD, "w", encoding="utf-8") as f:
                 f.write(yeni_icerik)
 
-    return {"tema_id": tema_id, "kaydedildi": True}
+    # ---- F6 (2026-07-10): talebi headless `claude` CLI ile OTOMATİK uygula.
+    # Talep her durumda yukarıda kuyruğa yazıldı (kayıt kaybolmaz); CLI yoksa
+    # veya kullanıcı otomatiği kapattıysa davranış eskisiyle aynı kalır.
+    if not body.otomatik:
+        return {"tema_id": tema_id, "kaydedildi": True, "otomatik": False}
+
+    claude_cli = shutil.which("claude")
+    if not claude_cli:
+        return {
+            "tema_id": tema_id,
+            "kaydedildi": True,
+            "otomatik": False,
+            "not": "claude CLI bulunamadı — talep yalnızca kuyruğa yazıldı.",
+        }
+
+    metin = body.metin.strip()
+
+    def calistir(job: Job) -> None:
+        prompt = (
+            "Test Hazırlık deposunda çalışıyorsun. Önce SISTEM.md'yi (kural kitabı) oku.\n"
+            f"Kullanıcının web arayüzünden gönderdiği serbest talep '{tema_id}' temasıyla\n"
+            f"ilgili; temanın dosyaları temalar/{tema_id}/ altında (sorular.html +\n"
+            "manifest.json + assets/), ortak görünüm sistem/flow.css.\n\n"
+            f"TALEP: {metin}\n\n"
+            "Kurallar:\n"
+            "- SISTEM.md §2'ye uy: yeni blok id'si tNN-eNNN ek serisinden; mevcut\n"
+            "  id'leri DEĞİŞTİRME; soru çıkarmak = manifest'ten satırını silmek;\n"
+            "  sıra değiştirmek = manifest'te taşımak.\n"
+            "- SADECE dosya düzenlemesi yap; PDF üretme, komut çalıştırma, git commit\n"
+            "  atma — kullanıcı PDF'i arayüzdeki 'Yeniden Üret' düğmesiyle basacak.\n"
+            "- Talep belirsizse ya da bu temayla ilgili değilse TAHMİN ETME: neyin\n"
+            "  eksik/belirsiz olduğunu yaz ve dosya değiştirmeden bitir.\n"
+            "- Bitince yaptığın değişiklikleri 2-3 cümleyle Türkçe özetle.\n"
+        )
+        job.log(f"$ claude -p … --permission-mode acceptEdits --model sonnet (tema: {tema_id})")
+        try:
+            sonuc = subprocess.run(
+                [claude_cli, "-p", prompt, "--permission-mode", "acceptEdits", "--model", "sonnet"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=1200,
+            )
+        except subprocess.TimeoutExpired:
+            job.basarisiz("claude CLI 20 dakikalık zaman aşımına takıldı — talep elle incelenmeli.")
+            return
+        cikti = ((sonuc.stdout or "") + (("\n" + sonuc.stderr) if sonuc.stderr else "")).strip()
+        for log_satiri in cikti.splitlines():
+            job.log(log_satiri)
+        runs_jsonl_yaz(
+            tema_dir,
+            {
+                "islem": "istek",
+                "girdi": metin,
+                "dogrulama": "ok" if sonuc.returncode == 0 else f"HATA rc={sonuc.returncode}",
+                "ajan": "claude CLI (sonnet, F6)",
+            },
+        )
+        islem_gunlugu_yaz(
+            tema_dir,
+            "Arayüz - serbest talep (F6, claude CLI)",
+            [
+                f"Talep: {metin}",
+                "Sonuç: uygulandı" if sonuc.returncode == 0 else f"Sonuç: HATA (rc={sonuc.returncode})",
+            ],
+        )
+        if sonuc.returncode != 0:
+            job.basarisiz(f"claude CLI hata kodu {sonuc.returncode} döndürdü (loglara bakın).")
+            return
+        job.bitir({
+            "ozet": cikti[-1500:],
+            "not": "Değişiklikleri PDF'e yansıtmak için 'Yeniden Üret'i kullanın.",
+        })
+
+    job = job_manager.yeni_is("istek", calistir, tema_id=tema_id)
+    return {"tema_id": tema_id, "kaydedildi": True, "otomatik": True, "job_id": job.id}
 
 
 # ------------------------------------------------------- DELETE /api/temalar/{id}
