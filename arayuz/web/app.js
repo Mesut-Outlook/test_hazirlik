@@ -994,6 +994,12 @@
     state.sihirbaz.jobId = null;
     gotoView("anasayfa");
   });
+  // Sonuç ekranından tek tıkla yeni bir temaya başla — gotoView("sihirbaz")
+  // sihirbazSifirla()'yı çağırıp formu ve adımları 1. adıma döndürür.
+  el("#btn-adim3-yeni-tema").addEventListener("click", () => {
+    state.sihirbaz.jobId = null;
+    gotoView("sihirbaz");
+  });
 
   // ================= DÜZENLEME EKRANI =================
 
