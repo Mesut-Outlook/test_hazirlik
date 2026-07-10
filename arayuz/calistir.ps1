@@ -7,6 +7,15 @@ $BackendDir = Resolve-Path (Join-Path $ScriptDir "backend")
 $VenvDir = Join-Path $BackendDir "venv"
 $Port = 8756
 
+# Sunucu zaten çalışıyorsa ikinci bir kopya başlatma — sadece tarayıcıyı aç.
+# (Masaüstü kısayolundan çift tıklamalarda güvenli davranış.)
+$zaten = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+if ($zaten) {
+    Write-Host "[arayuz] Sunucu zaten çalışıyor — tarayıcı açılıyor: http://127.0.0.1:$Port" -ForegroundColor Green
+    Start-Process "http://127.0.0.1:$Port"
+    exit 0
+}
+
 # Python yolunu bul
 $PythonExe = "C:\Users\egemen\AppData\Local\Programs\Python\Python311\python.exe"
 if (-not (Test-Path $PythonExe)) {
