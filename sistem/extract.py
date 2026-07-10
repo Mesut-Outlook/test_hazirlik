@@ -596,6 +596,47 @@ def extract_figure_crops(page, pnum, figure_regions, assets_dir, start_idx=0):
 
 
 TESSERACT_BIN = shutil.which("tesseract")
+if not TESSERACT_BIN:
+    # Windows kurulumları (winget/UB-Mannheim) PATH'e eklemeyebiliyor —
+    # bilinen kurulum yerlerine de bak (F12 düzeltmesi, 2026-07-10).
+    for _aday in (
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+        r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        os.path.join(os.environ.get("LOCALAPPDATA", ""), "Programs", "Tesseract-OCR", "tesseract.exe"),
+    ):
+        if _aday and os.path.exists(_aday):
+            TESSERACT_BIN = _aday
+            break
+
+_TESSERACT_LANG = None
+
+
+def _tesseract_lang():
+    """Kurulu dil paketlerinden uygun olanı seçer (tur > eng > afr).
+
+    Makineye göre değişiyor: Linux kurulumunda yalnız afr+osd vardı,
+    Windows (UB-Mannheim) kurulumunda yalnız eng+osd geliyor. Latin
+    script'li herhangi bir paket hem rakam tanıma (F9) hem "EGEMEN
+    SARIKCI" arama (F12) için yeterli. Liste alınamazsa 'eng' varsayılır.
+    Sonuç modül düzeyinde önbelleğe alınır (koşu başına tek --list-langs)."""
+    global _TESSERACT_LANG
+    if _TESSERACT_LANG is not None:
+        return _TESSERACT_LANG
+    diller = []
+    if TESSERACT_BIN:
+        try:
+            sonuc = subprocess.run(
+                [TESSERACT_BIN, "--list-langs"],
+                capture_output=True, text=True, encoding="utf-8",
+                errors="replace", timeout=10,
+            )
+            diller = [s.strip() for s in (sonuc.stdout + sonuc.stderr).splitlines()]
+        except Exception:
+            pass
+    _TESSERACT_LANG = next((d for d in ("tur", "eng", "afr") if d in diller), "eng")
+    return _TESSERACT_LANG
+
+
 OCR_QNUM_RE = re.compile(r"^\s*\d{1,3}[.)]")
 
 
@@ -604,9 +645,8 @@ def ocr_detect_question_number(page, bbox, ocr_stats):
     yüksekliğin ~%25'i) bakıp orada bir soru numarası ("12." / "7)") olup olmadığını
     tesseract ile denetler (SADECE rakam+nokta+parantez beyaz-listesiyle, --psm 6).
 
-    Sistemde `eng` dil paketi YOK (yalnız afr+osd) — `-l eng` denemek her zaman
-    "Failed loading language" hatasıyla başarısız olur, bu yüzden `-l afr`
-    kullanılır (rakam tanımada dil script'i Latin olduğu sürece fark etmiyor).
+    Dil paketi makineye göre değişir (_tesseract_lang ile dinamik seçilir);
+    rakam tanımada dil script'i Latin olduğu sürece fark etmiyor.
     tesseract kurulu değilse/başarısız olursa SESSİZCE False döner — davranış
     OCR öncesiyle birebir aynı kalır (img-block olarak devam), bkz. ocr_stats.
     """
@@ -631,7 +671,7 @@ def ocr_detect_question_number(page, bbox, ocr_stats):
         sonuc = subprocess.run(
             [
                 TESSERACT_BIN, tmp_path, "stdout",
-                "-l", "afr", "--psm", "6",
+                "-l", _tesseract_lang(), "--psm", "6",
                 "-c", "tessedit_char_whitelist=0123456789.)",
             ],
             capture_output=True, text=True, timeout=10,
@@ -719,7 +759,7 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
     kelime dizisinin bbox BİRLEŞİMİNİ (küçük pay ile) BEYAZ doldurur.
 
     F9'daki (ocr_detect_question_number) çağrı deseniyle AYNI ikili/dil
-    (TESSERACT_BIN, -l afr — sistemde eng yok) kullanılır, ama burada TÜM
+    (TESSERACT_BIN, _tesseract_lang) kullanılır, ama burada TÜM
     sayfa taranacağı ve kelimelerin sayfa üzerindeki KONUMU gerektiği için
     `stdout` metin çıktısı yerine `tsv` (bbox'lı) config kullanılır.
 
@@ -741,7 +781,7 @@ def _redact_banned_text_on_pixmap(pix, banned_texts, pad=4.0):
         os.close(fd)
         pix.save(tmp_path)
         sonuc = subprocess.run(
-            [TESSERACT_BIN, tmp_path, "stdout", "-l", "afr", "--psm", "3", "tsv"],
+            [TESSERACT_BIN, tmp_path, "stdout", "-l", _tesseract_lang(), "--psm", "3", "tsv"],
             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60,
         )
         if sonuc.returncode != 0:
