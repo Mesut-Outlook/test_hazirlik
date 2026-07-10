@@ -1,0 +1,135 @@
+{
+  "olusturuldu": "2026-07-10T19:56:15+03:00",
+  "tema_dir": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\temalar\\101-6-tema-ver-3",
+  "tema": "101",
+  "baslik": "101. TEMA",
+  "surum": 2,
+  "kaynak_pdf": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\temalar\\101-6-tema-ver-3\\kaynak\\9.sınıf 6.tema.pdf",
+  "cikti_pdf": "C:\\Users\\egemen\\Documents\\_PROJELER\\Test Hazırlık\\cikti\\6.tema_ver_3_v2.pdf",
+  "cikti_sayfa": 15,
+  "kaynak_soru_tahmini": 77,
+  "cikti_soru_sayisi": 0,
+  "metin_sayisi": 0,
+  "gorsel_sayisi": 0,
+  "salt_gorsel_sayisi": 0,
+  "eslesen_sayisi": 0,
+  "eslesmeyen_sayisi": 0,
+  "gorsel_icerik_sayisi": 0,
+  "eslesmeyen_idler": [],
+  "gorsel_icerik_idler": [],
+  "olasi_kayip_numaralar": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "kaynak_metin_kisitli": false,
+  "kaynak_soru_tahmini_satir_bazli": 31,
+  "kaynak_soru_tahmini_span_bazli": 77,
+  "kaynak_soru_tahmini_yontemi": "span_bazli",
+  "sayfa_gorsel_karsilastirma": [
+    {
+      "sayfa": 1,
+      "kaynak": 6,
+      "cikti": 1
+    },
+    {
+      "sayfa": 2,
+      "kaynak": 3,
+      "cikti": 1
+    },
+    {
+      "sayfa": 3,
+      "kaynak": 8,
+      "cikti": 4
+    },
+    {
+      "sayfa": 4,
+      "kaynak": 10,
+      "cikti": 3
+    },
+    {
+      "sayfa": 5,
+      "kaynak": 10,
+      "cikti": 4
+    },
+    {
+      "sayfa": 6,
+      "kaynak": 7,
+      "cikti": 1
+    },
+    {
+      "sayfa": 7,
+      "kaynak": 4,
+      "cikti": 2
+    },
+    {
+      "sayfa": 8,
+      "kaynak": 4,
+      "cikti": 2
+    },
+    {
+      "sayfa": 9,
+      "kaynak": 6,
+      "cikti": 4
+    },
+    {
+      "sayfa": 10,
+      "kaynak": 7,
+      "cikti": 5
+    },
+    {
+      "sayfa": 11,
+      "kaynak": 10,
+      "cikti": 7
+    },
+    {
+      "sayfa": 12,
+      "kaynak": 13,
+      "cikti": 12
+    },
+    {
+      "sayfa": 13,
+      "kaynak": 9,
+      "cikti": 8
+    },
+    {
+      "sayfa": 14,
+      "kaynak": 5,
+      "cikti": 4
+    },
+    {
+      "sayfa": 15,
+      "kaynak": 8,
+      "cikti": 7
+    }
+  ],
+  "olasi_eksik_gorsel_sayfalar": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "yontem_notu": "Kaynak soru sayısı için İKİ bağımsız TAHMİN hesaplanır — (1) satır bazlı: satır başında '12.'/'12)' + AYNI SATIRDA devam metni arar; (2) span bazlı (F10): get_text('dict')'te satırın İLK span'ı tam olarak '12.'/'12)' ise sayar (taranmış/görsel ağırlıklı kaynaklarda soru numarası kendi satırında yalnız durur, devam metni resim olduğu için satırda YOKTUR — yöntem 1 bunu kaçırır). Nihai tahmin ikisinin BÜYÜĞÜdür (bu koşuda: span_bazli); her iki ham değer de kaynak_soru_tahmini_satir_bazli / kaynak_soru_tahmini_span_bazli alanlarında saklanır. Cevap anahtarı satırları (örn. '1.B 2.A 3.C') her iki yöntemde de elenir. Aktarım kontrolü her çıktı sorusunun ilk ~40 normalize karakterini kaynak metninde arar, kısa/salt-görsel sorular karşılaştırma dışı tutulur. Sayfa bazlı görsel karşılaştırması (sayfa_gorsel_karsilastirma / olasi_eksik_gorsel_sayfalar) kaynaktaki basitleştirilmiş görsel-bölge sayımını (extract.py'nin gömülü görüntü + büyük vektör çizim kümesi mantığının basit bir kopyası, extract.py'nin kendisi ÇALIŞTIRILMADI) çıktıdaki aynı kaynak sayfaya bağlı <img> sayısıyla karşılaştırır — extract.py'nin banner/tekil-dolgu istisnaları burada yok, bu yüzden bir miktar yanlış pozitif (abartılı 'olası eksik') beklenir; kesin/otomatik doğrulama için qa/dogrula.py'ye bakın."
+}

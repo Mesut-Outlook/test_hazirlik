@@ -971,9 +971,17 @@ def sort_blocks_reading_order(blocks):
 
 def is_footer_block(block, page_height):
     x0, y0, x1, y1 = block["bbox"]
+    text = block_full_text(block).strip()
+    # Sayfa numarası / Üst-Alt bilgi kontrolü:
+    # Sayfanın en üstünde (y1 < 80pt) veya en altında (y0 > page_height - 80pt) yer alan
+    # ve yalnızca 1-4 haneli sayılardan oluşan bloklar elenir.
+    if bool(re.fullmatch(r"\d{1,4}", text)):
+        if y1 < 80.0 or y0 > page_height - 80.0:
+            return True
+    
+    # Standart footer bandı kontrolü
     if y0 < page_height - FOOTER_Y_MARGIN:
         return False
-    text = block_full_text(block).strip()
     return bool(re.fullmatch(r"\d{1,4}", text))
 
 
