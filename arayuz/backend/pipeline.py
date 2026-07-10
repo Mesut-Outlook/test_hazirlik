@@ -27,7 +27,7 @@ class KomutHatasi(RuntimeError):
 
 def _calistir(komut: list[str], log: callable, cwd: str = REPO_ROOT, izin_verilen_donus: tuple[int, ...] = (0,)) -> str:
     log(f"$ {' '.join(komut)}")
-    sonuc = subprocess.run(komut, cwd=cwd, capture_output=True, text=True)
+    sonuc = subprocess.run(komut, cwd=cwd, capture_output=True, encoding="utf-8", errors="ignore")
     cikti = (sonuc.stdout or "") + (sonuc.stderr or "")
     for satir in cikti.splitlines():
         log(satir)
@@ -74,7 +74,7 @@ def pdf_sayfa_sayisi(pdf_path: str) -> int | None:
     pdfinfo = shutil.which("pdfinfo")
     if not pdfinfo or not os.path.exists(pdf_path):
         return None
-    sonuc = subprocess.run([pdfinfo, pdf_path], capture_output=True, text=True)
+    sonuc = subprocess.run([pdfinfo, pdf_path], capture_output=True, encoding="utf-8", errors="ignore")
     for satir in sonuc.stdout.splitlines():
         if satir.startswith("Pages:"):
             try:

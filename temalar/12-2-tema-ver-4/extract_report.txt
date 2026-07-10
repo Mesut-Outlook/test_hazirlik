@@ -1,0 +1,32 @@
+========================================================================
+EXTRACTION REPORT
+========================================================================
+Timestamp: 2026-07-10T17:10:08.430350
+PDF Input: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\temalar\12-2-tema-ver-4\kaynak\2.tema.pdf
+Output Directory: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\temalar\12-2-tema-ver-4
+Tema No: 12
+Profile: metin_yayinlari
+Pages Processed: 84
+Total Pages in PDF: 84
+Yasaklı metin silinen satır sayısı (yasakli_metinler): 84
+------------------------------------------------------------------------
+TAM SAYFA MODU (F12 — resim tabanlı sayfalar):
+  Mod: tam_sayfa
+  Tam sayfa modu: 84 sayfa; yasaklı metin silinen bölge: 318
+------------------------------------------------------------------------
+STATISTICS:
+  Questions Found: 0
+  Theory Boxes Found: 0
+  Kur-tags Found: 0
+  Answer Keys Found: 0
+  Images Found (Raster + Figure crops): 84
+  Fallback Paragraphs: 0
+  Root Mathematical Symbols Converted: 0
+------------------------------------------------------------------------
+OCR (F9 — img-block -> question sınıflandırma):
+  Denendi: 0
+  Soruya çevrildi: 0
+  Eşleşmedi (img-block kaldı): 0
+------------------------------------------------------------------------
+No warnings or errors reported during extraction.
+========================================================================

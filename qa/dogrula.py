@@ -10,7 +10,7 @@ her extract+print kosusundan sonra calistirilmasi tavsiye edilir.
 
 Kullanim:
     python3 qa/dogrula.py [kaynak.pdf] [cikti.pdf]
-    (parametresiz calistirilirsa depo kokundeki v2 ve build_linux/v3_taslak2.pdf kullanilir)
+    (parametresiz calistirilirsa depo kokundeki v2 ve cikti/1.tema_egemen_sarikci_v3.pdf kullanilir)
 """
 import os
 import subprocess
@@ -23,7 +23,8 @@ DEFAULT_V3 = os.path.join(REPO_ROOT, "cikti", "1.tema_egemen_sarikci_v3.pdf")
 
 
 def get_text(path):
-    return subprocess.run(["pdftotext", "-layout", path, "-"], capture_output=True, text=True).stdout
+    res = subprocess.run(["pdftotext", "-layout", path, "-"], capture_output=True)
+    return res.stdout.decode('utf-8', errors='ignore')
 
 
 PHRASES = [
@@ -94,8 +95,8 @@ def main():
 
     print()
     print("Sayfa sayilari:")
-    info2 = subprocess.run(["pdfinfo", v2], capture_output=True, text=True).stdout
-    info3 = subprocess.run(["pdfinfo", v3], capture_output=True, text=True).stdout
+    info2 = subprocess.run(["pdfinfo", v2], capture_output=True, encoding="utf-8", errors="ignore").stdout
+    info3 = subprocess.run(["pdfinfo", v3], capture_output=True, encoding="utf-8", errors="ignore").stdout
     for line in info2.splitlines():
         if line.startswith("Pages"):
             print("  v2:", line)
@@ -131,7 +132,7 @@ def main():
                     dup_found = True
         
         if not dup_found:
-            print("  Tüm görseller benzersiz, mükerrer görsel tespiti temiz. ✓")
+            print("  Tüm görseller benzersiz, mükerrer görsel tespiti temiz. [OK]")
         else:
             all_ok = False
 

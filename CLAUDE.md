@@ -17,6 +17,9 @@
 > - Windows uyumluluğu: `arayuz/calistir.ps1` (başlatıcı), print.mjs Chrome/Edge
 >   yol tespiti, pipeline `sys.executable`, tesseract bilinen-kurulum-yolu tespiti
 >   (winget `UB-Mannheim.TesseractOCR` kurulu; diller eng+osd, dil dinamik seçilir).
+>   Ayrıca Windows cp1254 terminal/subprocess Türkçe kodlama uyuşmazlığı ve Unicode
+>   çökme hataları qa/dogrula.py, sistem/extract.py ve arayuz/backend/pipeline.py
+>   dosyalarında çözüldü.
 > - Arayüz tema kartlarında "son güncelleme" zaman rozeti.
 >
 > **Tarihçe (2026-07-05, FAZ 3 — Linux):** Proje bir süre kullanıcının Linux

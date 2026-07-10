@@ -151,7 +151,7 @@ Her çalıştırma iki yere yazar:
 6. **Anahtar ifade sayımı** (FAZ 3 dersi): bölüm başlıkları ("ISINMA HAREKETLERİ",
    "PİST ALANI"…), "Kurgusu" etiketleri ve "işleminin sonucu kaçtır" gibi kritik
    ifadelerin kaynak↔çıktı adet EŞİTLİĞİ otomatik kontrol edilir (örnek uygulama:
-   `build_linux/qa/dogrula.py`; CSS text-transform büyük harfe çevirebilir,
+   `qa/dogrula.py`; CSS text-transform büyük harfe çevirebilir,
    karşılaştırmayı buna dayanıklı yap).
 7. **Blok tekrarı taraması** (FAZ 3 dersi — bilinen tuzak): Chrome, tek sürekli
    çok-sütunlu (multicol) akışta `break-inside:avoid`'lu büyük blokları (tablo, görselli

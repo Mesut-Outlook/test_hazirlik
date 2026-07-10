@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-extract.py — v2 PDF -> sorular.html + manifest.json + assets/ (build_linux)
+extract.py — v2 PDF -> sorular.html + manifest.json + assets/ (sistem)
 
 FAZ 3 / Görev A4a (Claude-Sonnet #5) — YAPISAL DÜZELTME sürümü.
 
@@ -97,6 +97,20 @@ FRAC_Y_GAP = 6.0                 # pt — pay/payda ile çizgi arası izin veril
 FRAC_X_PAD = 2.2                 # pt — pay/payda yatay taşma toleransı
 FOOTER_Y_MARGIN = 42.0           # pt — sayfa altından bu kadarı footer bandı sayılır
 PROSE_WORD_RE = re.compile(r"[a-zA-ZçğıöşüÇĞİÖŞÜ]{4,}\s+[a-zA-ZçğıöşüÇĞİÖŞÜ]{3,}")
+
+# F13 (2026-07-10) — "sayfa_sadik" düzen modu: kaynak sayfa geometrisi ->
+# baskı alanı mm dönüşümü. print.mjs marginleri (üst 1.15in≈29.21mm, alt
+# 0.5in≈12.7mm, sol/sağ 0.4in≈10.16mm) A4'ten (210x297mm) düşülünce ortaya
+# çıkan basılabilir alan: genişlik ≈189.7mm, yükseklik ≈254.5mm (COORDINATION.md
+# F13 görev tanımındaki sabitler AYNEN kullanılıyor). PF_MAX_H_MM, 254.5mm'in
+# hemen altında küçük bir güvenlik payı — Chrome'un kırılım hesaplaması
+# yuvarlama yüzünden 254.5mm'i taşırsa oluşabilecek "ikinci boş sayfa"yı önler.
+PT_TO_MM = 0.3528
+PF_PRINT_W_MM = 189.7
+PF_PRINT_H_MM = 254.5
+PF_MAX_H_MM = 253.0
+PF_SIZE_GROUP_TOL = 1.5          # pt — ardışık satırları "aynı punto grubu" sayma toleransı
+PF_SIZE_OVERRIDE_TOL = 1.5       # pt — blok medyanından bu kadar sapan satır grubu kendi font-size'ını alır
 
 
 _TR_UPPER_MAP = str.maketrans({"i": "İ", "ı": "I"})
@@ -676,7 +690,7 @@ def ocr_detect_question_number(page, bbox, ocr_stats):
                 "-l", _tesseract_lang(), "--psm", "6",
                 "-c", "tessedit_char_whitelist=0123456789.)",
             ],
-            capture_output=True, text=True, timeout=10,
+            capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=10,
         )
         if sonuc.returncode != 0:
             ocr_stats["atlandi_tesseract_hatasi"] = ocr_stats.get("atlandi_tesseract_hatasi", 0) + 1
@@ -1382,6 +1396,68 @@ def parse_question_options_from_tokens(tokens):
 
 
 # ---------------------------------------------------------------------------
+# F13 (2026-07-10) — "sayfa_sadik" düzen modu yardımcıları
+# ---------------------------------------------------------------------------
+def _line_median_size(line):
+    sizes = [sp["size"] for sp in line.get("spans", ()) if sp.get("size")]
+    if not sizes:
+        return 10.0
+    sizes.sort()
+    return sizes[len(sizes) // 2]
+
+
+def group_lines_by_size(lines, tol=PF_SIZE_GROUP_TOL):
+    """Ardışık satırları benzer punto büyüklüğüne göre gruplar — sayfa_sadik
+    modunda blok-bazlı font boyutlandırma + "blokta belirgin farklı boyutlu
+    başlık satırı varsa o satırı kendi font-size'ıyla sar" istisnası için
+    (bkz. COORDINATION.md F13). Dönüş: [(medyan_punto, [line, ...]), ...]."""
+    groups = []
+    for line in lines:
+        if not line.get("spans"):
+            continue
+        sz = _line_median_size(line)
+        if groups and abs(groups[-1][0] - sz) <= tol:
+            groups[-1][1].append(line)
+        else:
+            groups.append((sz, [line]))
+    return groups
+
+
+def render_page_faithful_text_block(block, process_blocks_together, block_base_size, scale):
+    """Bir metin blokunu sayfa_sadik modu için TEK bir HTML parçasına
+    dönüştürür. MEVCUT span->HTML zincirini (process_blocks_together +
+    tokens_to_html — .rt kök / .frac kesir / .sup .sub, satır birleştirme
+    kuralları) satır-grubu bazında yeniden kullanır; blok geneli için
+    block_base_size (blok medyanı) CSS font-size'ı olarak kullanılır, ama
+    ardışık satırlar arasında belirgin (>PF_SIZE_OVERRIDE_TOL pt) punto
+    farkı varsa o satır grubu kendi <span style="font-size:...pt"> sargısını
+    alır (span bazlı değil, SATIR GRUBU bazlı — "basit tut" talimatı)."""
+    lines = block.get("lines", [])
+    groups = group_lines_by_size(lines)
+    if not groups:
+        return ""
+    parts = []
+    for gi, (gsize, glines) in enumerate(groups):
+        sub_block = dict(block)
+        sub_block["lines"] = glines
+        sub_tokens = process_blocks_together([sub_block])
+        # base_size GRUBUN kendi medyanı: sup/sub (üs/kök derecesi) tespiti
+        # her zaman KENDİ satırının puntosuna göreli olmalı — blok geneline
+        # göre kıyaslarsak, punto farkı büyük bir başlık grubundaki HER
+        # karakter yanlışlıkla "küçük/üs" sanılır.
+        sub_html = tokens_to_html(sub_tokens, base_size=gsize)
+        if not sub_html.strip():
+            continue
+        if gi > 0:
+            parts.append("<br>\n")
+        if abs(gsize - block_base_size) > PF_SIZE_OVERRIDE_TOL:
+            parts.append(f'<span style="font-size:{gsize * scale:.2f}pt">{sub_html}</span>')
+        else:
+            parts.append(sub_html)
+    return "".join(parts)
+
+
+# ---------------------------------------------------------------------------
 # Ana çıkarım
 # ---------------------------------------------------------------------------
 def main():
@@ -1443,6 +1519,12 @@ def main():
         # Bir sayfanın "resim tabanlı" sayılması için eşikler (bkz. COORDINATION.md F12).
         "tam_sayfa_metin_esigi": 60,
         "tam_sayfa_alan_orani": 0.70,
+        # F13 (2026-07-10) — sayfa yerleşim modu: "sayfa_sadik" (VARSAYILAN) =
+        # TÜM sayfalar orijinal yerleşimle (öğeler kaynak sayfadaki konumunda,
+        # .page-faithful konteyneri) üretilir; "akis" = FAZ 3'ten beri var olan
+        # iki sütunlu yeniden akıtma davranışı AYNEN (soru/theory-box/kur-tag
+        # sınıflandırması + çözüm boşlukları).
+        "duzen_modu": "sayfa_sadik",
     }
 
     # Profil yükleme
@@ -1479,6 +1561,8 @@ def main():
     taranmis_sayfa_modu = profile.get("taranmis_sayfa_modu", "tam_sayfa")
     tam_sayfa_metin_esigi = profile.get("tam_sayfa_metin_esigi", 60)
     tam_sayfa_alan_orani = profile.get("tam_sayfa_alan_orani", 0.70)
+    duzen_modu = profile.get("duzen_modu", "sayfa_sadik")
+    sayfa_sadik_count = 0
 
     for pnum in page_range:
         page = doc[pnum]
@@ -1514,6 +1598,13 @@ def main():
             if x1 - x0 > 180.0:
                 continue
             fraction_bars.append((x0, y0, x1, y1))
+
+        # F13: erken kuruluyor — hem "sayfa_sadik" (aşağıda, resim-tabanlı
+        # olmayan sayfalar için) hem "akis" (daha aşağıda) modu AYNI
+        # span->HTML dönüşüm zincirini (kesir/kök gruplama + satır
+        # birleştirme) kullanıyor.
+        process_spans = make_span_grouper(fraction_bars, root_bar_for)
+        process_blocks_together = make_block_grouper(process_spans, root_bar_for, thin_bars)
 
         theory_boxes = collect_theory_boxes(drawings, profile=profile)
 
@@ -1595,6 +1686,88 @@ def main():
         all_images = page_images + figure_crops
         g_count += len(all_images)
 
+        # --- F13 (2026-07-10): "sayfa_sadik" düzen modu ----------------------
+        # Resim tabanlı olmayan (yukarıdaki tam_sayfa dalı zaten hallettiği
+        # taranmış sayfalar HARİÇ) her sayfa TEK bir `.page-faithful`
+        # konteynerine dönüşür; her metin bloğu/görsel kaynak PDF'teki mm
+        # konumuna `position:absolute` `.pf-item` olarak yerleştirilir. "akis"
+        # modunun band/sütun/soru-sınıflandırma mantığına HİÇ girilmez.
+        if duzen_modu == "sayfa_sadik":
+            kaynak_gen_mm = page.rect.width * PT_TO_MM
+            kaynak_yuk_mm = page.rect.height * PT_TO_MM
+            scale = 1.0
+            if kaynak_gen_mm > 0 and kaynak_yuk_mm > 0:
+                scale = min(PF_PRINT_W_MM / kaynak_gen_mm, PF_PRINT_H_MM / kaynak_yuk_mm)
+            pf_w_mm = kaynak_gen_mm * scale
+            pf_h_mm = min(kaynak_yuk_mm * scale, PF_MAX_H_MM)
+
+            pf_items_html = []
+
+            # a) Görseller (raster + vektör-şekil kırpmaları) — konum/genişlik
+            # bbox × PT_TO_MM × scale; yükseklik CSS'te auto (en-boy oranı
+            # kırpma pixelleriyle zaten korunuyor).
+            for img in all_images:
+                ix0, iy0, ix1, iy1 = img["bbox"]
+                left_mm = ix0 * PT_TO_MM * scale
+                top_mm = iy0 * PT_TO_MM * scale
+                w_mm = (ix1 - ix0) * PT_TO_MM * scale
+                pf_items_html.append(
+                    f'<img class="pf-item" src="{img["path"]}" '
+                    f'style="left:{left_mm:.2f}mm;top:{top_mm:.2f}mm;width:{w_mm:.2f}mm;">'
+                )
+
+            # b) Metin blokları — görsel bölgeleriyle çakışanlar (çift baskı
+            # önleme, mevcut eşik 0.55 — bkz. akış modunun aynı adımı),
+            # footer bandı ve kur/bölüm rozeti satırları (F13: sayfa_sadik
+            # modda TAMAMEN atlanır) hariç, kalanlar konumlarında basılır.
+            for b in text_dict["blocks"]:
+                if "lines" not in b or not b["lines"]:
+                    continue
+                if is_footer_block(b, page_height):
+                    continue
+                bbox = b["bbox"]
+                if any(overlap_ratio(bbox, img["bbox"]) > 0.55 for img in all_images):
+                    continue
+                text_str = block_full_text(b).strip()
+                if not text_str:
+                    continue
+                if any(ks in turkish_upper(text_str) for ks in known_sections):
+                    continue  # kur rozeti / bölüm başlığı satırı — atlanır
+
+                spans_flat = block_spans_flat(b)
+                sizes = [sp["size"] for sp in spans_flat if sp.get("size")]
+                block_base_size = sorted(sizes)[len(sizes) // 2] if sizes else 10.0
+
+                content_html = render_page_faithful_text_block(
+                    b, process_blocks_together, block_base_size, scale
+                )
+                if not content_html.strip():
+                    continue
+
+                bx0, by0, bx1, by1 = bbox
+                left_mm = bx0 * PT_TO_MM * scale
+                top_mm = by0 * PT_TO_MM * scale
+                w_mm = (bx1 - bx0) * PT_TO_MM * 1.04 * scale + 1.0
+                font_pt = block_base_size * scale
+
+                pf_items_html.append(
+                    f'<div class="pf-item" style="left:{left_mm:.2f}mm;top:{top_mm:.2f}mm;'
+                    f'width:{w_mm:.2f}mm;font-size:{font_pt:.2f}pt;line-height:1.15;">'
+                    f'{content_html}</div>'
+                )
+
+            sayfa_sadik_count += 1
+            block_id = f"t{args.tema}-p{pnum + 1:03d}"
+            inner = "\n    ".join(pf_items_html)
+            html = (
+                f'<section class="page-faithful" id="{block_id}" data-kaynak-sayfa="{pnum+1}" '
+                f'style="width:{pf_w_mm:.2f}mm;height:{pf_h_mm:.2f}mm;">\n'
+                f'    {inner}\n  </section>'
+            )
+            blocks_db.append((block_id, html))
+            manifest_akis.append({"sayfa": pnum + 1, "bloklar": [block_id]})
+            continue  # bu sayfa için "akis" modunun band/sınıflandırma yolu ÇALIŞMAZ
+
         # 2. Footer (sayfa altı v2 numarası) süzme
         def keep_block(b):
             if "lines" not in b:
@@ -1661,9 +1834,6 @@ def main():
                         break
             if not inserted:
                 final_blocks.append(img)
-
-        process_spans = make_span_grouper(fraction_bars, root_bar_for)
-        process_blocks_together = make_block_grouper(process_spans, root_bar_for, thin_bars)
 
         page_manifest_blocks = []
         current_block_idx = 0

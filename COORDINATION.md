@@ -1513,6 +1513,7 @@ incelemeli. (Claude-Sonnet #4, X1, 2026-07-05)
   - Eski geçmişin TAM yedeği: `../test_hazirlik_gecmis_yedegi.bundle` (114 MB;
     silinen 03-ekonomi-6 dahil her şey gerekirse buradan kurtarılır:
     `git clone test_hazirlik_gecmis_yedegi.bundle eski_hali`).
+- 2026-07-10 (AGY - Antigravity): Windows ortamında Türkçe kod sayfası (cp1254) uyuşmazlığından kaynaklanan UnicodeEncodeError ve UnicodeDecodeError hataları giderildi. `qa/dogrula.py`, `sistem/extract.py` ve `arayuz/backend/pipeline.py` dosyalarındaki subprocess çağrıları ve log yazdırma adımları UTF-8 encoding desteği ile güncellendi.
 
 ## F9 — img-block'ların soruya dönüştürülmesi (AÇILDI 2026-07-08, plan: Fable, kod: Sonnet) — ✅ tamam (2026-07-10)
 
@@ -1729,3 +1730,66 @@ olmaz; (c) assemble+print sonrası PDF'te tam-sayfa görüntüler tek sayfaya
 sığar, logo her sayfada üst ortada; (d) 01-tema yeniden ÜRETİLMEZ (ID
 dondurma), değişiklik yalnızca yeni koşuları etkiler; (e) tesseract'sız
 ortamda davranış: sayfa yine tam sayfa korunur + rapora uyarı düşer.
+
+## F13 — Sayfa-sadık düzen: TÜM sayfalar orijinal yerleşimle (AÇILDI 2026-07-10, plan: Fable, kod: Sonnet alt-ajan)
+
+**Kullanıcı isteği (2026-07-10):** Hem resim hem metin içeren sayfalar dahil,
+çalışma SAYFA SAYFA yapılsın; her öğe (metin bloğu, görsel) orijinal sayfadaki
+KONUMUNA birebir yerleştirilsin, belge orijinal dizilimi korusun. Kapsam sorusuna
+kullanıcı yanıtı: **TÜM sayfalar** (iki sütunlu yeniden akıtma ve eklenen çözüm
+boşlukları varsayılan olarak devre dışı). Ayrıca "her sayfayı ayrı PDF yapıp
+birleştirme" fikri değerlendirildi ve REDDEDİLDİ: tek HTML'de sayfa başına
+konteyner + tek print koşusu aynı sonucu sayfa no/logo tutarlılığıyla verir.
+
+**Kapsam:**
+1. `sistem/extract.py` — yeni profil ayarı `duzen_modu: "sayfa_sadik"
+   (VARSAYILAN) | "akis"` ("akis" = bugünkü iki sütunlu davranış aynen).
+   sayfa_sadik modunda:
+   - Resim tabanlı sayfalar F12 tam_sayfa yolundan AYNEN devam eder.
+   - Diğer tüm sayfalar (metin/karma) `.page-faithful` sayfa konteyneri olur:
+     `<section class="page-faithful" id="tNN-pNNN" data-kaynak-sayfa="N">`
+     içinde her öğe `position:absolute` `.pf-item` olarak, kaynak bbox'ından
+     hesaplanan mm konum/boyutla yerleştirilir.
+   - Ölçek: kaynak sayfa (pt) → baskı alanı (189.7mm × ~255mm; print.mjs
+     marginleri: üst 1.15in, alt 0.5in, yan 0.4in) `scale = min(gen_orani,
+     yuk_orani)` ile; konumlar VE font boyutları (span pt × scale) aynı
+     ölçekle. Konteyner sabit boyutlu, yatayda ortalanır,
+     `break-before/after: page`.
+   - Metin öğeleri MEVCUT dönüşümlerden geçer: yasaklı satır filtresi, KUR
+     rozeti atma, `.rt/.frac/.sup/.sub` matematik, satır sonları kaynak
+     satırlarına göre. Görseller mevcut kümeleme/kırpma ile assets'e, konumuna.
+   - Comic Sans kaynaktan geniş olduğundan taşma riski: öğe genişliği bbox
+     genişliği + küçük pay, `line-height` sıkı; QA'da bariz üst üste binme
+     aranır.
+   - Manifest: sayfa başına TEK blok id (soru düzeyi taşıma bu modda yok —
+     belge zaten orijinal dizilimi hedefliyor; "akis" modu bunun kaçış yolu).
+2. `sistem/flow.css` — `.page-faithful` / `.pf-item` sınıfları (sabit mm boyut,
+   relative konteyner + absolute öğeler, sayfa başına bir kaynak sayfa, ikinci
+   boş sayfa üretmeme).
+3. NOT: Çalışma ağacında AGY'nin COMMIT'LENMEMİŞ UTF-8 düzeltmeleri var
+   (extract.py/pipeline.py/dogrula.py) — KORUNACAK, checkout/reset YASAK.
+
+**Kabul ölçütleri:** (a) 01-tema kaynağı (metin tabanlı v2) scratch'e yeni modla
+çıkarılıp basıldığında örneklem sayfalar kaynakla yan yana görsel karşılaştırmada
+aynı yerleşimi verir (öğeler doğru konumda, bariz üst üste binme yok); (b) metin
+öğelerinde matematik dönüşümü ve yasaklı metin filtresi çalışır, KUR rozetleri
+yok; (c) resim tabanlı sayfalar (08/11 kaynakları) F12 davranışını aynen korur;
+(d) profilde `duzen_modu: "akis"` ile eski davranış birebir geri gelir;
+(e) mevcut temalar yeniden üretilmez.
+
+## Windows / Türkçe CP1254 Karakter Uyuşmazlığı ve Hata Düzeltmeleri (AÇILDI 2026-07-10, plan: AGY, kod: AGY) — ✅ tamam (2026-07-10)
+
+**Sorun:** Windows işletim sisteminde terminal kod sayfasının varsayılan olarak `cp1254` (Windows Türkçe) olması nedeniyle, python `subprocess` çağrıları ve Unicode karakterlerin standart terminal çıktısına yazdırılması sırasında `UnicodeDecodeError` ve `UnicodeEncodeError` hataları fırlatılıyordu. Bu durum hem `qa/dogrula.py` doğrulama betiğinin hem de FastAPI backend motorunun çalışırken çökmesine sebep oluyordu.
+
+**Yapılanlar / Kapsam:**
+1. **`qa/dogrula.py`**:
+   - `get_text()` fonksiyonunda `pdftotext` çağrısının çıktısı `text=True` yerine raw byte olarak alınıp `stdout.decode('utf-8', errors='ignore')` ile decode edildi.
+   - `pdfinfo` subprocess çağrılarında `encoding="utf-8", errors="ignore"` parametreleri eklendi.
+   - Çıktıdaki `✓` onay işareti cp1254 terminalinde hata fırlattığı için `[OK]` ile değiştirildi.
+2. **`sistem/extract.py`**:
+   - `ocr_detect_question_number` içerisindeki tesseract subprocess çağrısına `encoding="utf-8", errors="replace"` parametreleri eklenerek olası stderr/stdout kodlama hataları engellendi.
+3. **`arayuz/backend/pipeline.py`**:
+   - `_calistir()` fonksiyonundaki ana subprocess çalıştırıcısına `encoding="utf-8", errors="ignore"` eklenerek, backend'in tüm sistem betiklerini (extract, assemble, print, rapor vb.) çağırırken oluşabilecek kodlama hataları önlendi.
+   - `pdf_sayfa_sayisi()` içerisindeki `pdfinfo` çağrısı `encoding="utf-8", errors="ignore"` ile güvenli hale getirildi.
+
+**Kabul ölçütleri:** (a) Windows terminalinde `python qa/dogrula.py` komutu hatasız bir şekilde tamamlandı ve hedef ifade sayımları ile sayfa sayıları başarıyla listelendi (Exit code: 0); (b) Arayüz backend pipeline'ı kodlama çökmesi olmadan çalışmaya elverişli hale getirildi.
