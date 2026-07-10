@@ -31,12 +31,16 @@ def main():
         sorular_content = f.read()
 
     blocks = {}
-    pattern = re.compile(r'<(section|div)\s+class="([^"]+)"\s+id="([^"]+)"\s+data-kaynak-sayfa="([^"]+)"[^>]*>(.*?)</\1>', re.DOTALL)
+    # F13 düzeltmesi (2026-07-10): açılış tag'inin TÜM öznitelikleri (style
+    # dahil — .page-faithful konteynerleri mm boyutlarını inline style'da
+    # taşır) olduğu gibi korunur; eskiden class/id/page yeniden kurulurken
+    # diğer öznitelikler sessizce düşüyordu.
+    pattern = re.compile(r'<(section|div)(\s+class="[^"]*"\s+id="([^"]+)"\s+data-kaynak-sayfa="[^"]*"[^>]*)>(.*?)</\1>', re.DOTALL)
     duplicates = []
-    for tag, cls, b_id, page, inner in pattern.findall(sorular_content):
+    for tag, attrs, b_id, inner in pattern.findall(sorular_content):
         if b_id in blocks:
             duplicates.append(b_id)
-        blocks[b_id] = f'<{tag} class="{cls}" id="{b_id}" data-kaynak-sayfa="{page}">{inner}</{tag}>'
+        blocks[b_id] = f'<{tag}{attrs}>{inner}</{tag}>'
     if duplicates:
         # SISTEM.md 2: id kalici ve TEKIL olmali; cakisma sessizce blok kaybettirir.
         print(f"HATA: sorular.html icinde mukerrer id: {sorted(set(duplicates))}")

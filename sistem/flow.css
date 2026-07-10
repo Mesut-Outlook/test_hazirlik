@@ -355,6 +355,34 @@ body {
   margin: 0 auto;
 }
 
+/* ---------- F13 (2026-07-10): sayfa-sadık düzen (duzen_modu: sayfa_sadik) ----
+   Her kaynak sayfa, extract.py'nin mm cinsinden boyutlandırdığı (inline
+   width/height) TEK bir .page-faithful konteyneri olur; içindeki her öğe
+   (.pf-item) kaynak PDF'teki bbox konumuna position:absolute ile yerleşir.
+   Konteyner iki sütunlu akışın içinde column-span:all ile tam genişlik alır,
+   sayfa başına bir kaynak sayfa basılır (break-before/after). Yükseklik
+   extract tarafında 253mm ile sınırlandığı için ikinci boş sayfa oluşmaz;
+   overflow:hidden, taşan tek tük öğenin kırılım hesabını bozmasını önler. */
+.page-faithful {
+  position: relative;
+  display: block;
+  column-span: all;
+  margin: 0 auto;
+  padding: 0;
+  break-before: page;
+  break-after: page;
+  break-inside: avoid;
+  overflow: hidden;
+}
+.page-faithful .pf-item {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+}
+.page-faithful img.pf-item {
+  height: auto;
+}
+
 /* ---------- Ayraç (soru arası noktalı çizgi, v2'de görülüyor) ---------- */
 .qsep {
   border: none;
