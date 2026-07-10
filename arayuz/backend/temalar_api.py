@@ -45,6 +45,27 @@ def _slugla(ad: str) -> str:
     return ad or "tema"
 
 
+def _tema_guncellenme(tema_dir: str) -> str | None:
+    """Tema kartında gösterilen 'son güncelleme' zamanı: manifest/sorular/meta
+    dosyalarından en yenisinin mtime'ı (extract, blok düzenleme ve üretim
+    hepsi bunlardan en az birine dokunur); hiçbiri yoksa klasörün mtime'ı."""
+    en_son = None
+    for ad in ("manifest.json", "sorular.html", "tema_meta.json"):
+        yol = os.path.join(tema_dir, ad)
+        try:
+            mt = os.path.getmtime(yol)
+        except OSError:
+            continue
+        if en_son is None or mt > en_son:
+            en_son = mt
+    if en_son is None:
+        try:
+            en_son = os.path.getmtime(tema_dir)
+        except OSError:
+            return None
+    return datetime.fromtimestamp(en_son, TR_TZ).isoformat(timespec="seconds")
+
+
 # ---------------------------------------------------------------- GET /api/temalar
 @router.get("/api/temalar")
 def get_temalar():
@@ -68,6 +89,7 @@ def get_temalar():
                     "job_id": meta.get("son_extract_job"),
                     "surum": None,
                     "soru_sayisi": None,
+                    "guncellenme": _tema_guncellenme(tema_dir),
                 }
             )
             continue
@@ -83,6 +105,7 @@ def get_temalar():
                     "hata": str(exc),
                     "surum": None,
                     "soru_sayisi": None,
+                    "guncellenme": _tema_guncellenme(tema_dir),
                 }
             )
             continue
@@ -99,6 +122,7 @@ def get_temalar():
                 "kok_sayisi": sayimlar["kok"],
                 "gorsel_sayisi": sayimlar["gorsel"],
                 "son_pdf": son_pdf,
+                "guncellenme": _tema_guncellenme(tema_dir),
             }
         )
     return sonuc

@@ -521,6 +521,17 @@
     hata: { metin: "Hata", sinif: "durum-rozeti hata" },
   };
 
+  // ISO zaman dizesini kart için "10.07.2026 15:42" biçimine çevirir.
+  function zamanBicimle(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return (
+      d.toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" }) +
+      " " +
+      d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" })
+    );
+  }
+
   function temaKartiOlustur(tema) {
     const kart = document.createElement("div");
     kart.className = "tema-kart";
@@ -532,6 +543,7 @@
         ${tema.surum ? `<span>v${kacisliMetin(tema.surum)}</span>` : ""}
         ${tema.soru_sayisi != null ? `<span>${kacisliMetin(tema.soru_sayisi)} soru</span>` : ""}
         ${tema.gorsel_sayisi != null ? `<span>${kacisliMetin(tema.gorsel_sayisi)} görsel</span>` : ""}
+        ${tema.guncellenme ? `<span title="Son güncelleme">🕒 ${kacisliMetin(zamanBicimle(tema.guncellenme))}</span>` : ""}
         ${rozetBilgi ? `<span class="${rozetBilgi.sinif}" style="background:none;">${rozetBilgi.metin}</span>` : ""}
       </div>
       ${tema.hata ? `<p style="color:var(--renk-hata); font-size:13px; margin:0;">${kacisliMetin(tema.hata)}</p>` : ""}
