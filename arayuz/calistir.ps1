@@ -1,4 +1,4 @@
-# arayuz/calistir.ps1 — Windows yerel web arayüzünü kurar/başlatır.
+﻿# arayuz/calistir.ps1 - Windows yerel web arayüzünü kurar/başlatır.
 # Kullanım: powershell -ExecutionPolicy Bypass -File arayuz/calistir.ps1
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -7,11 +7,11 @@ $BackendDir = Resolve-Path (Join-Path $ScriptDir "backend")
 $VenvDir = Join-Path $BackendDir "venv"
 $Port = 8756
 
-# Sunucu zaten çalışıyorsa ikinci bir kopya başlatma — sadece tarayıcıyı aç.
+# Sunucu zaten çalışıyorsa ikinci bir kopya başlatma - sadece tarayıcıyı aç.
 # (Masaüstü kısayolundan çift tıklamalarda güvenli davranış.)
 $zaten = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
 if ($zaten) {
-    Write-Host "[arayuz] Sunucu zaten çalışıyor — tarayıcı açılıyor: http://127.0.0.1:$Port" -ForegroundColor Green
+    Write-Host "[arayuz] Sunucu zaten çalışıyor - tarayıcı açılıyor: http://127.0.0.1:$Port" -ForegroundColor Green
     Start-Process "http://127.0.0.1:$Port"
     exit 0
 }
