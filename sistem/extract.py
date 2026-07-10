@@ -934,6 +934,70 @@ def render_full_page_tam_sayfa(page, pnum, assets_dir, banned_texts):
     return f"assets/{img_name}", silinen, tesseract_eksik
 
 
+def dekoratif_rozet_sil(png_yolu, doygunluk_esigi=60, sutun_orani=0.45, min_genislik_orani=0.05):
+    """F14 (2026-07-10) — üst şerit (banner) kırpmalarındaki yayınevi rozetini
+    (örn. ortadaki "5.KUR" kurdelesi) GÖRÜNTÜDEN siler. Rozet yazısı vektör
+    çizim olduğundan ne metin katmanında var ne de OCR güvenilir okuyor;
+    tespit RENK ile yapılır: kurdele, soluk banttan belirgin daha DOYGUN
+    renklidir ve sütun boyunca yüksek oranda doygun piksel içerir. Böyle
+    bitişik sütun aralıkları bulunur ve her satırda aralığın hemen SOLUNDAKİ
+    arka plan pikseliyle doldurulur (bant dokusu korunur, beyaz yama kalmaz).
+    "PİST ALANI" simgesi/ünite adı gibi küçük ya da ince öğeler sütun oranını
+    aşamadığından DOKUNULMAZ. Dönen değer: silinen aralık sayısı; Pillow
+    yoksa veya hata olursa 0 (görsel olduğu gibi kalır)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return 0
+    try:
+        im = Image.open(png_yolu).convert("RGB")
+        w, h = im.size
+        if w < 50 or h < 20:
+            return 0
+        px = im.load()
+        oranlar = []
+        for x in range(w):
+            sayi = 0
+            toplam = 0
+            for y in range(0, h, 2):
+                r, g, b = px[x, y]
+                if max(r, g, b) - min(r, g, b) > doygunluk_esigi:
+                    sayi += 1
+                toplam += 1
+            oranlar.append(sayi / toplam if toplam else 0.0)
+        araliklar = []
+        basla = None
+        for x in range(w + 1):
+            asiyor = x < w and oranlar[x] >= sutun_orani
+            if asiyor and basla is None:
+                basla = x
+            elif not asiyor and basla is not None:
+                if x - basla >= max(8, int(w * min_genislik_orani)):
+                    araliklar.append((basla, x))
+                basla = None
+        silinen = 0
+        pay = 6
+        for (ax0, ax1) in araliklar:
+            ax0 = max(0, ax0 - pay)
+            ax1 = min(w, ax1 + pay)
+            if ax0 - 3 >= 0:
+                kaynak_x = ax0 - 3
+            elif ax1 + 3 < w:
+                kaynak_x = ax1 + 3
+            else:
+                continue
+            for y in range(h):
+                dolgu = px[kaynak_x, y]
+                for x in range(ax0, ax1):
+                    px[x, y] = dolgu
+            silinen += 1
+        if silinen:
+            im.save(png_yolu)
+        return silinen
+    except Exception:
+        return 0
+
+
 def sort_blocks_reading_order(blocks):
     """Bir sütun içindeki blokları GÖRSEL SATIR okuma sırasına göre dizer.
 
@@ -1571,6 +1635,7 @@ def main():
     tam_sayfa_alan_orani = profile.get("tam_sayfa_alan_orani", 0.70)
     duzen_modu = profile.get("duzen_modu", "sayfa_sadik")
     sayfa_sadik_count = 0
+    rozet_silinen_toplam = 0  # F14 — banner içinden silinen rozet aralıkları
 
     for pnum in page_range:
         page = doc[pnum]
@@ -1692,6 +1757,18 @@ def main():
         page_images = unique_page_images
         
         all_images = page_images + figure_crops
+
+        # F14 (2026-07-10): sayfanın üst şeridindeki banner benzeri kırpmalarda
+        # yayınevi rozeti (örn. "5.KUR" kurdelesi) renk tespitiyle silinir.
+        # Koşul: kırpma sayfanın üst %15'inde başlıyor VE sayfa genişliğinin
+        # yarısından geniş (soru şekilleri bu koşula girmez). Profil ile
+        # kapatılabilir: "rozet_temizle": false.
+        if profile.get("rozet_temizle", True):
+            for _img in all_images:
+                _bx0, _by0, _bx1, _by1 = _img["bbox"]
+                if _by0 < page_height * 0.15 and (_bx1 - _bx0) > page.rect.width * 0.5:
+                    _yol = os.path.join(assets_dir, os.path.basename(_img["path"]))
+                    rozet_silinen_toplam += dekoratif_rozet_sil(_yol)
         g_count += len(all_images)
 
         # --- F13 (2026-07-10): "sayfa_sadik" düzen modu ----------------------
@@ -2141,6 +2218,7 @@ def main():
         f.write(f"  Tam sayfa modu: {tam_sayfa_count} sayfa; yasaklı metin silinen bölge: {tam_sayfa_silinen_toplam}\n")
         if tam_sayfa_tesseract_uyarisi:
             f.write("  UYARI: tesseract yok, tam-sayfa görüntülerde yasaklı metin taraması yapılamadı\n")
+        f.write(f"  Rozet temizleme (F14): banner görsellerinden silinen rozet aralığı: {rozet_silinen_toplam}\n")
         f.write("------------------------------------------------------------------------\n")
         f.write("STATISTICS:\n")
         f.write(f"  Questions Found: {q_count}\n")
