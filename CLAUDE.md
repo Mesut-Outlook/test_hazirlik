@@ -21,6 +21,10 @@
 >   çökme hataları qa/dogrula.py, sistem/extract.py ve arayuz/backend/pipeline.py
 >   dosyalarında çözüldü.
 > - Arayüz tema kartlarında "son güncelleme" zaman rozeti.
+> - **F13 (aktif varsayılan):** `duzen_modu: "sayfa_sadik"` — TÜM sayfalar
+>   orijinal yerleşimle üretilir (öğeler kaynak konumlarında, `.page-faithful`;
+>   çözüm boşluğu eklenmez); eski iki sütunlu akış için profilde
+>   `duzen_modu: "akis"`. assemble.py artık section özniteliklerini korur.
 >
 > **Tarihçe (2026-07-05, FAZ 3 — Linux):** Proje bir süre kullanıcının Linux
 > (CachyOS) makinesindeydi (`/home/mesuto/Documents/PROJELER/test_hazirlik/`);

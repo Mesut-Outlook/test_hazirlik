@@ -1731,7 +1731,21 @@ sığar, logo her sayfada üst ortada; (d) 01-tema yeniden ÜRETİLMEZ (ID
 dondurma), değişiklik yalnızca yeni koşuları etkiler; (e) tesseract'sız
 ortamda davranış: sayfa yine tam sayfa korunur + rapora uyarı düşer.
 
-## F13 — Sayfa-sadık düzen: TÜM sayfalar orijinal yerleşimle (AÇILDI 2026-07-10, plan: Fable, kod: Sonnet alt-ajan)
+## F13 — Sayfa-sadık düzen: TÜM sayfalar orijinal yerleşimle (AÇILDI 2026-07-10, plan: Fable, kod: Sonnet alt-ajan + Fable) — ✅ tamam (2026-07-10)
+
+> **Kapanış doğrulaması (Fable, 2026-07-10):** Sonnet alt-ajan extract.py
+> tarafını yazarken oturum limitinde kesildi; eksikleri Fable tamamladı:
+> flow.css `.page-faithful/.pf-item` stilleri ve assemble.py'nin section
+> özniteliklerini (style dahil) koruması (eskiden düşürüyordu → konteyner
+> 0 boyut → boş sayfalar basılıyordu). Doğrulama: (a) 01-tema kaynağından
+> 4 sayfalık dilim — yerleşim kaynakla örtüşüyor (sütun konumları, şekiller,
+> `.rt` kökler; sayfa 1 ve 3 gözle karşılaştırıldı), 4/4 sayfa; (b) F12
+> regresyonu: 08 dilimi 5 tam-sayfa + 1 sayfa-sadık = 6/6, isim silme
+> çalışıyor; (c) `duzen_modu:"akis"` profiliyle eski davranış birebir geri
+> geliyor (16 question + 16 solve-space, 0 page-faithful). **Bilinen pürüz:**
+> kesir-yoğun satırlarda hafif bindirme (örn. 01 kaynağı s.43, soru 47/49) —
+> gerekirse pf-item genişlik/line-height ince ayarı ayrı iş olarak açılır.
+> Kod: extract.py F13 `e7fe54c`'de, CSS+assemble düzeltmeleri `184579b`'de.
 
 **Kullanıcı isteği (2026-07-10):** Hem resim hem metin içeren sayfalar dahil,
 çalışma SAYFA SAYFA yapılsın; her öğe (metin bloğu, görsel) orijinal sayfadaki

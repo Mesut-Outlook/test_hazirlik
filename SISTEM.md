@@ -119,6 +119,14 @@ Tüm temalar aynı `sistem/flow.css`'i kullanır. Çekirdek sınıflar:
      davranışı için profilde `taranmis_sayfa_modu: "parcala"`. (Taranmış
      soruları vision LLM ile düzenlenebilir matematiğe çevirme planı — F11 —
      rafa kaldırıldı; referansı COORDINATION.md'de.)
+   - **Düzen modu (F13, 2026-07-10 — güncel varsayılan):** profil
+     `duzen_modu: "sayfa_sadik"` (varsayılan) ile TÜM sayfalar orijinal
+     yerleşimle üretilir — metinli/karma sayfalar `.page-faithful` konteyneri
+     olur, her öğe (metin bloğu, görsel) kaynak bbox konumuna mm ölçekli
+     yerleştirilir; matematik/yasaklı-metin/KUR dönüşümleri korunur; bu modda
+     soru başına çözüm boşluğu EKLENMEZ ve manifest sayfa başına tek blok
+     taşır (soru düzeyi taşıma yok). İki sütunlu yeniden akıtma + çözüm
+     boşlukları için `duzen_modu: "akis"`.
 3. Doğrulama (§6) → `sistem/assemble.py` → `sistem/print.mjs` → `cikti/…_vN.pdf`.
 4. Log yaz (§5), COORDINATION.md panosunu güncelle, git commit at.
 5. İş bölümü: planlama/denetim Fable (ana oturum), kod ve toplu dönüşüm Sonnet

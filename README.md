@@ -110,7 +110,13 @@ Soruların sayfalara dengeli yayılması, gereksiz boşlukların önlenmesi ve s
 * **Manuel Sütun Kesme (`force-break-column`)**: Bir bloğun (soru veya konu başlığı) zorunlu olarak bir sonraki sütuna geçmesini istiyorsanız, o bloğun class listesine `force-break-column` ekleyin (örn: `<section class="question force-break-column" id="...">`).
 * **Manuel Sayfa Kesme (`force-break-page`)**: Bir bloğun yeni bir sayfada başlamasını istiyorsanız, o bloğun class listesine `force-break-page` ekleyin.
 
-### 3. Taranmış Sayfa Davranışını Değiştirme (`taranmis_sayfa_modu`)
+### 3. Sayfa Düzeni Modu (`duzen_modu`, F13)
+Varsayılan olarak belge **sayfa-sadık** üretilir: her sayfa, öğeleri (metin/görsel) orijinal kaynaktaki konumlarında olacak şekilde birebir yerleşimle çıkar; bu modda soru altına çözüm boşluğu eklenmez ve sorular sayfa içinde taşınamaz. Eski davranışı — soruların iki sütunlu akışa dizilip her soruya çözüm boşluğu eklenmesini — istiyorsanız profil json'una şunu ekleyin:
+```json
+"duzen_modu": "akis"
+```
+
+### 4. Taranmış Sayfa Davranışını Değiştirme (`taranmis_sayfa_modu`)
 Varsayılan olarak resim tabanlı (metin katmanı zayıf) sayfalar tek tam-sayfa görüntü olarak korunur (`"tam_sayfa"`). Bir kaynakta eski davranışı — sayfanın soru soru bölünüp iki sütuna akıtılmasını — istiyorsanız kullanılan profil json'una şunu ekleyin:
 ```json
 "taranmis_sayfa_modu": "parcala"
