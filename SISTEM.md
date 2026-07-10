@@ -29,8 +29,9 @@ test_hazirlik/
 │   └── 1.tema_egemen_sarikci_v3.pdf
 └── arayuz/                  yerel web arayüzü (FAZ 4)
     ├── backend/             FastAPI (API sözleşmesi: COORDINATION.md "FAZ 4")
-    ├── web/                 framework'süz SPA (Türkçe; logo sol üstte)
-    └── calistir.sh          başlat → http://127.0.0.1:8756
+    ├── web/                 framework'süz SPA (Türkçe)
+    ├── calistir.sh          başlat (Linux) → http://127.0.0.1:8756
+    └── calistir.ps1         başlat (Windows) → http://127.0.0.1:8756
 ```
 
 ## 2. İçerik Formatı — soru düzeyinde düzenlenebilirlik
@@ -85,7 +86,8 @@ Tüm temalar aynı `sistem/flow.css`'i kullanır. Çekirdek sınıflar:
   depo kökündeki `kok_bitisik_ornek.html` (kullanıcı onaylı, 2026-07-04).
 - `.theory-box`, `.kur-tag`, `.tag-kurgusu`, `.answer-key`, `.solve-space` (min 26mm),
   `.img-block`
-- Header: SADECE logo (yazı yok), footer: sayfa numarası — print.mjs verir.
+- Header: SADECE logo (yazı yok), ÜST ORTADA (2026-07-10 kullanıcı kararı;
+  önceki konum sol üsttü), footer: sayfa numarası — print.mjs verir.
 - İçerik kuralları (değişmez): matematik birebir korunur (tahmin yok); yayınevi KUR
   rozetleri atılır, gerçek bölüm adları korunur; "2020 MSÜ Kurgusu" tipi etiketler
   içeriktir, korunur; her sorudan sonra çözüm boşluğu.
@@ -95,15 +97,28 @@ Tüm temalar aynı `sistem/flow.css`'i kullanır. Çekirdek sınıflar:
   düzeyinde, boşluk/harf-aralığı ve büyük-küçük harf duyarsız filtreler; silinen
   satır sayısı extract_report.txt'ye yazılır. Yeni yasaklı ifade eklemek =
   profil json'una eklemek.
+  **F12 eki (2026-07-10):** tam-sayfa korunan (taranmış) sayfalarda yasaklı
+  metinler GÖRÜNTÜ İÇİNDEN de silinir — tesseract bbox taraması + beyaz dolgu.
+  Eşleştirme Türkçe harf katlamalı (ç→c, ı/İ→i…, "Sarıkçı" da yakalanır),
+  bulanık (difflib ≥0.85 ifade / ≥0.86 tek kelime — eşikler "gelen/sarı" gibi
+  masum kelimeleri silmeyecek şekilde kalibre edildi) ve psm 3 boş dönerse
+  psm 11 ile ikinci geçişlidir. tesseract yoksa sayfa yine korunur ama rapora
+  açık UYARI düşer (sessiz atlama YASAK).
 
 ## 4. Yeni Kaynak PDF Geldiğinde İş Akışı
 
 1. `temalar/NN-ad/kaynak/` içine kopyala (orijinal neredeyse oradan da SİLME).
 2. `sistem/extract.py` çalıştır → sorular.html + manifest.json + assets/ + rapor.
-   - Kaynak taranmış görüntüyse (metin katmanı yoksa): sayfalar 200dpi PNG'ye çevrilir,
-     transkripsiyon ajanlarla yapılır (FAZ 1-2'deki AGENT_INSTRUCTIONS yöntemi); ajan
-     çıktısı yine §2 formatında blok üretir. extract.py yalnızca metin katmanlı PDF'lerde
-     tam otomatiktir.
+   - **Taranmış/resim tabanlı sayfalar (F12, 2026-07-10 — güncel davranış):**
+     metin katmanı eşik altı (<60 karakter) veya tek görselin sayfa alanının
+     >%70'ini kapladığı sayfalar OLDUĞU GİBİ korunur — sayfa 200dpi tek
+     tam-sayfa `img-block` olur (`assets/pNNN_tam.png`, `.img-block.tam-sayfa`,
+     çıktıda sayfa başına bir kaynak sayfa), yasaklı metinler görüntüden
+     silinir (§3). Karışık kaynaklarda karar SAYFA SAYFA verilir; metin
+     katmanlı sayfalar normal blok çıkarımından geçer. Eski soru-soru bölme
+     davranışı için profilde `taranmis_sayfa_modu: "parcala"`. (Taranmış
+     soruları vision LLM ile düzenlenebilir matematiğe çevirme planı — F11 —
+     rafa kaldırıldı; referansı COORDINATION.md'de.)
 3. Doğrulama (§6) → `sistem/assemble.py` → `sistem/print.mjs` → `cikti/…_vN.pdf`.
 4. Log yaz (§5), COORDINATION.md panosunu güncelle, git commit at.
 5. İş bölümü: planlama/denetim Fable (ana oturum), kod ve toplu dönüşüm Sonnet

@@ -1674,6 +1674,21 @@ uyarı verir.
 > **Bilinen kısıt (kullanıcı kararıyla uyumlu):** tam-sayfa korunan sayfalarda
 > soru başına `.solve-space` eklenmez (sayfa olduğu gibi kalır); istisna
 > gereken kaynaklarda profil `taranmis_sayfa_modu: "parcala"` kaçış yoludur.
+>
+> **Sonraki düzeltmeler (2026-07-10, Fable):**
+> - `df63101` — tesseract Windows'ta PATH'te değildi ve `-l afr` bu makinede
+>   yok (eng+osd var): bilinen kurulum yolları denenir, dil `--list-langs` ile
+>   dinamik seçilir (tur > eng > afr).
+> - `fc62a37` — kullanıcı testinde (tema 11, 84 sayfa) 9 sayfada isim kaçtı:
+>   kaynakta "SARIKÇI" (Ç) yazımı OCR'da "SARIKC/" okunuyordu, bir sayfada da
+>   isim iki ayrı satıra düşmüştü. Çözüm: normalize'a Türkçe harf katlama +
+>   NFKD, satır içi bulanık pencere (difflib ≥0.85), ifade parçalarının tek
+>   kelime aranması (≥0.86), psm 3 boş dönerse psm 11 ikinci geçiş. Eşikler
+>   soru metnindeki benzer masum kelimelere ("gelen", "sarı", ≤0.73) karşı
+>   kalibre edildi. Tema 11 yeniden üretildi: 84/84 silindi, bağımsız tarama
+>   kalıntı bulamadı; `cikti/2.Tema_ver_2_v3.pdf` + masaüstüne kopya.
+> - `afd4c1e` — arayüz tema kartlarına "son güncelleme" zaman rozeti
+>   (backend `guncellenme` alanı: manifest/sorular/meta en yeni mtime).
 
 **Kullanıcı isteği (2026-07-10):** (1) Resim tabanlı soruların olduğu sayfalar
 OLDUĞU GİBİ bırakılsın (bugünkü bölge bölge kırpıp iki sütuna akıtma yerine);

@@ -1,11 +1,28 @@
 # Proje: 9. Sınıf Matematik PDF Yeniden Düzenleme (1.tema.pdf)
 
-> **GÜNCEL DURUM (2026-07-05, FAZ 3 — Linux):** Proje kullanıcının Linux (CachyOS)
-> makinesine taşındı; depo `/home/mesuto/Documents/PROJELER/test_hazirlik/` (GitHub:
-> Mesut-Outlook/test_hazirlik). Bu dosyanın aşağısı FAZ 1-2'nin (Windows) tarihi
-> planlama dokümanıdır — Windows yolları artık GEÇERSİZ. Güncel kural kitabı:
-> **`SISTEM.md`**, canlı görev panosu ve değişiklik günlüğü: **`COORDINATION.md`**
-> (önce bu ikisini oku). Kısa özet:
+> **GÜNCEL DURUM (2026-07-10 — Windows'a dönüş + F12):** Proje kullanıcının
+> Windows makinesine geri taşındı; depo
+> `C:\Users\egemen\Documents\_PROJELER\Test Hazırlık` (GitHub:
+> Mesut-Outlook/test_hazirlik). Güncel kural kitabı **`SISTEM.md`**, canlı görev
+> panosu **`COORDINATION.md`** (önce bu ikisini oku). 2026-07-10 değişiklikleri:
+> - **F12 (aktif davranış):** Resim tabanlı/taranmış sayfalar dönüştürülMEZ,
+>   OLDUĞU GİBİ tek tam-sayfa görüntü olarak korunur (`taranmis_sayfa_modu:
+>   "tam_sayfa"` varsayılan; eski soru-soru bölme için `"parcala"`). O
+>   sayfalardaki "EGEMEN SARIKCI/Sarıkçı…" yazıları görüntüden tesseract ile
+>   silinir (Türkçe harf katlama + bulanık eşleşme + psm 11 ikinci geçiş —
+>   yanlış pozitif eşiği kalibre edilmiş, "gelen/sarı" gibi kelimeler silinmez).
+>   Logo TÜM sayfalarda ÜST ORTADA (önce sol üstteydi).
+> - **F11 (vision ile taranmış soruları düzenlenebilir matematiğe çevirme)
+>   RAFA KALKTI** — plan referans olarak COORDINATION.md'de; API anahtarı gerekmez.
+> - Windows uyumluluğu: `arayuz/calistir.ps1` (başlatıcı), print.mjs Chrome/Edge
+>   yol tespiti, pipeline `sys.executable`, tesseract bilinen-kurulum-yolu tespiti
+>   (winget `UB-Mannheim.TesseractOCR` kurulu; diller eng+osd, dil dinamik seçilir).
+> - Arayüz tema kartlarında "son güncelleme" zaman rozeti.
+>
+> **Tarihçe (2026-07-05, FAZ 3 — Linux):** Proje bir süre kullanıcının Linux
+> (CachyOS) makinesindeydi (`/home/mesuto/Documents/PROJELER/test_hazirlik/`);
+> FAZ 3-4 orada tamamlandı. Bu dosyanın aşağısı FAZ 1-2'nin tarihi planlama
+> dokümanıdır — oradaki eski Windows scratchpad yolları GEÇERSİZ. Kısa özet:
 > - FAZ 1-2 çıktısı: `1.tema_egemen_sarikci_v2.pdf` (135 sayfa; logo sol üstte, header
 >   yazısız, karekökler `.rad` yamalı) — artık `temalar/01-tema/kaynak/` altında; bu dosya
 >   ve kökteki `1.tema_orijinal.pdf` SALT OKUNUR (kök kopyası 2026-07-08 temizliğinde
@@ -27,9 +44,10 @@
 >   temalar/01-tema/sorular.html ../../sistem/flow.css temalar/01-tema/1tema.html`
 >   sonra `node sistem/print.mjs temalar/01-tema/1tema.html cikti/<ad>.pdf`.
 > - **FAZ 4 — ARAYÜZ (TAMAMLANDI, 2026-07-06):** Yerel web arayüzü ve entegrasyonu tamamlandı.
->   `bash arayuz/calistir.sh` → http://127.0.0.1:8756 (FastAPI backend +
->   framework'süz Türkçe SPA; dosya/klasör seçimi, dönüştürme job'ları + canlı
->   ilerleme, PDF önizleme, blok düzenleme, serbest talep kuyruğu; logo sol üstte).
+>   Linux: `bash arayuz/calistir.sh`, Windows: `powershell -File arayuz/calistir.ps1`
+>   → http://127.0.0.1:8756 (FastAPI backend + framework'süz Türkçe SPA;
+>   dosya/klasör seçimi, dönüştürme job'ları + canlı ilerleme, PDF önizleme,
+>   blok düzenleme, serbest talep kuyruğu; çıktıda logo üst ortada, 2026-07-10).
 >   F3 (extract genelleştirme), F4 (uçtan uca test & QA entegrasyonu) ve F5 (paketleme
 >   & README/tanıtım güncellemeleri) tamamlanarak depoya gönderildi. Matematiksel ifadelerin
 >   (integral, limit, Yunan/Latin harfleri vb.) sistem genelinde çözümlenmesi sağlandı.
