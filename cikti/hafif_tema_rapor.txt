@@ -9,21 +9,22 @@ Toplam sayfa: 15
 Banner/rozet silinen bolge sayisi: 34
 Sayfa numarasi silinen sayfa sayisi: 15
 Filigran silinen bolge sayisi: 54
+Footer URL (www.metinyayinlari.com) silinen sayfa sayisi: 15
 Yontem: vektor redaksiyon (page.add_redact_annot + apply_redactions)
 
 Sayfa sayfa detay:
-  {'sayfa': 1, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2}
-  {'sayfa': 2, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 3, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2}
-  {'sayfa': 4, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 5, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 6, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 2}
-  {'sayfa': 7, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 8, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 9, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 10, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 11, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 12, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 13, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 14, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
-  {'sayfa': 15, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4}
+  {'sayfa': 1, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
+  {'sayfa': 2, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 3, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
+  {'sayfa': 4, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 5, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 6, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
+  {'sayfa': 7, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 8, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 9, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 10, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 11, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 12, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 13, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 14, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 15, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}

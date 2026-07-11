@@ -183,6 +183,22 @@ def find_page_number_rect(page, profile):
     return None
 
 
+def find_footer_url_rect(page, profile):
+    """Alt-sağ köşedeki 'www.metinyayinlari.com' izini bulur. Bu da filigran
+    gibi GERÇEK METİN DEĞİL (page.search_for / get_text('words') içinde
+    görünmüyor, doğrulandı) — bileşik vektör path olarak gömülü, dolgu rengi
+    normal gövde metniyle aynı olduğundan RENKLE ayırt edilemiyor. Ama KONUMU
+    kaynak PDF'lerde SABİT, bu yüzden profildeki `hafif_footer_url_bbox`
+    (sayfa boyutuna ORANSAL [x0,y0,x1,y1], 0-1 aralığında) kullanılarak doğrudan
+    hedeflenir — arama/renk kıstası YOK, sadece bu dar sabit bölge silinir."""
+    ratio = profile.get("hafif_footer_url_bbox")
+    if not ratio or len(ratio) != 4:
+        return None
+    pw, ph = page.rect.width, page.rect.height
+    x0, y0, x1, y1 = ratio
+    return fitz.Rect(x0 * pw, y0 * ph, x1 * pw, y1 * ph)
+
+
 def find_filigran_rects(page, profile):
     """Filigran ("Metin Yayınları") harflerini oluşturan bileşik vektör
     path'lerini bulur — bkz. modül docstring'indeki teknik not. İki ayrı
@@ -292,16 +308,20 @@ def process_text_page(doc, page, pnum, profile, stats):
     banner_rects = find_banner_ribbon_rects(page, profile)
     pagenum_rect = find_page_number_rect(page, profile)
     filigran_rects_ = find_filigran_rects(page, profile)
+    footer_url_rect = find_footer_url_rect(page, profile)
 
-    # 1. geçiş: banner/rozet + filigran — SADECE grafik kaldırılır, üzerine
-    #    binen gerçek metne DOKUNULMAZ (bkz. redact_rects docstring). pad=4
-    #    (varsayılan 1.2'den daha bol): bileşik bezier path'lerin (özellikle
-    #    filigran harfleri) get_drawings() bbox'ı bazen gerçek boyanan
-    #    alandan biraz DAR çıkıyor — 6.tema.pdf sayfa 5'te dar pad ile ince
-    #    bir kenar artığı kalmıştı (bkz. islem_gunlugu.md). text=1 (ignore)
-    #    kullanıldığı için bol pad güvenli — gerçek metne asla dokunmaz.
+    # 1. geçiş: banner/rozet + filigran + sabit-konum footer URL izi —
+    #    SADECE grafik kaldırılır, üzerine binen gerçek metne DOKUNULMAZ (bkz.
+    #    redact_rects docstring). pad=4 (varsayılan 1.2'den daha bol): bileşik
+    #    bezier path'lerin (özellikle filigran harfleri) get_drawings() bbox'ı
+    #    bazen gerçek boyanan alandan biraz DAR çıkıyor — 6.tema.pdf sayfa
+    #    5'te dar pad ile ince bir kenar artığı kalmıştı (bkz.
+    #    islem_gunlugu.md). text=1 (ignore) kullanıldığı için bol pad güvenli
+    #    — gerçek metne asla dokunmaz. footer_url_rect küçük/sabit pad=1.2 ile
+    #    yeterli (bkz. find_footer_url_rect docstring — bölge zaten dar/izole).
     graphic_rects = list(banner_rects) + list(filigran_rects_)
     n1 = redact_rects(page, graphic_rects, pad=4.0, remove_text=False)
+    n1b = redact_rects(page, [footer_url_rect] if footer_url_rect is not None else [], pad=1.2, remove_text=False)
 
     # 2. geçiş: sayfa no dairesi — İÇİNDEKİ orijinal rakam da kasıtlı olarak
     #    silinir (o dar bölgede gerçek soru metni olmadığı doğrulandı).
@@ -310,13 +330,15 @@ def process_text_page(doc, page, pnum, profile, stats):
     stats["banner_silinen"] += len(banner_rects)
     stats["sayfa_no_silinen"] += 1 if pagenum_rect is not None else 0
     stats["filigran_silinen"] += len(filigran_rects_)
-    stats["toplam_redaksiyon"] += n1 + n2
+    stats["footer_url_silinen"] += 1 if footer_url_rect is not None else 0
+    stats["toplam_redaksiyon"] += n1 + n1b + n2
     return {
         "sayfa": pnum + 1,
         "mod": "vektor",
         "banner": len(banner_rects),
         "sayfa_no": 1 if pagenum_rect is not None else 0,
         "filigran": len(filigran_rects_),
+        "footer_url": 1 if footer_url_rect is not None else 0,
     }
 
 
@@ -406,6 +428,7 @@ def main():
         "banner_silinen": 0,
         "sayfa_no_silinen": 0,
         "filigran_silinen": 0,
+        "footer_url_silinen": 0,
         "toplam_redaksiyon": 0,
         "taranmis_sayfa_sayisi": 0,
         "metin_sayfa_sayisi": 0,
@@ -447,13 +470,14 @@ def main():
         f.write(f"Banner/rozet silinen bolge sayisi: {stats['banner_silinen']}\n")
         f.write(f"Sayfa numarasi silinen sayfa sayisi: {stats['sayfa_no_silinen']}\n")
         f.write(f"Filigran silinen bolge sayisi: {stats['filigran_silinen']}\n")
+        f.write(f"Footer URL (www.metinyayinlari.com) silinen sayfa sayisi: {stats['footer_url_silinen']}\n")
         f.write(f"Yontem: vektor redaksiyon (page.add_redact_annot + apply_redactions)\n")
         f.write("\nSayfa sayfa detay:\n")
         for info in per_page_log:
             f.write(f"  {info}\n")
 
     print(f"Rapor: {rapor_path}")
-    print(f"Ozet: banner={stats['banner_silinen']} sayfa_no={stats['sayfa_no_silinen']} filigran={stats['filigran_silinen']} (metin sayfa={stats['metin_sayfa_sayisi']}, taranmis={stats['taranmis_sayfa_sayisi']})")
+    print(f"Ozet: banner={stats['banner_silinen']} sayfa_no={stats['sayfa_no_silinen']} filigran={stats['filigran_silinen']} footer_url={stats['footer_url_silinen']} (metin sayfa={stats['metin_sayfa_sayisi']}, taranmis={stats['taranmis_sayfa_sayisi']})")
 
 
 if __name__ == "__main__":

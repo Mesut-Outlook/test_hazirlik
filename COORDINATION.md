@@ -1808,3 +1808,64 @@ yok; (c) resim tabanlı sayfalar (08/11 kaynakları) F12 davranışını aynen k
    - `pdf_sayfa_sayisi()` içerisindeki `pdfinfo` çağrısı `encoding="utf-8", errors="ignore"` ile güvenli hale getirildi.
 
 **Kabul ölçütleri:** (a) Windows terminalinde `python qa/dogrula.py` komutu hatasız bir şekilde tamamlandı ve hedef ifade sayımları ile sayfa sayıları başarıyla listelendi (Exit code: 0); (b) Arayüz backend pipeline'ı kodlama çökmesi olmadan çalışmaya elverişli hale getirildi.
+
+## F14 — Yayınevi rozet kurdelesi temizliği (ağır pipeline, renk tespiti) — ✅ tamam (2026-07-10)
+
+*(Retrospektif not — bu bölümü işi yapan değil, sonradan belgeleyen yazdı; bkz. commit `c1eb2f6`.)*
+
+Ağır pipeline'da (`sistem/extract.py`) üst şerit banner kırpma görsellerine (HTML'e
+çıkarılmış PNG'ler) gömülü "N.KUR" rozet kurdelesi (5.KUR vb.) artık **renk
+tespitiyle** siliniyor: rozet yazısı vektör çizim olduğundan metin katmanı/OCR
+işe yaramıyor; geniş banner kırpmalarında sütun bazlı doygun-renk oranı ile
+kurdele aralığı bulunup satır satır arka plan pikseliyle dolduruluyor (PIST
+ALANI simgesi ve ünite adı korunur). Profil ile kapatılabilir: `rozet_temizle:
+false`. `requirements.txt`'e `pillow` eklendi. Doğrulama: Tema 103 (6.tema, 15
+sayfa) yeniden üretildi, 4 rozet aralığı silindi, görselle doğrulandı.
+
+**Not:** Bu mekanizma F15'ten (aşağı) FARKLI — extract.py'nin AĞIR
+(HTML'e-çıkar → Comic Sans) hattı İÇİNDE çalışır, sadece kırpılmış banner
+görsellerini piksel bazlı temizler.
+
+## F15 — Hafif tema motoru: PDF'i doğrudan düzenleyen bağımsız redaksiyon hattı (AÇILDI 2026-07-11, plan: Fable, kod: Sonnet alt-ajan) — ✅ tamam (2026-07-11, Fable çapraz doğrulamalı)
+
+**Kullanıcı isteği:** Üstbilgideki renkli şerit + "1.KUR/2.KUR" rozetinin,
+"Metin Yayınları" gibi filigranların, orijinal sayfa numaralarının TAMAMEN
+kaldırılması; sadece kendi logomuzun eklenmesi; metin içeriğine ve YAZI
+STİLİNE bile dokunulmaması (Comic Sans'a çevirme AYRI/OPSİYONEL bir özellik,
+bu motoru ilgilendirmiyor); hem metin tabanlı hem taranmış (resim tabanlı)
+PDF'lerde çalışması.
+
+**F14'ten farkı:** F14 ağır pipeline (extract.py→HTML→Comic Sans) İÇİNDE,
+HTML'e çıkarılmış banner kırpma görsellerini temizliyor. F15 TAMAMEN
+BAĞIMSIZ — extract.py'yi hiç kullanmıyor, kaynak PDF'i fitz (PyMuPDF) ile
+doğrudan düzenliyor, metin/font orijinal vektör/metin olarak kalıyor (HTML'e
+hiç çevrilmiyor). Yeni script: `sistem/hafif_tema.py` + profil
+`sistem/profiller/metin_yayinlari.json`.
+
+**Teknik bulgular:**
+- "Metin Yayınları" filigranının gerçek metin/görsel/pattern/Type3/OCG değil,
+  bileşik bezier vektör path olarak gömülü olduğu keşfedildi (renk+path
+  karmaşıklığı — öğe sayısı — ile tespit edildi).
+- Banner/KUR rozeti de aynı şekilde vektör path (gerçek metin değil), renk+
+  konum (sayfa üst %15'i) ile tespit edildi.
+- Orijinal sayfa no: gri daire + beyaz rakam, konum+renkle tespit edildi.
+- Footer "www.metinyayinlari.com" da vektör path (search_for/get_text
+  ("words") içinde bulunamıyor), dolgu rengi normal gövde metniyle aynı
+  olduğundan renkle ayırt edilemiyor — ama KONUMU kaynak PDF'lerde SABİT,
+  bu yüzden sayfa boyutuna ORANSAL bbox (`hafif_footer_url_bbox` profil
+  alanı) ile doğrudan hedeflenip siliniyor (bu oturumdaki ek).
+
+**Doğrulama:** `/home/mesuto/Downloads/9.sınıf 6.tema.pdf` (15 sayfa, tamamı
+metin tabanlı) → `cikti/6.tema_hafif_v1.pdf`. pdftotext kelime-çokluğu
+kaynak=çıktı (4340=4340 kelime, tek fark orijinal sayfa no ↔ kendi sayfa no),
+15 sayfa 150dpi PNG görsel QA (Fable tarafından örneklemle — sayfa 4, 10 —
+çapraz doğrulandı, footer URL izi de dahil).
+
+**Bilinen kısıt:** Taranmış (resim tabanlı) sayfa yolu (`process_image_page`
+fonksiyonu, piksel-orantılı best-effort) bu kaynakta test EDİLEMEDİ (6.tema.pdf'te
+taranmış sayfa yok) — ayrı bir işte uygun taranmış örnekle doğrulanması
+gerekiyor (henüz AÇIK).
+
+**Kabul ölçütleri:** (a) 6.tema.pdf'te banner/KUR/filigran/orijinal-sayfa-no/
+www.metinyayinlari.com sıfır; (b) metin bütünlüğü kaybı sıfır; (c) taranmış
+sayfa desteği ayrı iş.
