@@ -1,0 +1,799 @@
+--- SAYFA 1 ---
+
+## Isınma Hareketleri
+
+### Merkezi Eğilim ve Yayılım Ölçüleri
+
+> **Merkezi Eğilim Ölçüleri:** İstatistiksel çalışmada elde edilen veri grubunun; genel olarak eğilim gösterdiği, grubun tamamını değerlendirmek ve yorumlamak için tespit edilen değerlerdir.
+>
+> - **Ortanca (Medyan):** Bir veri grubu küçükten büyüğe sıralandığında veri grubunu eşit sayıda iki gruba ayıran değerdir.
+>
+>   *Veri grubu çift sayıda ise ortanca ortadaki iki terimin aritmetik ortalamasıdır.*
+>
+> - **Tepe Değer (Mod):** Bir veri grubunda en çok tekrar eden elemandır.
+>
+>   *Bir veri grubunda tepe değer birden fazla olabileceği gibi bazı veri gruplarında tepe değer olmayabilir.*
+>
+> - **Aritmetik Ortalama ($\bar{X}$):** Bir veri grubundaki elemanların toplamının elemanların adedine bölümüdür.
+>
+>   $\bar{X} = \dfrac{x_1 + x_2 + \dots + x_n}{n}$
+>
+>   *Aritmetik ortalama, veri grubundaki her değerden etkilenen en hassas merkezi eğilim ölçüsüdür.*
+>
+> - Veri yorumlamada hangi merkezi eğilim ölçüsünün kullanılacağı yapılan istatistik çalışmaya göre değişir. Örneğin, aritmetik ortalama aşırı uç değerlerden kolay etkilendiğinden verilerin genel eğilimini tam olarak temsil etmeyebilir.
+>
+> **Merkezi Yayılım Ölçüleri:** Bir veri grubundaki elemanların, merkezi eğilim ölçüsü etrafındaki yayılımını gösteren yani merkezi eğilim ölçüsüne yakın olup olmadığını belirten değerlerdir.
+>
+> - **Açıklık (A):** Bir veri grubundaki en büyük ile en küçük değer arasındaki farktır.
+> - **Çeyrekler Açıklığı (ÇA):** Bir veri grubu küçükten büyüğe sıralandığında ortanca (medyan) veri grubunu alt ve üst olmak üzere iki gruba ayırır. Alt ve üst grubun her birinin ortancasına da sırasıyla alt ve üst çeyrekler denilir. Üst çeyrek ve alt çeyrek arasındaki farka ise çeyrekler açıklığı denir.
+> - **Standart Sapma (S):** Bir veri grubunun aritmetik ortalamaya yakınlığını gösteren en hassas merkezi yayılım ölçüsüdür.
+>
+>   $S = \sqrt{\dfrac{(\bar{X}-x_1)^2 + (\bar{X}-x_2)^2 + \dots + (\bar{X}-x_n)^2}{n-1}}$
+>
+>   bağıntısı ile hesaplanır.
+
+> - Merkezi yayılım ölçüsünün küçük olması verilerin fazla dağınık olmadığını yani tutarlı ve istikrarlı olduğunu gösterir.
+> - İki veri grubu karşılaştırılırken açıklıkları aynı ise çeyrekler açıklığına, çeyrekler açıklığı aynı ise standart sapmalara bakılır.
+
+**1.** Aşağıdaki veri gruplarının ortanca değerlerini bulunuz.
+
+a) 5; 63; 20  b) 1; 2; 13; 7
+
+c) 1; 3; 3; 1; 5; 1; 1  d) 5; 5; 5; 5; 5; 5
+
+**2.** Aşağıdaki veri gruplarının tepe değerlerini bulunuz.
+
+a) 2; 13; 5; 2  b) 1; 3; 13; 7; 4
+
+c) 6; 5; 2; 5; 6; 4  d) 3; 5; 7; 5; 3; 7
+
+**3.** Şifanur, hafta içi günlerinde sırasıyla 3, 5, 7, 3 ve 2 test çözmüştür.
+
+Buna göre, Şifanur günlük ortalama kaç test çözmektedir?
+
+**Cevaplar:** 1. a) 20  b) 4,5  c) 1  d) 5   2. a) 2  b) yok  c) 5 ve 6  d) yok   3. 4
+
+--- SAYFA 2 ---
+
+**4.** Aşağıdaki veri gruplarının açıklıklarını bulunuz.
+
+a) 11; 7; 3; 5; 24  b) 3; 3; 3; 3; 3
+
+**5.** Aşağıdaki veri gruplarının çeyrekler açıklıklarını bulunuz.
+
+a) 7, 5, 12, 11, 4, 8, 2
+
+b) 3, 5, 7, 8, 1, 12, 21, 4
+
+**6.** Denetlemeye giren beş kamyondan dördünün yük miktarları 8, 5, 12 ve 21 tondur. Bir kamyonun yük miktarı silinmiştir.
+
+Bu beş kamyonun yük miktarlarından oluşan veri grubunun açıklığı 18 ton olarak kaydedildiğine göre, beşinci kamyonun ağırlığı kaç ton olabilir?
+
+**7.** İki futbolcunun yedi maçta attığı gol sayıları aşağıdaki gibidir.
+
+Çağan: 2, 1, 0, 3, 5, 2, 1
+
+Altan: 3, 5, 2, 2, 3, 2, 0
+
+Buna göre, hangi futbolcu daha tutarlıdır?
+
+**8.** Süleyman'ın bir eğitim öğretim yılında coğrafya sınavlarından aldığı notlar aşağıdaki gibidir.
+
+70, 65, 85, 60, 75, 65
+
+Süleyman'ın coğrafya notlarından oluşan bu veri grubunun standart sapması kaçtır?
+
+**9.** Aşağıda iki farklı inek türünün üç gün boyunca verdiği süt miktarları verilmiştir.
+
+A cinsi: 5 litre, 7 litre, 3 litre
+
+B cinsi: 4 litre, 6 litre, 5 litre
+
+Süt üretim tesisi kurmak isteyen Erkan, hangi cins ineği seçmesi gerektiğini aritmetik ortalama ve standart sapma kullanarak tespit ediniz.
+
+**10.** Bir sınıfta yapılan sınıf başkanlığı seçiminde başkanlığa aday 5 öğrencinin aldığı oylar aşağıdaki gibidir.
+
+8, 5, 7, 5, 10
+
+Adayların aldığı oy sayılarından oluşan veri grubunun
+
+a) Merkezi eğilim ölçüsü değerleri nelerdir?
+
+b) Merkezi yayılım ölçüsü değerleri nelerdir?
+
+**Cevaplar:** 4. a) 21  b) 0   5. a) 7  b) 6,5   6. 3 ya da 23   7. Altan   8. $4\sqrt{5}$   9. B cinsi   10. a) Medyan: 7, Mod: 5, $\bar{X} = 7$  b) A: 5, Ç.A.: 4, $S = \sqrt{\frac{9}{2}}$
+
+--- SAYFA 3 ---
+
+### Verilerin Grafikle Gösterilmesi
+
+> **Veri Türleri:** İstatistiksel bir çalışmada veriler ikiye ayrılır.
+>
+> - **Sürekli Veriler:** Belirli bir aralıktaki bütün değerleri alan verilerdir. Örneğin; bir şehrin sıcaklık değerleri için alınan veriler, bütün değerleri alarak değişir.
+>
+>   *Sürekli veriler için çizgi grafiği kullanmak daha uygundur.*
+>
+> - **Kesikli Veriler:** Belirli bir aralıktaki her değeri alamayan verilerdir. Örneğin; bir şehrin nüfusu için alınan veriler, her değeri almadan değişebilir.
+>
+> **Grafik Türleri:** Verileri karşılaştırmada ve yorumlamada grafiklerden faydalanılır.
+>
+> - **Sütun Grafiği:** Veri gruplarının gelişimini gösterir. Veri gruplarını karşılaştırmak için kullanılan grafik türüdür. (Grafik problemleri konusunu tekrarlayınız.)
+> - **Çizgi Grafiği:** Bir veri grubunun belirli bir zaman aralığındaki değişimini gösterir.
+> - **Daire Grafiği:** Bir veri grubundaki parçaların bütün içerisindeki oranını gösterir.
+> - **Histogram:** Belirli bir aralıktaki veri sayılarını gösteren sütun grafikleridir. Sütun grafiğinden farklı olarak sütunlar arasında boşluklar yoktur.
+> - **Serpme Grafiği:** İki farklı değişken arasındaki ilişkiyi vurgulamak için kullanılır.
+> - **Kutu Grafiği:** Bir veri grubunun en büyük ve en küçük değerlerini, ortancasını, alt ve üst çeyreğini gösteren grafiklerdir. Verilerin genel dağılımını gösterir.
+>
+>   *Grafik oluşturulurken grafiğin başlığı ve temsil ettiği değişkenler belirtilmelidir.*
+
+**1.** Yandaki grafikte bir mağazaya sabah saatlerinde gelen müşteri sayıları verilmiştir.
+
+**[Grafik:** sütun grafiği "Müşteri Sayısı" — saat 8: 15, saat 9: 20, saat 10: 25, saat 11: 35, saat 12: 20**]**
+
+Buna göre, aşağıdaki soruları cevaplayınız.
+
+a) En az ve en çok müşterinin geldiği saatler hangileridir?
+
+b) Veri grubunun merkezi eğilim ölçüleri nelerdir?
+
+c) Veri grubunun açıklığı kaçtır?
+
+d) Veri grubunun çeyrekler açıklığı kaçtır?
+
+**2.** Yandaki grafikte bir şehrin hafta içi sıcaklık değerleri verilmiştir.
+
+**[Grafik:** çizgi grafiği "Sıcaklık (°C)" — Pazartesi: 10, Salı: 25, Çarşamba: 15, Perşembe: 25, Cuma: 5**]**
+
+Buna göre, aşağıdaki soruları cevaplandırınız.
+
+a) Sıcaklık değişiminin en fazla olduğu gün hangisidir?
+
+b) Veri grubunun merkezi eğilim ölçüleri nelerdir?
+
+c) Veri grubunun merkezi yayılım ölçüleri nelerdir?
+
+**3.** Özay'ın bir günlük aktivitelerine ayırdığı zamanların oranları yandaki daire grafiğinde verilmiştir.
+
+**[Grafik:** daire grafiği "Özay'ın Günlük Aktiviteleri" — Uyku: 120°, Okul: 105°, Serbest: 45°, Yemek: 30°, Ders: 60° (kalan açı)**]**
+
+Buna göre, aşağıdaki soruları cevaplandırınız.
+
+a) Özay, günde kaç saat ders çalışır?
+
+b) Özay, gününün yüzde kaçını serbest zamana ayırır?
+
+c) Özay, günlük her aktiviteye ortalama kaç saat ayırmıştır?
+
+**Cevaplar:** 1. a) EA = 8:00, EÇ = 11:00  b) Medyan = 20, Mod = 20, $\bar{X} = 23$  c) 20  d) 12,5   2. a) Cuma  b) Medyan: 15, Mod: 25, $\bar{X} = 16$  c) A: 20, Ç.A.: 17,5, $S = \sqrt{80}$   3. a) 4  b) 12,5  c) 4,8
+
+--- SAYFA 4 ---
+
+### Histogram
+
+> - Bir veri grubundaki verilerin belirli sayıda gruplara ayrılarak her gruptaki veri adedinin bir sütunla gösterildiği grafiklerdir.
+> - Histogramlarda sütunlar aralarında boşluk olmayacak şekilde düzenlenir.
+> - **Grup Sayısı:** Histogramın kaç sütundan oluşacağını gösterir.
+> - **Grup Genişliği:** Her sütundaki verilerin genişliğini gösterir. Grup genişliği bulunurken açıklık, grup sayısına bölünür. Bulunan değerden sonraki tam sayı grup genişliğini verir.
+
+**1.** **[Grafik:** histogram "Öğrenci Sayısı" — 1-20 arası: 1, 21-40 arası: 4, 41-60 arası: 3, 61-80 arası: 5, 81-100 arası: 2**]**
+
+Yukarıdaki histogramda bir sınıftaki öğrencilerin matematik sınavında aldıkları notlar verilmiştir.
+
+Buna göre, aşağıdaki soruları cevaplandırınız.
+
+a) Bu sınıfta kaç öğrenci vardır?
+
+b) Grup sayısı kaçtır?
+
+c) Grup genişliği nedir?
+
+d) Verilerin açıklığı en çok kaç olabilir?
+
+e) Verilerin açıklığı en az kaç olabilir?
+
+f) 40'dan çok 61'den az not alanlar sınıfın yüzde kaçıdır?
+
+g) En çok kaç öğrenci başarılı not almıştır? (44 üstü)
+
+h) En az kaç öğrenci başarısız not almıştır? (45 altı)
+
+### Serpme Grafiği
+
+> - İki değişken arasındaki ilişkiyi göstermek için serpme grafiği kullanılır.
+> - Serpme grafikleri 3 şekilde yorumlanır.
+>   - **Pozitif Yönlü İlişki:** Değişkenlerden biri artarken diğeri de artıyorsa bu iki değişken arasında pozitif yönlü ilişki vardır. **[Şekil:** sağa yatık nokta bulutu, "Sağa Yatık" etiketli**]**
+>   - **Negatif Yönlü İlişki:** Değişkenlerden biri artarken diğeri de azalıyorsa bu değişkenler arasında negatif yönlü ilişki vardır. **[Şekil:** sola yatık nokta bulutu, "Sola Yatık" etiketli**]**
+>   - **İlişkisiz:** Değişkenler arasında artma veya azalma ilişkisi yoksa değişkenler ilişkisizdir. **[Şekil:** dağınık nokta bulutu, "Dağınık" etiketli**]**
+
+**1.** **[Grafik:** serpme grafiği "Ağırlık (kg) — Boy (cm)" — noktalar yaklaşık (50, 3), (60, 3,3), (65, 4), (70, 4), (80, 5), (90, 5,3)**]**
+
+Yukarıdaki grafikte bir bebeğin doğumdan sonra hastanede yapılan altı kontrolde elde edilen boy ve kilo değerleri verilmiştir.
+
+Buna göre,
+
+a) Boy ve kilo arasındaki ilişki türü nedir?
+
+b) Bebeğin ağırlığı kaç kilogram iken boyu uzadığı halde ağırlığı değişmemiştir?
+
+c) Bebek doğduğunda boyu kaç cm dir?
+
+**Cevaplar:** 1. a) 15  b) 5  c) 20  d) 99  e) 61  f) 20  g) 10  h) 5   1. a) Pozitif Yönlü  b) 4  c) 50
+
+--- SAYFA 5 ---
+
+### Kutu Grafiği
+
+> - Bir veri grubundaki; en büyük değeri, en küçük değeri, ortancayı, alt çeyreği ve üst çeyreği gösteren grafiğe kutu grafiği denir.
+> - Kutu grafiği çizilirken aşağıdaki adımlar takip edilir.
+>   1. Veri grubunu içine alan bir sayı doğrusu çizilir.
+>   2. En küçük ve en büyük değerler kutu grafiğinin uç noktaları olarak işaretlenir.
+>   3. Alt ve üst çeyrekler kutunun kenarları olarak alınır.
+>   4. Ortanca kutunun içinde belirtilir.
+>
+>   **[Şekil:** örnek kutu grafiği şablonu — sayı doğrusu üzerinde soldan sağa a) En Küçük Değer, b) Alt Çeyrek, c) Ortanca, d) Üst Çeyrek, e) En Büyük Değer noktaları işaretli**]**
+
+**1.** **[Grafik:** kutu grafiği, sayı doğrusu 1-11 — en küçük değer: 2, alt çeyrek: 3, ortanca: 5, üst çeyrek: 9, en büyük değer: 10**]**
+
+Yukarıda bir veri grubu için kutu grafiği çizilmiştir.
+
+Buna göre bu veri grubu için aşağıdaki soruları cevaplandırınız.
+
+a) En küçük değeri kaçtır?
+
+b) En büyük değeri kaçtır?
+
+c) Alt çeyrek değeri kaçtır?
+
+d) Üst çeyrek değeri kaçtır?
+
+e) Medyanı kaçtır?
+
+f) Açıklığı kaçtır?
+
+g) Çeyrekler açıklığı kaçtır?
+
+**2.** Aşağıda bir öğrencinin on gün boyunca çözdüğü soru sayıları verilmiştir.
+
+90, 73, 82, 95, 65, 78, 80, 104, 65, 48
+
+Öğrencinin çözdüğü soru sayılarından oluşan veri grubu için kutu grafiğini çiziniz.
+
+**[Grafik:** sayı doğrusu 45-105 arası (5'er aralıklarla), kutu grafiği çizimi için boş şablon**]**
+
+**3.** Bütün verileri birbirinden farklı 20 veriden oluşan bir veri grubunda
+
+a) Alt çeyrek değerden küçük kaç veri vardır?
+
+b) Ortanca değerden küçük kaç değer vardır?
+
+c) Üst çeyrek değerden küçük kaç değer vardır?
+
+d) Alt çeyrek değeri ile üst çeyrek değer arasında kaç veri vardır?
+
+**4.** **[Grafik:** iki kutu grafiği, sayı doğrusu −10 ile 20 arası — Kars: en küçük ≈ −10, alt çeyrek ≈ −5, ortanca ≈ −3, üst çeyrek ≈ 0, en büyük ≈ 3; İzmir: en küçük ≈ 5, alt çeyrek ≈ 10, ortanca ≈ 11, üst çeyrek ≈ 15, en büyük ≈ 20**]**
+
+Şekilde Kars ve İzmir illerinin 28 çeken bir Şubat ayındaki günlük ortalama sıcaklıklarının kutu grafiği verilmiştir.
+
+Buna göre,
+
+a) Şubat ayında hangi şehir genellikle daha sıcaktır?
+
+b) Kars ilinin sıcaklık verilerinin açıklığı kaçtır?
+
+c) Kars ilinde sıcaklığın medyanı kaçtır?
+
+d) İzmir ilinde sıcaklığın medyanı kaçtır?
+
+**[Grafik:** soru 2'nin cevabı — kutu grafiği, en küçük değer: 48, alt çeyrek: 65, ortanca: 79, üst çeyrek: 90, en büyük değer: 104**]**
+
+**Cevaplar:** 1. a) 2  b) 10  c) 3  d) 9  e) 5  f) 8  g) 6   3. a) 5  b) 10  c) 15  d) 10   4. a) İzmir  b) 13  c) −3  d) 11
+
+--- SAYFA 6 ---
+
+## Isınma Hareketleri
+
+### Nokta Grafiği
+
+> **Nokta Grafiği**
+> - Nokta grafiği, bir sayı doğrusu üstünde veri sayısının noktalarla gösterildiği grafiktir.
+> - Nokta grafiği çizilirken aşağıdaki örneği verelim: Bir sınıf öğretmeni sene sonunda öğrencilerinin kaç kitap okuduğunu aşağıdaki nokta grafiğini göstererek hesaplamıştır.
+>
+> **[Grafik:** okunan kitap sayısına göre öğrenci nokta grafiği — 4: 2, 5: 3, 6: 2, 7: 5, 8: 3, 9: 4 (toplam 19 öğrenci)**]**
+>
+> - Grafikteki tüm noktaları sayarak sınıf mevcudunun 19 olduğunu bulur.
+> - Soldan itibaren saydığı 10. nokta 7 kitap okuyanların bu sınıfın medyanını oluşturduğunu görür.
+> - Bu sınıfta en az okunan kitap sayısı 4, en çok okunan kitap sayısı 9 olduğu için Açıklığın = 9 – 4 = 5 olduğunu görür.
+> - Bu sınıfta en çok okunan kitap sayısı 7 olduğu için mod (Tepe değer)'un 7 olduğunu görür.
+
+**1.** 15 kişinin koştuğu bir parkurda kaç kişinin kaç saniyede parkuru bitirdiğine dair tablo aşağıda verilmiştir.
+
+| Süre (sn) | Kişi Sayısı |
+|---|---|
+| 55 | 4 |
+| 60 | 3 |
+| 63 | 5 |
+| 65 | 2 |
+| 70 | 1 |
+
+Buna göre, bu kişilerin oluşturduğu nokta grafiği çiziniz.
+
+*(Cevap: 55: 4, 60: 3, 63: 5, 65: 2, 70: 1 — tablodaki değerlerle birebir aynı nokta grafiği çizilir.)*
+
+**2.** Aşağıda sınıftaki herkesin girdiği Matematik yazılısından alınan notların nokta grafiği verilmiştir.
+
+**[Grafik:** yazılıda alınan notların nokta grafiği — 60: 3, 65: 4, 72: 5, 78: 2, 85: 3, 95: 3, 100: 2**]**
+
+Buna göre,
+
+a) Sınıf mevcudu kaçtır?
+
+b) Veri grubunun mod (Tepe değer) kaçtır?
+
+c) Bu veri grubunun medyanı kaçtır?
+
+**3.** Aşağıda bir tura katılan kişilerin yaşlarına göre sayıca dağılımını veren nokta grafiği verilmiştir.
+
+**[Grafik:** tura katılanların yaşına göre nokta grafiği — 25: 3, 27: 3, 32: 4, 35: 2, 42: 3**]**
+
+Buna göre, bu tura katılan kişilerin yaş ortalaması kaçtır?
+
+**Cevap Anahtarı:** 2. a) 22  b) 72  c) 72   3. 32
+
+---
+
+--- SAYFA 7 ---
+
+## Günlük Hayat Uygulamaları
+
+**1.** Aşağıdaki istatiksel ölçümlerden bir veri grubunun eğilim gösterdiği değerleri tespit etmek için kullanılanları "ME" (Merkezi eğilim), veri grubunun istikrarını tespit etmek için kullanılanları "MY" (Merkezi yayılım) ile belirtiniz.
+
+a) Veri grubundaki sayıların hepsinin toplanıp veri sayısına bölünmesiyle elde edilen değer.
+
+b) Veriler arasındaki en çok tekrar eden değer.
+
+c) Veri grubundaki en büyük değerden en küçük değer çıkarıldığında bulunan değer.
+
+d) Veri grubundaki üst çeyrekten alt çeyrek çıkarılınca bulunan değer.
+
+e) Veriler küçükten büyüğe sıralandığında tam ortada kalan değer.
+
+f) Bir veri grubundaki verilerin aritmetik ortalamaya yakınlığının gösteren değer.
+
+**2.** Bir dolmuşun 15 sefer yaptığında taşıdığı yolcu sayıları aşağıda verilmiştir.
+
+18, 20, 15, 13, 18, 22, 17, 25, 18, 19, 20, 14, 15, 17, 19
+
+Bu verilere ait aşağıdaki ölçüm değerlerini bulunuz.
+
+a) Aritmetik ortalama
+
+b) Tepe Değer
+
+c) Ortanca
+
+d) Açıklık
+
+e) Çeyreler açıklığı
+
+**3.** Aşağıda iki aracın bir depo benzinle aldığı yollar farklı günlerde kaydediliyor.
+
+A Marka: 400, 420, 470, 430, 440, 430
+
+B Marka: 430, 410, 400, 440, 440, 420
+
+Buna göre, hangi marka aracın benzin tüketimi daha tutarlıdır?
+
+**4.** Bir basketbol takımındaki dört kişinin boy uzunlukları 160 cm, 170 cm, 175 cm ve 165 cm dir.
+
+Takımın boy ortalamasının 168 cm olması için takıma alınacak 5. kişinin boy uzunluğu kaç cm olmalıdır?
+
+**5.** Bir turist kafilesindeki 15 bayanın yaş ortalaması 22, 10 erkeğin yaş ortalaması 25 tir.
+
+Buna göre, bu turist kafilesinin yaş ortalaması kaçtır?
+
+**6.** Aşağıda bir öğrencinin altı sınavdan aldığı notlar verilmiştir.
+
+60, 75, 60, 80, 85, 90
+
+Buna göre, bu notlara ait standart sapmanın değeri kaçtır?
+
+**7.** Tuba ve Leyla aynı yayın evinde çalışan iki dizgicidir. Bu iki dizgicinin 5 dakika boyunca her bir dakikada yazabildikleri kelime sayıları aşağıda tabloda verilmiştir.
+
+**Tablo: Dizgicilerin yazdıkları kelime sayıları**
+
+| | 1. dk | 2. dk | 3. dk | 4. dk | 5. dk |
+|---|---|---|---|---|---|
+| Leyla | 120 | 100 | 130 | 110 | 100 |
+| Tuba | 110 | 115 | 120 | 110 | 115 |
+
+Bu verilere ait standart sapmaları tespit ederek hangi dizgicinin daha istikrarlı olduğunu tespit ediniz.
+
+**Cevap Anahtarı:** 1. a) ME  b) ME  c) MY  d) MY  e) ME  f) MY   2. a) 18  b) 18  c) 18  d) 12  e) 5   3. B Marka   4. 170 cm   5. 23,2   6. $4\sqrt{10}$   7. Leyla: $\sqrt{170}$ > Tuba: $\sqrt{142{,}5}$ — Tuba daha istikrarlıdır.
+
+---
+
+--- SAYFA 8 ---
+
+## Günlük Hayat Uygulamaları (devamı)
+
+**8.** Aşağıdaki verilerden sürekli olanları "S", kesik olanları "K" ile belirtiniz.
+
+a) Bir sınıftaki her bir branşı seçen öğrenci sayılarını belirten grafikteki veriler.
+
+b) Milli takımdaki güreşçilerin kütlelerini belirten grafikteki veriler.
+
+c) Bir bebeğin doğumundan itibaren kütlesindeki değişimi gösteren grafikteki veriler.
+
+d) Herhangi bir aralıktaki verilmeyen değerler hakkında fikir veren grafikteki veriler.
+
+e) Herhangi bir aralıktaki her değeri alamayan grafikteki veriler.
+
+**9.** Yukarıdaki histogramda 80 soruluk Matematik sınavında bir sınıfın doğru cevap sayıları gösterilmiştir.
+
+**[Grafik:** doğru cevap sayısına göre öğrenci histogramı — 11-24: 3 öğrenci, 25-38: 6 öğrenci, 39-52: 7 öğrenci, 53-66: 5 öğrenci, 67-80: 4 öğrenci**]**
+
+Buna göre, aşağıdaki soruları cevaplandırınız.
+
+a) Sınıfta kaç öğrenci vardır?
+
+b) Grup sayısı kaçtır?
+
+c) Grup genişliği nedir?
+
+d) Verilerin açıklığı en fazla kaç olabilir?
+
+e) Verilerin açıklığı en az kaç olabilir?
+
+f) Doğru sayısı 35 - 45 arasında olan en az kaç öğrenci olabilir?
+
+g) Doğru sayısı 35 - 45 arasında olan en çok kaç öğrenci olabilir?
+
+h) Sınıftaki öğrencilerin yüzde kaçı 52 üzerinde doğru yapmıştır?
+
+**10.** Yukarıdaki grafikte bir öğretim yılında bir öğrencinin İngilizce ve Matematik sınavlarından aldığı notlar sırasıyla gösterilmiştir.
+
+**[Grafik:** İngilizce–Matematik notlarının serpme (nokta) grafiği, sınav sırasına göre — yaklaşık noktalar (Matematik, İngilizce): (50, 95), (65, 80), (75, 65), (85, 70), (100, 60); genel eğilim: Matematik notu zamanla artarken İngilizce notu genel olarak azalmış (negatif ilişki)**]**
+
+Bu öğrenci için aşağıdakilerden doğru olanları "D", yanlış olanları "Y" ile belirtiniz.
+
+a) Öğrenci, yıl içerisinde matematik dersine çalıştığı zamanı arttırmıştır.
+
+b) Öğrencinin, İngilizce notları ile Matematik notları arasında pozitif bir ilişki vardır.
+
+c) Öğrencinin hem İngilizce hem de Matematik notunu arttırdığı sınav olmuştur.
+
+**11.** Yukarıdaki kutu grafikleri, bir okuldaki 23'er öğrencisi bulunan 12. sınıf, A ve B şubelerinin bir matematik sınavında aldığı notlara göre oluşturulmuştur.
+
+**[Grafik:** A ve B şubelerinin matematik notu kutu (box-plot) grafikleri, not ekseni 70-100 arası işaretli (70,75,80,85,90,95,100) — A şubesi: en düşük 70, alt çeyrek 75, medyan 80, üst çeyrek 88, en yüksek 95; B şubesi: en düşük 70, alt çeyrek 78, medyan 85, üst çeyrek 92, en yüksek 100**]**
+
+Buna göre, aşağıdaki soruları cevaplayınız.
+
+a) A sınıfının notlarının açıklığı kaçtır?
+
+b) Çeyrekler açıklığına göre hangi sınıftaki öğrencilerin öğrenme seviyeleri birbirine daha yakındır?
+
+c) 85 ile 95 arasında not alan öğrenci sayısı hangi şubede daha azdır?
+
+**Cevap Anahtarı:** 8. a) K  b) K  c) S  d) S  e) K   9. a) 25  b) 5  c) 14  d) 69  e) 43  f) 0  g) 13  h) %36   10. a) D  b) Y  c) D   11. a) 25  b) A  c) B
+
+---
+
+--- SAYFA 9 ---
+
+## ÖSYM Sorularına Hazırlık
+
+**1.** Şekildeki grafikte bir sınıftaki bütün öğrencilerin matematik sınavından aldıkları notlara göre dağılımları verilmiştir.
+
+**[Grafik:** matematik sınavı not dağılımı sütun grafiği — Not 1: 2 öğrenci, Not 2: 6 öğrenci, Not 3: 10 öğrenci, Not 4: 8 öğrenci, Not 5: 4 öğrenci**]**
+
+Öğretmen, 3 ün üstünde not alan öğrencileri başarılı kabul etmektedir.
+
+Öğretmenin değerlendirmesine göre sınıfın yüzde kaçı başarısızdır?
+
+A) 40   B) 45   C) 50   D) 55   E) 60
+
+**2.** Aşağıda bir veri grubuna ait bir nokta grafiği verilmiştir.
+
+**[Grafik:** nokta grafiği — 1: 2, 2: 3, 3: 5, 4: 2, 5: 2, 6: 3, 7: 2**]**
+
+Buna göre,
+
+I. Bu veri grubunun açıklığı 6'dır.
+
+II. Bu veri grubunun mod (Tepe)'u 3'tür.
+
+III. Bu veri grubunun medyanı 4'tür.
+
+ifadelerinden hangileri doğrudur?
+
+A) Yalnız I   B) Yalnız II   C) I ve II   D) I ve III   E) I, II ve III
+
+**3.** Veri grubunda sayılar küçükten büyüğe doğru sıralandığında gruptaki terim tek ise ortadaki sayıya, çift ise ortadaki iki sayının aritmetik ortalamasına o veri grubunun medyanı (ortanca değeri) denir.
+
+**[Grafik:** öğrencilerin notuna göre dağılım sütun grafiği — Not 60: 12 öğrenci, Not 70: 8 öğrenci, Not 80: 10 öğrenci, Not 90: 6 öğrenci, Not 100: 4 öğrenci**]**
+
+Buna göre, öğrencilerin aldığı nota bağlı veri grubunun medyanı kaçtır?
+
+A) 60   B) 70   C) 80   D) 90   E) 100
+
+**4.** $x_1, x_2, x_3, \dots, x_n$ elemanlarından oluşan bir veri grubunun aritmetik ortalaması $\bar{x}$ iken standart sapması ($S$)
+
+$$S = \sqrt{\dfrac{(x_1 - \bar{x})^2 + (x_2 - \bar{x})^2 + \dots + (x_n - \bar{x})^2}{n - 1}}$$
+
+formülü ile hesaplanır.
+
+Cem, bir eğitim öğretim yılında Fizik sınavlarından aşağıdaki notları almıştır.
+
+85, 80, 85, 80, 90, 90
+
+Cem'in Fizik sınav notlarının standart sapması aşağıdakilerden hangisidir?
+
+A) 2   B) $\sqrt{5}$   C) 3   D) $2\sqrt{5}$   E) $5\sqrt{2}$
+
+**Cevap Anahtarı:** 1. E   2. C   3. C   4. D
+
+---
+
+--- SAYFA 10 ---
+
+## ÖSYM Sorularına Hazırlık (devamı)
+
+**5.** Online kitap satan bir internet sitesinin stoğunda Eylül ayının başında 10.000 adet Metin Yayınları Parkur kitabı bulunmaktadır.
+
+Bu kitabın 3000 tanesi ilk ay, 5000 tanesi ilk iki ay ve 9000 tanesi de ilk üç ay içinde satılıyor.
+
+Buna göre, bu internet sitesinin stoğunda bulunan Metin Yayınları Parkur kitabının miktarının aylara göre dağılımını gösteren grafik aşağıdakilerden hangisidir?
+
+**[Grafik seçenekleri — Parkur (x1000 Adet), Aylar: Eylül, Ekim, Kasım, Aralık]**
+
+A) Eylül: 10, Ekim: 8, Kasım: 5, Aralık: 1
+
+B) Eylül: 10, Ekim: 7, Kasım: 5, Aralık: 1
+
+C) Eylül: 10, Ekim: 7, Kasım: 5 (Aralık çubuğu gösterilmemiş)
+
+D) Eylül: 10, Ekim: 5, Kasım: 8, Aralık: 7
+
+E) Eylül: 10, Ekim: 3, Kasım: 5, Aralık: 9
+
+**6.** Aşağıdaki grafikte öğrencilerin günlük matematik dersine çalışma süresine bağlı olarak aldıkları notlar verilmiştir.
+
+**[Grafik:** günlük çalışma süresi (saat) – Not nokta grafiği: 1 saat: 80, 2 saat: 85, 3 saat: 90, 4 saat: 90, 5 saat: 100**]**
+
+Grafiğe göre aşağıdakilerden hangisi söylenemez?
+
+A) Günde 1 saat çalışan öğrenci 80 ile 85 arasında not almıştır.
+
+B) Öğrencilerin günlük çözdüğü soru sayısı matematik başarısını arttırmıştır.
+
+C) Öğrencilerin günlük matematik dersine çalışma süreleri ile matematik sınavından aldığı notlar arasında pozitif yönlü bir ilişki vardır.
+
+D) 3 saat çalışan öğrenci ile 4 saat çalışan öğrenci aynı notu almıştır.
+
+E) En yüksek notu 5 saat çalışan öğrenci almıştır.
+
+**7.** Bir veri grubundaki sayılar küçükten büyüğe doğru sıralandığında veri sayısı tek ise ortadaki sayıya, veri sayısı çift ise ortadaki iki sayının aritmetik ortalamasına o veri grubunun medyanı (ortanca), veri grubunda en çok tekrar eden sayıya ise o veri grubunun modu (tepe değer) denir.
+
+Bir dolmuşun 15 sefer yaptığında taşıdığı yolcu sayıları aşağıda verilmiştir.
+
+18, 20, 15, 13, 18, 22, 17, 25, 18, 19, 20, 14, 15, 17, 19
+
+Buna göre, bu verilere ait aşağıdakilerden hangisi doğrudur?
+
+| Seçenek | Medyan | Mod |
+|---|---|---|
+| A | 14 | 18 |
+| B | 18 | 16 |
+| C | 16 | 18 |
+| D | 16 | 16 |
+| E | 18 | 18 |
+
+**Cevap Anahtarı:** 5. B   6. B   7. E
+
+--- SAYFA 11 ---
+
+## ÖSYM Kurgularsa
+
+*Bu bölümdeki sorular TYT, AYT ve MSÜ sınavlarında çıkmış ve basın aracılığıyla paylaşılmış bazı sorulardan esinlenerek hazırlanmıştır. Bu sorular çıkmış soruların bire bir aynısı değildir.*
+
+### 2022 TYT Kurgusu
+
+**1.** Başlangıçta kumbarasında 200 TL'si olan Ali'nin 5 hafta boyunca kumbarasına attığı ve kumbarasından aldığı para miktarları grafikte gösterilmiştir.
+
+**[Grafik:** "Atılan / Alınan Para" başlıklı sütun grafiği — yatay eksen 1.-5. hafta, dikey eksen 20-100 TL arası. Kumbaraya atılan para (mor) ve kumbaradan alınan para (pembe) haftalık olarak: 1. hafta atılan 80 / alınan 50; 2. hafta atılan 70 / alınan 90; 3. hafta atılan 100 / alınan 20; 4. hafta atılan 50 / alınan 70; 5. hafta atılan 100 / alınan 70.**]**
+
+Buna göre Ali'nin 5 hafta sonra kumbarasındaki para miktarı kaç TL'dir?
+
+A) 180  B) 250  C) 300  D) 310  E) 320
+
+--- SAYFA 12 ---
+
+## Veri Analizi ve İstatistiksel Araştırma
+
+### Pist Alanı
+
+**1.** Aşağıdaki sütun grafiğinde bir tur teknesinin 4 hafta boyunca teknesinde taşıdığı yolcu sayısı verilmiştir.
+
+**[Grafik:** "Kişi Sayısı" başlıklı sütun grafiği — yatay eksen 1.-4. hafta, dikey eksen 32-38 kişi arası. 1. Hafta: 34, 2. Hafta: 38, 3. Hafta: 32, 4. Hafta: 38.**]**
+
+Buna göre, 4 hafta boyunca toplamda kaç yolcu taşınmıştır?
+
+A) 104  B) 125  C) 130  D) 135  E) 142
+
+**2.** Aşağıda bir veri grubuna ait kutu grafiği verilmiştir.
+
+**[Grafik:** Kutu (box-plot) grafiği — sayı doğrusu 10'dan 70'e kadar 10'ar birim işaretli. Sol bıyık ucu 20, kutunun sol kenarı 30, kutu içindeki medyan çizgisi 40, kutunun sağ kenarı 60, sağ bıyık ucu 70.**]**
+
+Grafiğe göre aşağıdakilerden hangisi doğrudur?
+
+A) En küçük değer 30'dur.
+B) En büyük değer 60'dır.
+C) Aritmetik ortalama 40'dır.
+D) Açıklık 60'dır.
+E) Ortanca değer 50'dir.
+
+**3.** 3, 4, 9, 10, 14
+
+sayılarının standart sapması aşağıdaki aralıkların hangisindedir?
+
+A) (2, 3)  B) (3, 4)  C) (4, 5)  D) (5, 6)  E) (6, 7)
+
+**4.** Aşağıda yıllara göre Metin Okullarına cinsiyete göre kayıt yaptıran öğrenci sayılarını gösteren sütun grafiği verilmiştir.
+
+**[Grafik:** "Öğrenci Sayısı (x100)" başlıklı, yıllara göre (2021-2025) Erkek (mavi) ve Kız (pembe) öğrenci sayıları sütun grafiği. 2021: Erkek 6, Kız 7; 2022: Erkek 5, Kız 4; 2023: Erkek 4, Kız 6; 2024: Erkek 5, Kız 5; 2025: Erkek 7, Kız 3.**]**
+
+Hangi yıl kayıt yaptıran toplam öğrenci sayısı kayıt yaptıran kız öğrenci sayısının katıdır?
+
+A) 2021  B) 2022  C) 2023  D) 2024  E) 2025
+
+--- SAYFA 13 ---
+
+**5.** $a_1, a_2, a_3, \dots, a_n$ sayı dizisinin aritmetik ortalaması $\bar{x}$ ise standart sapması
+
+$$S = \sqrt{\frac{(a_1 - \bar{x})^2 + (a_2 - \bar{x})^2 + \dots + (a_n - \bar{x})^2}{n - 1}}$$
+
+biçiminde bulunur.
+
+Buna göre,
+
+I. 2, 3, 4, 5, 6
+II. 5, 5, 5, 5, 5
+III. 2, 4, 6, 8, 10
+
+veri grubunun standart sapmasının küçükten büyüğe sıralaması aşağıdakilerden hangisidir?
+
+A) III < II < I
+B) II < I < III
+C) II < III < I
+D) I < II < III
+E) I < III < II
+
+**6.** Aşağıdaki grafik bir ilçedeki A, B, C ve D okullarındaki öğretmen sayılarının okullara göre dağılımını göstermektedir.
+
+**[Grafik:** "Öğretmen Sayısı" başlıklı sütun grafiği — A: 50, B: 70, C: 30, D: 50.**]**
+
+Okuldaki öğretmen sayıları okullarına göre bir daire grafiği ile gösterildiğinde C okulunu gösteren daire diliminin merkez açısı kaç derecedir?
+
+A) 45  B) 50  C) 54  D) 60  E) 90
+
+**7.** Bir sınavdaki genel yetenek, genel kültür ve eğitim bilimleri bölümündeki her sorunun puanı sırasıyla $a$, $b$ ve $c$ dir. Elif, Doğa ve Ercan'ın bu sınavda çözdükleri soru sayıları aşağıdaki grafikte verilmiştir.
+
+**[Grafik:** "Soru Sayısı" başlıklı, kişiye göre (Elif, Doğa, Ercan) Genel Yetenek (mavi), Genel Kültür (kırmızı), Eğitim Bilimleri (yeşil) sütun grafiği. Elif: Genel Yetenek 30, Genel Kültür 60, Eğitim Bilimleri 30. Doğa: Genel Yetenek 60, Genel Kültür 30, Eğitim Bilimleri 30. Ercan: Genel Yetenek 30, Genel Kültür 30, Eğitim Bilimleri 60.**]**
+
+$a + b + c = 4{,}7$ olduğuna göre, kişi başı ortalama kaç puan almışlardır?
+
+A) 188  B) 186  C) 184  D) 182  E) 180
+
+**8.** Aşağıdaki histogramda 80 soruluk matematik sınavında bir sınıfın doğru cevap sayıları gösterilmiştir.
+
+**[Grafik:** "Öğrenci Sayısı" başlıklı histogram — yatay eksen "Doğru Cevap Sayısı" aralıkları 11-24, 25-38, 39-52, 53-66, 67-80; dikey eksen öğrenci sayısı 1-7. Sırasıyla: 11-24: 3, 25-38: 6, 39-52: 7, 53-66: 5, 67-80: 4.**]**
+
+Buna göre,
+
+I. Verilerin açıklığı en fazla 69'dur.
+II. Doğru sayısı 35 – 45 arasında olan en çok 15 öğrenci vardır.
+III. Sınıftaki öğrencilerin %36'sı 52 sorudan fazla doğru yapmıştır.
+
+ifadelerinden hangileri doğrudur?
+
+A) Yalnız I  B) Yalnız II  C) Yalnız III  D) I ve III  E) II ve III
+
+--- SAYFA 14 ---
+
+**9.** Aşağıda Aysun, Beliz ve Cemil isimli üç öğrenci ile ilgili
+
+- Şekil 1'deki grafikte üç öğrencinin 1 yılda okuması gereken kitap sayısı
+- Şekil 2'deki grafikte ise bu üç öğrencinin 1 yılda okuduğu kitap sayısı
+
+gösterilmiştir.
+
+**[Grafik:** Şekil 1 — "Kitap Sayısı (Adet)" okuması gereken: Aysun 20, Beliz 10, Cemil 15. Şekil 2 — "Kitap Sayısı (Adet)" okuduğu: Aysun 18, Beliz 9, Cemil 12.**]**
+
+Buna göre,
+
+I. Aysun ve Beliz okumaları gereken kitap sayısına göre aynı oranda kitap okumuşlardır.
+II. Okuması gereken kitap sayısına göre en düşük oran Cemil'dedir.
+III. Okuması gereken kitap sayısına göre, Cemil Beliz'den daha fazla oranda kitap okumuştur.
+
+ifadelerinden hangileri doğrudur?
+
+A) Yalnız I  B) Yalnız II  C) I ve II  D) I ve III  E) II ve III
+
+**10.** Aşağıdaki grafikte bir öğretim yılında bir öğrencinin İngilizce ve Matematik sınavlarından aldığı notlar sırasıyla gösterilmiştir.
+
+**[Grafik:** Dağılım (saçılım) grafiği — yatay eksen Matematik, dikey eksen İngilizce, ikisi de 50-100 aralığı. Noktalar sırasıyla (Matematik, İngilizce): (50, 95), (60, 80), (70, 80), (75, 70), (90, 70), (100, 60).**]**
+
+Buna göre,
+
+I. Öğrenci, yıl içerisinde matematik dersine çalıştığı zamanı arttırmıştır.
+II. Öğrencinin, İngilizce notları ile Matematik notları arasında pozitif bir ilişki vardır.
+III. Öğrencinin hem İngilizce hem de Matematik notunu arttırdığı sınav olmuştur.
+
+ifadelerinden hangileri doğrudur?
+
+A) Yalnız I  B) Yalnız II  C) Yalnız III  D) I ve III  E) II ve III
+
+**11.** Aşağıda bir okuldaki sınıfların sınıf mevcuduna göre sayılarını veren nokta grafiği verilmiştir.
+
+**[Grafik:** Nokta (dot plot) grafiği — yatay eksen "Sınıf mevcudu" değerleri 15, 20, 24, 25, 30. Değer başına nokta sayısı: 15 → 3, 20 → 3, 24 → 4, 25 → 3, 30 → 1 (toplam 14 nokta).**]**
+
+Buna göre,
+
+I. Okulda toplam sınıf sayısı 14'tür.
+II. Bu veri grubunun mod (Tepe Değer) u 20'dir.
+III. Bu veri grubunun açıklığı 15'tir.
+
+ifadelerinden hangileri doğrudur?
+
+A) Yalnız I  B) Yalnız III  C) I ve II  D) I ve III  E) I, II ve III
+
+--- SAYFA 15 ---
+
+**12.** Aşağıda verilen kutu grafiği 9A sınıfının matematik sınavına aittir.
+
+**[Grafik:** Kutu (box-plot) grafiği — sayı doğrusu üzerinde işaretli noktalar: a (bilinmeyen en küçük değer), 65, 70, 78, 95 ("Puan" ekseni). Kutunun sol kenarı 65, medyan çizgisi 70, kutunun sağ kenarı 78, sağ bıyık ucu 95, sol bıyık ucu a.**]**
+
+Buna göre, bu veri grubunun açıklık değeri, medyan değerinden 20 eksik ise Matematik sınavından alınan en düşük not kaçtır?
+
+A) 35  B) 40  C) 45  D) 50  E) 55
+
+**13.** Her öğrencinin yalnız bir enstrüman çalabildiği bir sınıfta aşağıdaki grafik verilmiştir.
+
+**[Grafik:** "Kişi Sayısı" başlıklı sütun grafiği — yatay eksen "Enstrüman": Gitar 8, Saz 6, Piyano 4, Keman 2.**]**
+
+Buna göre, bu enstrümanlar bir daire grafiğinde gösterildiğinde piyanonun merkez açısı kaç olur?
+
+A) 36  B) 72  C) 108  D) 144  E) 160
+
+**14.** Aşağıda, Nehir dışında tüm öğrencilerin katıldığı matematik sınavına ait süre bilgisinin olduğu nokta grafiği verilmiştir.
+
+**[Grafik:** Nokta (dot plot) grafiği — yatay eksen "Süre (dakika)" değerleri 45, 50, 55, 57, 65, 75. Değer başına nokta sayısı: 45 → 3, 50 → 3, 55 → 3, 57 → 4, 65 → 3, 75 → 1.**]**
+
+Nehir iyileşip okula geldiğinde öğretmeni aynı sınavı Nehir'e uygulamış, Nehir ise bu sınavı arkadaşlarının sürelerinin olduğu veri grubundaki medyan değerinden büyük, mod (tepe değer) değerinden küçük bir sürede tamamlamıştır.
+
+Buna göre, Nehir bu sınavı kaç dakikada tamamlamıştır?
+
+A) 48  B) 54  C) 56  D) 58  E) 67
+
+## CEVAP ANAHTARI
+
+### Sayfa 11 — ÖSYM Kurgularsa
+
+1. C
+
+### Sayfa 12-15 — Pist Alanı (Veri Analizi ve İstatistiksel Araştırma)
+
+1. E
+2. D
+3. C
+4. D
+5. B
+6. C
+7. A
+8. D
+9. C
+10. D
+11. D
+12. C
+13. B
+14. C
