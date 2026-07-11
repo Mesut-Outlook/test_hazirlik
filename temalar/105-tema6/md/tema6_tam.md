@@ -494,7 +494,7 @@ A) 40   B) 45   C) 50   D) 55   E) 60
 
 **2.** Aşağıda bir veri grubuna ait bir nokta grafiği verilmiştir.
 
-**[Grafik:** nokta grafiği — 1: 2, 2: 3, 3: 5, 4: 2, 5: 2, 6: 3, 7: 2**]**
+**[Grafik:** nokta grafiği — 1: 2, 2: 3, 3: 5, 4: 3, 5: 2, 6: 3, 7: 2**]**
 
 Buna göre,
 
