@@ -130,6 +130,7 @@ talepleri TAMAMEN ön yüzden yürür.
 (Arayüzden gelen serbest metin düzenleme talepleri buraya eklenecek — işleyen
 ajan talebin altına ✅ + özet yazar.)
 - 2026-07-10T19:55:51+03:00 (100-tema-6-ver-2): F6 kayit testi (otomatiksiz)
+- 2026-07-11T14:24:56+03:00 (107-tema-7-tam-donusum): seceneklerde 1/2 gibi secenekleri daha iyi nasıl gosterirsin
 
 ## FAZ 3 — Bitişik Kök + Düzenlenebilir HTML'in Yeniden Kurulması (Linux, 2026-07-04 gece)
 

@@ -1,0 +1,1 @@
+- 2026-07-11T14:24:56+03:00 (107-tema-7-tam-donusum): seceneklerde 1/2 gibi secenekleri daha iyi nasıl gosterirsin

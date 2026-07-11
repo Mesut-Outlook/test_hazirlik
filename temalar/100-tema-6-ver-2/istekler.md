@@ -1,1 +1,0 @@
-- 2026-07-10T19:55:51+03:00 (100-tema-6-ver-2): F6 kayit testi (otomatiksiz)

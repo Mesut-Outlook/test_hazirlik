@@ -1,30 +1,28 @@
 HAFİF TEMA MOTORU — İŞLEM RAPORU
 ==================================================
-Kaynak: /home/mesuto/Downloads/9.sınıf 6.tema.pdf
-Cikti: cikti/6.tema_hafif_v1.pdf
+Kaynak: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\temalar\110-tema-7\kaynak\9.sınıf 7.tema.pdf
+Cikti: C:\Users\egemen\Documents\_PROJELER\Test Hazırlık\cikti\Tema_7_v1.pdf
 Profil: metin_yayinlari
-Toplam sayfa: 15
-  Metin tabanli sayfa: 15
+Toplam sayfa: 13
+  Metin tabanli sayfa: 13
   Taranmis (resim tabanli) sayfa: 0
-Banner/rozet silinen bolge sayisi: 34
-Sayfa numarasi silinen sayfa sayisi: 15
-Filigran silinen bolge sayisi: 54
-Footer URL (www.metinyayinlari.com) silinen sayfa sayisi: 15
+Banner/rozet silinen bolge sayisi: 30
+Sayfa numarasi silinen sayfa sayisi: 13
+Filigran silinen bolge sayisi: 70
+Footer URL (www.metinyayinlari.com) silinen sayfa sayisi: 13
 Yontem: vektor redaksiyon (page.add_redact_annot + apply_redactions)
 
 Sayfa sayfa detay:
-  {'sayfa': 1, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
+  {'sayfa': 1, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 2, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 3, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
+  {'sayfa': 3, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 4, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 5, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 6, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 2, 'footer_url': 1}
-  {'sayfa': 7, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 6, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 10, 'footer_url': 1}
+  {'sayfa': 7, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 16, 'footer_url': 1}
   {'sayfa': 8, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 9, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 10, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 11, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 10, 'mod': 'vektor', 'banner': 3, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
+  {'sayfa': 11, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 12, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
   {'sayfa': 13, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 14, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
-  {'sayfa': 15, 'mod': 'vektor', 'banner': 2, 'sayfa_no': 1, 'filigran': 4, 'footer_url': 1}
