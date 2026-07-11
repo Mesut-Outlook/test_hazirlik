@@ -157,6 +157,44 @@
 
     <!-- ADIM 1 -->
     <div class="panel adim-panel" id="panel-adim-1">
+      <div class="form-grup form-grup--mod">
+        <label class="mod-secici-baslik">Dönüşüm Modu — ne yapılacağını seçin</label>
+        <div class="mod-secici">
+          <label class="mod-secenegi mod-secenegi--tam">
+            <input type="radio" name="donusum-modu" value="agir" checked>
+            <div class="mod-secenegi__govde">
+              <div class="mod-secenegi__ust">
+                <span class="mod-secenegi__baslik">Tam Dönüşüm</span>
+                <span class="mod-secenegi__rozet">Varsayılan</span>
+                <span class="mod-secenegi__onay">Seçili</span>
+              </div>
+              <ul class="mod-secenegi__liste">
+                <li>Tüm yazıyı <strong>Comic Sans</strong> yazı tipine çevirir</li>
+                <li>Soruları <strong>sıralama / silme / ekleme</strong> ekranı açılır</li>
+                <li>Dönüşüm raporu ve otomatik doğrulama çalışır</li>
+                <li>Daha uzun sürer, en esnek sonucu verir</li>
+              </ul>
+            </div>
+          </label>
+          <label class="mod-secenegi mod-secenegi--hafif">
+            <input type="radio" name="donusum-modu" value="hafif">
+            <div class="mod-secenegi__govde">
+              <div class="mod-secenegi__ust">
+                <span class="mod-secenegi__baslik">Hafif Tema</span>
+                <span class="mod-secenegi__rozet">Hızlı</span>
+                <span class="mod-secenegi__onay">Seçili</span>
+              </div>
+              <ul class="mod-secenegi__liste">
+                <li>Sadece üst banner/rozet, filigran ve orijinal sayfa numarasını <strong>kaldırır</strong></li>
+                <li>Kendi logonuzu ekler; <strong>metne ve yazı tipine dokunmaz</strong></li>
+                <li>Düzenleme ekranı ve rapor <strong>yoktur</strong></li>
+                <li>Tek adımda, saniyeler içinde PDF hazır olur</li>
+              </ul>
+            </div>
+          </label>
+        </div>
+      </div>
+
       <div class="form-grup">
         <label for="girdi-kaynak-dosya">Kaynak Ders Notu (PDF veya Word)</label>
         <div class="dosya-secici">
@@ -179,26 +217,6 @@
         <label for="girdi-tema-adi">Tema Adı</label>
         <input type="text" id="girdi-tema-adi" placeholder="Örn. 2. Tema — Fonksiyonlar">
         <span class="ipucu">Testi daha sonra listede tanıyabilmeniz için kısa bir ad.</span>
-      </div>
-
-      <div class="form-grup">
-        <label>Dönüşüm Modu</label>
-        <div class="mod-secici">
-          <label class="mod-secenegi">
-            <input type="radio" name="donusum-modu" value="agir" checked>
-            <div class="mod-secenegi__govde">
-              <div class="mod-secenegi__baslik">Tam Dönüşüm</div>
-              <div class="mod-secenegi__aciklama">Comic Sans'a çevirir, soruları düzenleyebilirsin (mevcut davranış).</div>
-            </div>
-          </label>
-          <label class="mod-secenegi">
-            <input type="radio" name="donusum-modu" value="hafif">
-            <div class="mod-secenegi__govde">
-              <div class="mod-secenegi__baslik">Hafif Tema</div>
-              <div class="mod-secenegi__aciklama">Sadece üst banner/rozet, filigran ve orijinal sayfa numarasını kaldırır, logomuzu ekler. Metne ve yazı stiline dokunmaz, düzenleme ekranı yok — tek adımda PDF hazır olur.</div>
-            </div>
-          </label>
-        </div>
       </div>
 
       <div class="form-eylemleri">
