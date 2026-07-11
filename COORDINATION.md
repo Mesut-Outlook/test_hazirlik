@@ -1869,3 +1869,13 @@ gerekiyor (henüz AÇIK).
 **Kabul ölçütleri:** (a) 6.tema.pdf'te banner/KUR/filigran/orijinal-sayfa-no/
 www.metinyayinlari.com sıfır; (b) metin bütünlüğü kaybı sıfır; (c) taranmış
 sayfa desteği ayrı iş.
+
+### F15-UI — Sihirbaza entegrasyon çapraz doğrulaması (Fable, 2026-07-11)
+
+Commit `aa5d8a8` (arayüzde "hafif"/"agir" mod seçimi) uçtan uca API üzerinden
+test edildi (`POST /api/temalar {mod:"hafif"}` → job tamam → `GET
+.../bloklar` 400, `GET .../rapor` 404 — beklenen davranış, hafif modda blok
+düzenleme/rapor yok). Çıktı PDF'i (6.tema.pdf, 15 sayfa) 150dpi'de sayfa 4
+gözle kontrol edildi: logo üst ortada, KUR/banner/filigran/orijinal sayfa no
+yok, kendi sayfa numarası temiz. Test teması ve çıktısı doğrulama sonrası
+temizlendi. **SONUÇ: entegrasyon çalışıyor, ek düzeltme gerekmedi.**
