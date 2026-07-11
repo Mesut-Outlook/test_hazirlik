@@ -15,9 +15,15 @@
                                       [{tema_id, ad, durum:'hazırlanıyor'|'hazır'|'hata',
                                         surum?, soru_sayisi?, kok_sayisi?, gorsel_sayisi?,
                                         job_id?, hata?}]  — PDF YOLU YOK (bkz. not aşağıda).
-     POST /api/temalar            -> { tema_id, job_id }  (bu iş SADECE extract.py'yi
-                                      çalıştırır — PDF ÜRETMEZ; PDF için ayrıca /uret
-                                      çağrılması gerekir, bkz. sihirbazJobIzle zinciri)
+     POST /api/temalar            body {kaynak_dosya, ad, cikti_klasoru, mod?:
+                                      "agir"(vars.)|"hafif"} -> { tema_id, job_id }
+                                      mod="agir": bu iş SADECE extract.py'yi çalıştırır
+                                      — PDF ÜRETMEZ; PDF için ayrıca /uret çağrılması
+                                      gerekir (bkz. sihirbazJobIzle zinciri).
+                                      mod="hafif": TEK bu iş sistem/hafif_tema.py'yi
+                                      çalıştırıp PDF'i DE üretir (job.sonuc.mod="hafif",
+                                      .cikti_pdf/.kopya dolu) — /uret'e ZİNCİRLENMEZ;
+                                      bu temada /bloklar, /manifest, /uret 400 döner.
      GET  /api/jobs/{id}          -> { id, tur, tema_id, durum:'bekliyor'|'çalışıyor'|'tamam'|'hata',
                                         loglar:[düz metin satırları], sonuc, hata }
                                       — ilerleme YÜZDESİ ve mesaj alanı YOK; durum metni
@@ -58,7 +64,7 @@
   const state = {
     ayarlar: null,
     temalar: null,
-    sihirbaz: { kaynakDosya: null, ciktiKlasoru: null, temaAdi: "", temaId: null, jobId: null },
+    sihirbaz: { kaynakDosya: null, ciktiKlasoru: null, temaAdi: "", temaId: null, jobId: null, mod: "agir" },
     duzenle: { temaId: null, akis: [], suruklenenId: null },
     gezgin: null,
     aktifJobIzleyici: null,
@@ -536,10 +542,12 @@
     const kart = document.createElement("div");
     kart.className = "tema-kart";
     const hazirDegil = tema.durum && tema.durum !== "hazır";
+    const hafifMi = tema.mod === "hafif";
     const rozetBilgi = DURUM_ROZETI[tema.durum];
     kart.innerHTML = `
       <h3 class="tema-kart__baslik">${kacisliMetin(tema.ad)}</h3>
       <div class="tema-kart__meta">
+        ${hafifMi ? `<span title="Dönüşüm modu">Hafif Tema</span>` : ""}
         ${tema.surum ? `<span>v${kacisliMetin(tema.surum)}</span>` : ""}
         ${tema.soru_sayisi != null ? `<span>${kacisliMetin(tema.soru_sayisi)} soru</span>` : ""}
         ${tema.gorsel_sayisi != null ? `<span>${kacisliMetin(tema.gorsel_sayisi)} görsel</span>` : ""}
@@ -549,16 +557,26 @@
       ${tema.hata ? `<p style="color:var(--renk-hata); font-size:13px; margin:0;">${kacisliMetin(tema.hata)}</p>` : ""}
       <div class="tema-kart__butonlar">
         <button class="btn" data-aksiyon="onizle" ${hazirDegil ? "disabled" : ""}>Önizle</button>
-        <button class="btn btn-birincil" data-aksiyon="duzenle" ${hazirDegil ? "disabled" : ""}>Düzenle</button>
+        ${
+          hafifMi
+            ? ""
+            : `<button class="btn btn-birincil" data-aksiyon="duzenle" ${hazirDegil ? "disabled" : ""}>Düzenle</button>
         <button class="btn" data-aksiyon="uret" ${hazirDegil ? "disabled" : ""}>Yeniden Üret</button>
-        <button class="btn" data-aksiyon="rapor" ${hazirDegil ? "disabled" : ""}>Rapor</button>
+        <button class="btn" data-aksiyon="rapor" ${hazirDegil ? "disabled" : ""}>Rapor</button>`
+        }
         <button class="btn btn-tehlike" data-aksiyon="sil" title="Temayı çöpe taşı">Sil</button>
       </div>
     `;
+    // Hafif mod: blok düzenleme/yeniden üretim/rapor bu modda yok (backend 400
+    // döner) — kartta o butonlar hiç oluşturulmadı, "Önizle" doğrudan son_pdf'i
+    // gösterir (aynı pdfOnizlemeAc/sonuç ekranı bileşeni yeniden kullanılıyor).
     kart.querySelector('[data-aksiyon="onizle"]').addEventListener("click", () => pdfOnizlemeAc(tema));
-    kart.querySelector('[data-aksiyon="duzenle"]').addEventListener("click", () => duzenleAc(tema.tema_id));
-    kart.querySelector('[data-aksiyon="uret"]').addEventListener("click", () => temaYenidenUret(tema));
-    kart.querySelector('[data-aksiyon="rapor"]').addEventListener("click", () => raporModalAc(tema));
+    const duzenleBtn = kart.querySelector('[data-aksiyon="duzenle"]');
+    if (duzenleBtn) duzenleBtn.addEventListener("click", () => duzenleAc(tema.tema_id));
+    const uretBtn = kart.querySelector('[data-aksiyon="uret"]');
+    if (uretBtn) uretBtn.addEventListener("click", () => temaYenidenUret(tema));
+    const raporBtn = kart.querySelector('[data-aksiyon="rapor"]');
+    if (raporBtn) raporBtn.addEventListener("click", () => raporModalAc(tema));
     kart.querySelector('[data-aksiyon="sil"]').addEventListener("click", () => temaSilOnayla(tema));
     return kart;
   }
@@ -685,10 +703,12 @@
 
   function sihirbazSifirla() {
     if (state.sihirbaz.jobId) return; // devam eden bir iş varsa sıfırlama
-    state.sihirbaz = { kaynakDosya: null, ciktiKlasoru: null, temaAdi: "", temaId: null, jobId: null };
+    state.sihirbaz = { kaynakDosya: null, ciktiKlasoru: null, temaAdi: "", temaId: null, jobId: null, mod: "agir" };
     el("#girdi-kaynak-dosya").value = "";
     el("#girdi-cikti-klasoru").value = state.ayarlar ? state.ayarlar.cikti_klasoru || "" : "";
     el("#girdi-tema-adi").value = "";
+    const varsayilanRadio = el('input[name="donusum-modu"][value="agir"]');
+    if (varsayilanRadio) varsayilanRadio.checked = true;
     adimGoster(1);
   }
 
@@ -746,6 +766,8 @@
       return;
     }
     state.sihirbaz.temaAdi = temaAdi;
+    const secilenModRadio = el('input[name="donusum-modu"]:checked');
+    state.sihirbaz.mod = secilenModRadio ? secilenModRadio.value : "agir";
 
     el("#adim2-log-paneli").innerHTML = "";
     el("#adim2-ilerleme-cubuk").style.width = "0%";
@@ -759,6 +781,7 @@
         kaynak_dosya: state.sihirbaz.kaynakDosya,
         ad: state.sihirbaz.temaAdi,
         cikti_klasoru: state.sihirbaz.ciktiKlasoru,
+        mod: state.sihirbaz.mod,
       });
       state.sihirbaz.temaId = sonuc.tema_id;
       state.sihirbaz.jobId = sonuc.job_id;
@@ -810,8 +833,8 @@
           bildirimGoster("Dönüştürme başarısız oldu.", "hata");
           return;
         }
-        if (asama === "olustur") {
-          // Bloklar hazır — şimdi PDF üretimini başlat (aynı adım 2 ekranında devam).
+        if (asama === "olustur" && state.sihirbaz.mod !== "hafif") {
+          // Ağır mod: bloklar hazır — şimdi PDF üretimini başlat (aynı adım 2 ekranında devam).
           logSatiriEkle(el("#adim2-log-paneli"), "Bloklar hazır, PDF üretimi başlatılıyor…");
           el("#adim2-durum-metni").textContent = "PDF üretiliyor…";
           try {
@@ -825,7 +848,8 @@
           }
           return;
         }
-        // asama === "uret": PDF hazır.
+        // asama === "uret" (ağır mod) VEYA asama === "olustur" + mod === "hafif":
+        // TEK job'ın sonucu = final sonuç, PDF hazır.
         const pdfYolu = veri.sonuc && (veri.sonuc.kopya || veri.sonuc.cikti_pdf);
         sonPdfYoluKaydet(state.sihirbaz.temaId, pdfYolu);
         adim3Doldur(veri.sonuc || {});
@@ -967,22 +991,45 @@
     if (e.target.id === "rapor-modal") raporModalKapat();
   });
 
+  // Hafif modda (extract.py/assemble.py hiç çalışmadığı için) qa/dogrula.py ve
+  // sistem/rapor.py'nin ürettiği alanlar yok — dogrulamaPaneliOlustur/
+  // raporPaneliOlustur'u undefined ile çağırıp yanıltıcı "atlandı/bulunamadı"
+  // uyarıları göstermek yerine, tek bir bilgilendirici panel gösterilir.
+  function hafifModBilgiPaneliOlustur() {
+    const sarmalayici = document.createElement("div");
+    sarmalayici.innerHTML = `<div class="rozet" style="background:var(--renk-basari-zemin); color:var(--renk-basari);">
+      <span class="rozet__isaret" style="background:var(--renk-basari);">✓</span>
+      <span>Hafif tema: üst banner/rozet, filigran ve orijinal sayfa numarası kaldırıldı, kendi logomuz eklendi.
+      Metne ve yazı stiline dokunulmadı. Bu modda ayrı bir doğrulama/dönüşüm raporu çalıştırılmaz.</span>
+    </div>`;
+    return sarmalayici;
+  }
+
   function adim3Doldur(sonuc) {
     const pdfYolu = sonuc.kopya || sonuc.cikti_pdf;
     if (pdfYolu) {
       pdfEmbedYukle(el("#adim3-pdf-onizleme"), pdfYolu);
     }
+    const hafifMi = sonuc.mod === "hafif";
+    const dogrulamaBaslik = el("#adim3-dogrulama-baslik");
+    if (dogrulamaBaslik) dogrulamaBaslik.textContent = hafifMi ? "Hafif Tema Özeti" : "Doğrulama Sonucu";
     const liste = el("#adim3-dogrulama-listesi");
     liste.innerHTML = "";
-    liste.appendChild(dogrulamaPaneliOlustur(sonuc.dogrulama));
+    liste.appendChild(hafifMi ? hafifModBilgiPaneliOlustur() : dogrulamaPaneliOlustur(sonuc.dogrulama));
     el("#adim3-cikti-notu").innerHTML = pdfYolu
       ? `PDF şu konuma kaydedildi:<br><code>${kacisliMetin(pdfYolu)}</code><br>Dosya yöneticinizden bu klasöre giderek dosyayı bulabilirsiniz.`
       : "Çıktı konumu bilgisi alınamadı.";
+    const raporBaslik = el("#adim3-rapor-baslik");
+    if (raporBaslik) raporBaslik.hidden = hafifMi;
     const raporKutu = el("#adim3-rapor-kutusu");
     if (raporKutu) {
       raporKutu.innerHTML = "";
-      raporKutu.appendChild(raporPaneliOlustur(sonuc.rapor_ozet));
+      raporKutu.hidden = hafifMi;
+      if (!hafifMi) raporKutu.appendChild(raporPaneliOlustur(sonuc.rapor_ozet));
     }
+    // Hafif modda düzenleme ekranı yok — "Soruları Düzenle" düğmesi anlamsız.
+    const duzenleBtn = el("#btn-adim3-duzenle");
+    if (duzenleBtn) duzenleBtn.hidden = hafifMi;
   }
 
   el("#btn-adim3-duzenle").addEventListener("click", () => {

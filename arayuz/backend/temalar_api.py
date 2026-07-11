@@ -36,6 +36,20 @@ from datetime import datetime
 router = APIRouter()
 
 DESTEKLENEN_KAYNAK_UZANTILARI = {"pdf", "docx", "doc"}
+DESTEKLENEN_MODLAR = {"agir", "hafif"}
+
+
+def _hafif_mod_engelle(tema_dir: str) -> None:
+    """Bloklar/manifest/uret uç noktaları yalnızca AĞIR mod temaları için
+    anlamlıdır (extract.py'nin ürettiği blok/soru modeline dayanır). Hafif
+    modda bunlar hiç üretilmez — anlaşılır bir 400 ile reddet."""
+    meta = tema_meta.oku(tema_dir)
+    if meta.get("mod") == "hafif":
+        raise ApiHata(
+            400,
+            "bu tema hafif modda oluşturuldu",
+            "Hafif tema modunda blok düzenleme/yeniden üretim yok — PDF tek adımda üretilip son_pdf alanında sunulur.",
+        )
 
 
 def _slugla(ad: str) -> str:
@@ -80,6 +94,31 @@ def get_temalar():
         if not os.path.isdir(tema_dir):
             continue
         meta = tema_meta.oku(tema_dir)
+        mod = meta.get("mod", "agir")
+
+        if mod == "hafif":
+            # Hafif modda manifest.json HİÇ üretilmez (extract.py çalışmaz) —
+            # "hazır" olup olmadığı yalnızca son_pdf'in varlığına bakılarak
+            # anlaşılır (bkz. COORDINATION.md notu / bu dosyanın üst yorumu).
+            son_pdf = meta.get("son_pdf")
+            if son_pdf and not os.path.exists(son_pdf):
+                son_pdf = None
+            sonuc.append(
+                {
+                    "tema_id": tema_id,
+                    "ad": meta.get("ad", tema_id),
+                    "durum": "hazır" if son_pdf else "hazırlanıyor",
+                    "mod": "hafif",
+                    "surum": None,
+                    "soru_sayisi": None,
+                    "kok_sayisi": None,
+                    "gorsel_sayisi": None,
+                    "son_pdf": son_pdf,
+                    "guncellenme": _tema_guncellenme(tema_dir),
+                }
+            )
+            continue
+
         manifest_yol = os.path.join(tema_dir, "manifest.json")
         if not os.path.exists(manifest_yol):
             sonuc.append(
@@ -87,6 +126,7 @@ def get_temalar():
                     "tema_id": tema_id,
                     "ad": meta.get("ad", tema_id),
                     "durum": "hazırlanıyor",
+                    "mod": "agir",
                     "job_id": meta.get("son_extract_job"),
                     "surum": None,
                     "soru_sayisi": None,
@@ -103,6 +143,7 @@ def get_temalar():
                     "tema_id": tema_id,
                     "ad": meta.get("ad", tema_id),
                     "durum": "hata",
+                    "mod": "agir",
                     "hata": str(exc),
                     "surum": None,
                     "soru_sayisi": None,
@@ -118,6 +159,7 @@ def get_temalar():
                 "tema_id": tema_id,
                 "ad": meta.get("ad", manifest.get("baslik", tema_id)),
                 "durum": "hazır",
+                "mod": "agir",
                 "surum": manifest.get("surum"),
                 "soru_sayisi": sayimlar["soru"],
                 "kok_sayisi": sayimlar["kok"],
@@ -134,10 +176,14 @@ class YeniTema(BaseModel):
     kaynak_dosya: str
     ad: str
     cikti_klasoru: str
+    mod: str = "agir"  # "agir" (Tam Dönüşüm, varsayılan) | "hafif" (Hafif Tema)
 
 
 @router.post("/api/temalar")
 def post_tema(body: YeniTema):
+    if body.mod not in DESTEKLENEN_MODLAR:
+        raise ApiHata(400, "geçersiz mod", f"'{body.mod}' — 'agir' veya 'hafif' bekleniyor")
+
     kaynak_gercek = guvenli_ev_yolu(body.kaynak_dosya, gerekli="file")
     uzanti = kaynak_gercek.rsplit(".", 1)[-1].lower() if "." in kaynak_gercek else ""
     if uzanti not in DESTEKLENEN_KAYNAK_UZANTILARI:
@@ -171,18 +217,65 @@ def post_tema(body: YeniTema):
             "kaynak_dosya_kopya": kopya_yolu,
             "cikti_klasoru": cikti_klasoru_gercek,
             "olusturuldu": simdi_iso(),
+            "mod": body.mod,
         },
     )
 
     def calistir(job: Job) -> None:
-        job.log(f"Tema oluşturuluyor: {tema_id}")
+        job.log(f"Tema oluşturuluyor: {tema_id} (mod={body.mod})")
         pdf_yolu = kopya_yolu
         if uzanti in ("docx", "doc"):
             job.log("Word belgesi PDF'e çevriliyor (soffice)...")
             pdf_yolu = pipeline.docx_to_pdf(kopya_yolu, kaynak_dir, job.log)
-            tema_meta.yaz(tema_dir, {"kaynak_pdf": pdf_yolu})
-        else:
-            tema_meta.yaz(tema_dir, {"kaynak_pdf": pdf_yolu})
+        tema_meta.yaz(tema_dir, {"kaynak_pdf": pdf_yolu})
+
+        if body.mod == "hafif":
+            job.log("hafif_tema.py çalıştırılıyor (tek adım — banner/rozet, filigran, orijinal sayfa no temizliği)...")
+            cikti_pdf = sonraki_cikti_yolu(body.ad, 1)
+            pipeline.run_hafif_tema(pdf_yolu, cikti_pdf, job.log)
+
+            kopya_yolu_cikti = None
+            if cikti_klasoru_gercek and os.path.isdir(cikti_klasoru_gercek):
+                kopya_yolu_cikti = os.path.join(cikti_klasoru_gercek, os.path.basename(cikti_pdf))
+                if os.path.realpath(cikti_pdf) != os.path.realpath(kopya_yolu_cikti):
+                    shutil.copy2(cikti_pdf, kopya_yolu_cikti)
+                    job.log(f"Kopyalandı: {kopya_yolu_cikti}")
+                else:
+                    job.log(f"Çıktı zaten hedef klasörde: {cikti_pdf}")
+
+            sayfa = pipeline.pdf_sayfa_sayisi(cikti_pdf)
+            tema_meta.yaz(tema_dir, {"son_pdf": cikti_pdf, "mod": "hafif"})
+            runs_jsonl_yaz(
+                tema_dir,
+                {
+                    "islem": "hafif_tema",
+                    "girdi": pdf_yolu,
+                    "cikti": cikti_pdf,
+                    "sayfa": sayfa,
+                    "dogrulama": "-",
+                    "sha256": "",
+                    "ajan": "Arayüz",
+                },
+            )
+            islem_gunlugu_yaz(
+                tema_dir,
+                "Arayüz - hafif tema oluşturma",
+                [
+                    f"Kaynak: {kaynak_gercek}",
+                    f"hafif_tema.py ile {os.path.basename(cikti_pdf)} üretildi ({sayfa} sayfa).",
+                ],
+            )
+            job.bitir(
+                {
+                    "tema_id": tema_id,
+                    "cikti_pdf": cikti_pdf,
+                    "kopya": kopya_yolu_cikti,
+                    "mod": "hafif",
+                    "dogrulama": {"calisti": False, "not": "Hafif tema modunda ayrı doğrulama çalıştırılmaz"},
+                    "rapor_ozet": None,
+                }
+            )
+            return
 
         job.log("extract.py çalıştırılıyor...")
         pipeline.run_extract(pdf_yolu, tema_dir, tema_no, job.log)
@@ -227,6 +320,7 @@ def post_tema(body: YeniTema):
 @router.get("/api/temalar/{tema_id}/bloklar")
 def get_bloklar(tema_id: str):
     tema_dir = tema_dir_by_id(tema_id)
+    _hafif_mod_engelle(tema_dir)
     return {"tema_id": tema_id, "bloklar": blocks.bloklar_listesi(tema_dir)}
 
 
@@ -255,6 +349,7 @@ class ManifestPatch(BaseModel):
 @router.patch("/api/temalar/{tema_id}/manifest")
 def patch_manifest(tema_id: str, body: ManifestPatch):
     tema_dir = tema_dir_by_id(tema_id)
+    _hafif_mod_engelle(tema_dir)
     if tema_id == "01-tema":
         # ID dondurma kuralı yalnızca extract.py yeniden koşumunu yasaklar; sıralama/silme
         # SISTEM.md §2'ye göre serbesttir. Yine de yedek alınır (manifest_patch içinde).
@@ -278,6 +373,7 @@ class YeniBlok(BaseModel):
 @router.post("/api/temalar/{tema_id}/bloklar")
 def post_blok(tema_id: str, body: YeniBlok):
     tema_dir = tema_dir_by_id(tema_id)
+    _hafif_mod_engelle(tema_dir)
     tema_no = tema_id.split("-", 1)[0]
     sonuc = blocks.blok_ekle(tema_dir, tema_no, body.sinif, body.html_govde, body.konum)
     islem_gunlugu_yaz(
@@ -299,6 +395,7 @@ def patch_blok_sinif(tema_id: str, blok_id: str, body: BlokSinifPatch):
     eklenir (idempotent); `img-block`'a çevrilirken kaldırılır. id/data-kaynak-sayfa
     değişmez (SISTEM.md §2 id dondurma kuralı)."""
     tema_dir = tema_dir_by_id(tema_id)
+    _hafif_mod_engelle(tema_dir)
     solve_space = body.sinif == "question"
     sonuc = blocks.blok_sinif_degistir(tema_dir, blok_id, body.sinif, solve_space)
     islem_gunlugu_yaz(
@@ -317,6 +414,7 @@ class UretIstek(BaseModel):
 @router.post("/api/temalar/{tema_id}/uret")
 def post_uret(tema_id: str, body: UretIstek):
     tema_dir = tema_dir_by_id(tema_id)
+    _hafif_mod_engelle(tema_dir)
     meta = tema_meta.oku(tema_dir)
 
     def calistir(job: Job) -> None:

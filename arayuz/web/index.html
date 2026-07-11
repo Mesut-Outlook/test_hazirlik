@@ -181,6 +181,26 @@
         <span class="ipucu">Testi daha sonra listede tanıyabilmeniz için kısa bir ad.</span>
       </div>
 
+      <div class="form-grup">
+        <label>Dönüşüm Modu</label>
+        <div class="mod-secici">
+          <label class="mod-secenegi">
+            <input type="radio" name="donusum-modu" value="agir" checked>
+            <div class="mod-secenegi__govde">
+              <div class="mod-secenegi__baslik">Tam Dönüşüm</div>
+              <div class="mod-secenegi__aciklama">Comic Sans'a çevirir, soruları düzenleyebilirsin (mevcut davranış).</div>
+            </div>
+          </label>
+          <label class="mod-secenegi">
+            <input type="radio" name="donusum-modu" value="hafif">
+            <div class="mod-secenegi__govde">
+              <div class="mod-secenegi__baslik">Hafif Tema</div>
+              <div class="mod-secenegi__aciklama">Sadece üst banner/rozet, filigran ve orijinal sayfa numarasını kaldırır, logomuzu ekler. Metne ve yazı stiline dokunmaz, düzenleme ekranı yok — tek adımda PDF hazır olur.</div>
+            </div>
+          </label>
+        </div>
+      </div>
+
       <div class="form-eylemleri">
         <button class="btn" id="btn-adim1-iptal">Vazgeç</button>
         <button class="btn btn-birincil btn-buyuk" id="btn-adim1-donustur">Dönüştür →</button>
@@ -207,10 +227,10 @@
           <embed id="adim3-pdf-onizleme" type="application/pdf">
         </div>
         <div class="dogrulama-paneli">
-          <h3>Doğrulama Sonucu</h3>
+          <h3 id="adim3-dogrulama-baslik">Doğrulama Sonucu</h3>
           <div class="rozet-listesi" id="adim3-dogrulama-listesi"></div>
           <div class="cikti-klasoru-notu" id="adim3-cikti-notu"></div>
-          <h3 style="margin-top:22px;">Dönüşüm Raporu</h3>
+          <h3 id="adim3-rapor-baslik" style="margin-top:22px;">Dönüşüm Raporu</h3>
           <div id="adim3-rapor-kutusu"></div>
           <div class="form-eylemleri" style="justify-content:flex-start; margin-top:22px;">
             <button class="btn btn-birincil" id="btn-adim3-duzenle">Soruları Düzenle</button>

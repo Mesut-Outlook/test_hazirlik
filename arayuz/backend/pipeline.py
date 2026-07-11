@@ -10,7 +10,7 @@ import os
 import shutil
 import subprocess
 
-from config import ASSEMBLE_PY, DOGRULA_PY, EXTRACT_PY, FLOW_CSS, PRINT_MJS, RAPOR_PY, REPO_ROOT
+from config import ASSEMBLE_PY, DOGRULA_PY, EXTRACT_PY, FLOW_CSS, HAFIF_TEMA_PY, PRINT_MJS, RAPOR_PY, REPO_ROOT
 
 import sys
 
@@ -56,6 +56,14 @@ def docx_to_pdf(kaynak_dosya: str, hedef_dir: str, log) -> str:
 def run_extract(pdf_path: str, tema_dir: str, tema_no: str, log, profil: str = "metin_yayinlari") -> None:
     """sistem/extract.py çağrısı. --tema ve --profil parametreleri ile genelleştirildi."""
     komut = [PY, EXTRACT_PY, "--pdf", pdf_path, "--out", tema_dir, "--tema", tema_no, "--profil", profil]
+    _calistir(komut, log)
+
+
+def run_hafif_tema(pdf_path: str, out_pdf_path: str, log, profil: str = "metin_yayinlari") -> None:
+    """sistem/hafif_tema.py çağrısı — extract.py/assemble.py/print.mjs hattından
+    TAMAMEN bağımsız, TEK ADIMDA kaynak PDF -> çıktı PDF üretir (blok düzenleme
+    YOK). CLI imzası doğrulandı: `hafif_tema.py <kaynak> <cikti> [--profil ad]`."""
+    komut = [PY, HAFIF_TEMA_PY, pdf_path, out_pdf_path, "--profil", profil]
     _calistir(komut, log)
 
 
